@@ -1,0 +1,6 @@
+.metadata
+.settings
+bin
+obj
+*.log
+LibRaw/lib
