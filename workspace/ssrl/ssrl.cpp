@@ -39,7 +39,6 @@ int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage*
 		RawProcessor.imgdata.params.four_color_rgb    = 1;
 	}
 
-	//int ret = RawProcessor.open_buffer(buffer, size);
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
 	if (ret != LIBRAW_SUCCESS)
 	{
@@ -77,7 +76,7 @@ int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage*
 
 int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res)
 {
-	res->data = 0;	// data = 0 means "error during processing"
+	res->thumbnail_data = 0;	// data = 0 means "error during processing"
 
 	LibRaw RawProcessor;
 
@@ -99,7 +98,7 @@ int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res)
     }
 
     // Extracting the picture
-    res->data = image->data;
+    res->thumbnail_data = image->data;
     res->data_size = image->data_size;
     res->libraw_image = image;
     res->is_jpeg = image->type == LIBRAW_IMAGE_JPEG;

@@ -3,6 +3,7 @@
 	<name>ssrl</name>
 	<comment></comment>
 	<projects>
+		<project>bitmaps</project>
 		<project>LibRaw</project>
 	</projects>
 	<buildSpec>
