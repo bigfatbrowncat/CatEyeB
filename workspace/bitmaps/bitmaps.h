@@ -19,6 +19,15 @@ struct FloatBitmap
 	float* b;
 };
 
+struct Int8Bitmap
+{
+	int width;
+	int height;
+	Int8* r;
+	Int8* g;
+	Int8* b;
+};
+
 struct Int16Bitmap
 {
 	int width;
@@ -40,9 +49,16 @@ extern "C"
 	DllDef Int16Bitmap Int16Bitmap_Copy(Int16Bitmap src);
 	DllDef void Int16Bitmap_Destroy(Int16Bitmap fb);
 
+	// Int8Bitmap management
+	DllDef Int8Bitmap Int8Bitmap_Create(int width, int height);
+	DllDef Int8Bitmap Int8Bitmap_Copy(Int8Bitmap src);
+	DllDef void Int8Bitmap_Destroy(Int8Bitmap fb);
+
 	// Converters
 	DllDef FloatBitmap FloatBitmap_From_Int16Bitmap(FloatBitmap src);
 	DllDef Int16Bitmap Int16Bitmap_From_FloatBitmap(Int16Bitmap src);
+	DllDef FloatBitmap FloatBitmap_From_Int8Bitmap(FloatBitmap src);
+	DllDef Int16Bitmap Int8Bitmap_From_FloatBitmap(Int16Bitmap src);
 }
 
 #endif /* BITMAPS_H_ */

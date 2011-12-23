@@ -1,7 +1,7 @@
 OSTYPE := $(shell uname)
 libraw_path = ../LibRaw/lib/r
-target_bin_R = ../bin/Release
-target_bin_D = ../bin/Debug
+target_bin_R = bin/Release
+target_bin_D = bin/Debug
 
 COMMON_CPPFLAGS = -fopenmp -I"$(PWD)/include" -static-libgcc -static-libstdc++
 

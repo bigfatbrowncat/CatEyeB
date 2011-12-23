@@ -71,6 +71,9 @@ int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage*
 
 	RawProcessor.recycle(); // just for show this call
 
+
+
+
 	return 0;
 }
 
