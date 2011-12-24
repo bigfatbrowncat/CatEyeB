@@ -1,12 +1,17 @@
 package com.bigfatbrowncat.cateye.core.raw;
 
-import java.util.Date;
-
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 public class ExtractedDescription extends Structure
 {
+	public ExtractedDescription(Pointer p)
+	{
+		super();
+		useMemory(p);
+		read();
+	}
+	
 	public Pointer data;
 	public int data_size;	// in bytes
 	public Boolean is_jpeg;

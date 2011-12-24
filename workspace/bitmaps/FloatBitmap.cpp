@@ -32,7 +32,7 @@ void FloatBitmap_Destroy(FloatBitmap fb)
 	delete [] fb.b;
 }
 
-FloatBitmap FloatBitmap_From_Int16Bitmap(FloatBitmap src)
+FloatBitmap FloatBitmap_FromInt16Bitmap(FloatBitmap src)
 {
 	FloatBitmap res = FloatBitmap_Create(src.width, src.height);
 	for (int k = 0; k < src.width * src.height; k++)

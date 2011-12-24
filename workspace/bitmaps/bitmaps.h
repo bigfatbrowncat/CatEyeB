@@ -55,10 +55,10 @@ extern "C"
 	DllDef void Int8Bitmap_Destroy(Int8Bitmap fb);
 
 	// Converters
-	DllDef FloatBitmap FloatBitmap_From_Int16Bitmap(FloatBitmap src);
-	DllDef Int16Bitmap Int16Bitmap_From_FloatBitmap(Int16Bitmap src);
-	DllDef FloatBitmap FloatBitmap_From_Int8Bitmap(FloatBitmap src);
-	DllDef Int16Bitmap Int8Bitmap_From_FloatBitmap(Int16Bitmap src);
+	DllDef FloatBitmap FloatBitmap_FromInt16Bitmap(FloatBitmap src);
+	DllDef Int16Bitmap Int16Bitmap_FromFloatBitmap(Int16Bitmap src);
+	DllDef FloatBitmap FloatBitmap_FromInt8Bitmap(FloatBitmap src);
+	DllDef Int16Bitmap Int8Bitmap_FromFloatBitmap(Int16Bitmap src);
 }
 
 #endif /* BITMAPS_H_ */

@@ -32,7 +32,7 @@ void Int16Bitmap_Destroy(Int16Bitmap ib)
 	delete [] ib.b;
 }
 
-Int16Bitmap Int16Bitmap_From_FloatBitmap(Int16Bitmap src)
+Int16Bitmap Int16Bitmap_FromFloatBitmap(Int16Bitmap src)
 {
 	Int16Bitmap res = Int16Bitmap_Create(src.width, src.height);
 	for (int k = 0; k < src.width * src.height; k++)
