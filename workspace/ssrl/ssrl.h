@@ -3,6 +3,12 @@
 
 using namespace std;
 
+#ifdef WIN32
+# define DllDef  __declspec( dllexport )
+#else
+# define DllDef
+#endif
+
 struct ExtractedRawImage {
 	int width;
 	int height;
@@ -39,9 +45,9 @@ typedef bool ExtractingErrorReporter(int error);
 extern "C"
 {
 	DllDef int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage* res, ExtractingProgressReporter* progress_callback, ExtractingErrorReporter* error_callback);
-	DllDef int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res, ExtractingErrorReporter* error_callback);
+	DllDef int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res);
 	DllDef void FreeExtractedRawImage(ExtractedRawImage img);
-	DllDef void FreeExtractedDescription(ExtractedDescription img);
+	DllDef void FreeExtractedDescription(ExtractedDescription description);
 }
 
 

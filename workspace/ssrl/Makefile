@@ -35,9 +35,9 @@ $(target_bin_D):
 $(target_bin_R):
 	mkdir -p $(target_bin_R)
 
-$(target_bin_D)/$(libssrl_shared): $(target_bin_D)
+$(target_bin_D)/$(libssrl_shared): $(target_bin_D) ssrl.cpp ssrl.h
 	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(libraw_path)/libraw.a $(LIBS)  
 
-$(target_bin_R)/$(libssrl_shared): $(target_bin_R)
+$(target_bin_R)/$(libssrl_shared): $(target_bin_R) ssrl.cpp ssrl.h
 	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(libraw_path)/libraw.a $(LIBS)  
 	

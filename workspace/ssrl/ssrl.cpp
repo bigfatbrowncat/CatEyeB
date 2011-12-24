@@ -81,7 +81,7 @@ int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res)
 {
 	res->thumbnail_data = 0;	// data = 0 means "error during processing"
 
-	LibRaw RawProcessor;
+	LibRaw& RawProcessor = *(new LibRaw());
 
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
 	if (ret != LIBRAW_SUCCESS)
@@ -129,6 +129,7 @@ int ExtractDescriptionFromFile(char* filename, ExtractedDescription* res)
 
 	RawProcessor.recycle(); // just for show this call
 
+	delete &RawProcessor;
 	return 0;
 }
 
@@ -137,10 +138,10 @@ void FreeExtractedRawImage(ExtractedRawImage img)
 	LibRaw::dcraw_clear_mem(img.libraw_image);
 }
 
-void FreeExtractedDescription(ExtractedDescription img)
+void FreeExtractedDescription(ExtractedDescription description)
 {
-	LibRaw::dcraw_clear_mem(img.libraw_image);
-	delete[] img.artist;
-	delete[] img.desc;
-	delete[] img.gpsdata;
+	LibRaw::dcraw_clear_mem(description.libraw_image);
+	delete[] description.artist;
+	delete[] description.desc;
+	delete[] description.gpsdata;
 }
