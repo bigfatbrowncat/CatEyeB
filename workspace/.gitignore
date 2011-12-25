@@ -4,3 +4,5 @@ bin
 obj
 *.log
 LibRaw/lib
+data/test
+jpeg-8c/lib/

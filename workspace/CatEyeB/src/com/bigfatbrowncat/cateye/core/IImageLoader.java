@@ -13,4 +13,9 @@ public interface IImageLoader {
 	 * Loads the image by a specified file name
 	 */
 	Image load(String fileName);
+	
+	/**
+	 * Loads the description of an image
+	 */
+	ImageDescription loadDescription(String fileName);
 }

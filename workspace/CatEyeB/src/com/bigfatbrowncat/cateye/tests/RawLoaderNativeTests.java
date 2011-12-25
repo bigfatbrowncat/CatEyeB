@@ -1,34 +1,35 @@
 package com.bigfatbrowncat.cateye.tests;
+import junit.framework.Assert;
+
 import org.junit.Test;
 
-import com.bigfatbrowncat.cateye.core.raw.ExtractedDescription;
-import com.bigfatbrowncat.cateye.core.raw.RawLoaderNative;
-import com.sun.jna.Pointer;
+import com.bigfatbrowncat.cateye.core.IImageLoader;
+import com.bigfatbrowncat.cateye.core.ImageDescription;
+import com.bigfatbrowncat.cateye.core.raw.RawModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 
 public class RawLoaderNativeTests {
 
 	@Test
 	public void test() {
-		Pointer result = RawLoaderNative.INSTANCE.ExtractedDescription_Create();
-		RawLoaderNative.INSTANCE.ExtractedDescription_LoadFromFile("C:\\Photos to compare\\Part 3\\IMG_1848.CR2", result);		
-		ExtractedDescription ed = new ExtractedDescription(result);
+		Injector injector = Guice.createInjector(new RawModule());
+		IImageLoader loader = injector.getInstance(IImageLoader.class);
 		
-		System.out.println(ed.aperture);
-		System.out.println(ed.artist);
-		System.out.println(ed);
-		System.out.println(ed.camera_model);
-		System.out.println(ed.data_size);
-		System.out.println(ed.desc);
-		System.out.println(ed.flip);
-		System.out.println(ed.focal_len);
-		System.out.println(ed.iso_speed);
-		System.out.println(ed.shot_order);
-		System.out.println(ed.shutter);
-		System.out.println(ed.timestamp);
-		System.out.println(ed.is_jpeg);
+		ImageDescription description = loader.loadDescription("..\\data\\test\\IMG_5196.CR2");
+		Assert.assertEquals(2f, description.getAperture());
+		Assert.assertEquals("", description.getArtist());
+		Assert.assertEquals("Canon", description.getCameraMaker());
+		Assert.assertEquals("EOS 550D", description.getCameraModel());
+		Assert.assertEquals("", description.getDescription());
+		Assert.assertEquals(5, description.getFlip());
+		Assert.assertEquals(50f, description.getFocalLength());
+		Assert.assertEquals(800f, description.getIsoSpeed());
+		Assert.assertEquals(0, description.getShotOrder());
+		Assert.assertEquals(0.012048522f, description.getShutter(), 0.00001f);
+		Assert.assertEquals("Sun Oct 02 19:02:18 MSD 2011", description.getTimestamp().toString());
 		
-		RawLoaderNative.INSTANCE.ExtractedDescription_Destroy(result);
+		description.dispose();
 	}
-
 }
