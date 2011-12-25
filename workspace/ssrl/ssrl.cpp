@@ -1,10 +1,50 @@
-#include <libraw/libraw.h>
 #include <math.h>
 #include <stdio.h>
+#include <libraw/libraw.h>
+
+#include <jpeglib.h>
 
 #include "ssrl.h"
 
 // ** Private functions **
+
+void decode_jpeg(unsigned char* buffer, unsigned long size)
+{
+	struct jpeg_decompress_struct cinfo;
+	struct jpeg_error_mgr jerr;
+	char *image;
+
+	/*Initialize, open the JPEG and query the parameters */
+	cinfo.err = jpeg_std_error(&jerr);
+	jpeg_create_decompress(&cinfo);
+
+	//jpeg_stdio_src(&cinfo, stdin);
+	jpeg_mem_src(&cinfo, buffer, size);
+
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	/* allocate data and read the image as RGBRGBRGBRGB */
+	image = (char*)malloc(cinfo.output_width * cinfo.output_height * cinfo.num_components);
+	for(int i = 0; i < cinfo.output_height; i++)
+	{
+		char *ptr = image + i * 3 * cinfo.output_width;
+		jpeg_read_scanlines(&cinfo, &ptr, 1);
+	}
+
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+
+	/*Write a PPM */
+	FILE* file = fopen("c:\\test.ppm", "wb");
+
+	fprintf(file, "P6\n%i %i 255\n", cinfo.output_width, cinfo.output_height);
+	fwrite(image, 1, cinfo.output_width * cinfo.output_height * cinfo.num_components, file);
+
+	fclose(file);
+
+	free(image);
+}
 
 int internal_callback(void *d, enum LibRaw_progress p, int iteration, int expected)
 {
@@ -71,9 +111,6 @@ int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage*
 
 	RawProcessor.recycle(); // just for show this call
 
-
-
-
 	return 0;
 }
 
@@ -82,10 +119,14 @@ void ExtractedRawImage_Destroy(ExtractedRawImage* img)
 	LibRaw::dcraw_clear_mem(img->libraw_image);
 }
 
+ExtractedDescription* ExtractedDescription_Create()
+{
+	ExtractedDescription* res = new ExtractedDescription();
+	return res;
+}
+
 int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
 {
-	res->thumbnail_data = 0;	// data = 0 means "error during processing"
-
 	LibRaw& RawProcessor = *(new LibRaw());
 
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
@@ -106,10 +147,20 @@ int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
     }
 
     // Extracting the picture
-    res->thumbnail_data = image->data;
+
+    res->thumbnail = NULL;
+
+    if (image->type == LIBRAW_IMAGE_JPEG)
+    {
+    	decode_jpeg(image->data, image->data_size);
+    }
+
+    /*res->thumbnail_data = image->data;
     res->data_size = image->data_size;
     res->libraw_image = image;
     res->is_jpeg = image->type == LIBRAW_IMAGE_JPEG;
+    */
+
     res->flip = RawProcessor.imgdata.sizes.flip;	// 0 - no rotation; 3 - 180-deg rotation; 5 - 90-deg counterclockwise, 6 - 90-deg clockwise
 
     // Extracting the main data
@@ -124,7 +175,6 @@ int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
     res->shot_order = RawProcessor.imgdata.other.shot_order;
     res->timestamp = RawProcessor.imgdata.other.timestamp;
 
-
     res->artist = new char[64];
     strcpy(res->artist, RawProcessor.imgdata.other.artist);
     res->desc = new char[512];
@@ -132,22 +182,17 @@ int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
     res->gpsdata = new unsigned[32];
     memcpy(res->gpsdata, RawProcessor.imgdata.other.gpsdata, 32 * sizeof(unsigned int));
 
+
 	RawProcessor.recycle(); // just for show this call
 
+	LibRaw::dcraw_clear_mem(image);
 	delete &RawProcessor;
 
 	return 0;
 }
 
-ExtractedDescription* ExtractedDescription_Create()
-{
-	ExtractedDescription* res = new ExtractedDescription();
-	return res;
-}
-
 void ExtractedDescription_Destroy(ExtractedDescription* description)
 {
-	LibRaw::dcraw_clear_mem(description->libraw_image);
 	delete[] description->artist;
 	delete[] description->desc;
 	delete[] description->gpsdata;

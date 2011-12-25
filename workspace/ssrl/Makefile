@@ -1,9 +1,10 @@
 OSTYPE := $(shell uname)
 libraw_path = ../LibRaw/lib/r
+libjpeg_path = ../jpeg-8c/lib
 target_bin_R = bin/Release
 target_bin_D = bin/Debug
 
-COMMON_CPPFLAGS = -fopenmp -I"$(PWD)/include" -static-libgcc -static-libstdc++
+COMMON_CPPFLAGS = -fopenmp -I"$(PWD)/include" -I"$(PWD)/include/jpeg-8c" -static-libgcc -static-libstdc++
 
 R_FLAGS = -O4
 D_FLAGS = -O0 -g3
@@ -36,8 +37,8 @@ $(target_bin_R):
 	mkdir -p $(target_bin_R)
 
 $(target_bin_D)/$(libssrl_shared): $(target_bin_D) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(libraw_path)/libraw.a $(LIBS)  
+	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(LIBS)  
 
 $(target_bin_R)/$(libssrl_shared): $(target_bin_R) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(libraw_path)/libraw.a $(LIBS)  
+	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(LIBS)  
 	

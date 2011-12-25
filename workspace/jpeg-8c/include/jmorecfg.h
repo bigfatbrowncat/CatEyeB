@@ -130,43 +130,51 @@ typedef char JOCTET;
  * typedefs live at a different point on the speed/space tradeoff curve.)
  */
 
+
 /* UINT8 must hold at least the values 0..255. */
 
-#ifdef HAVE_UNSIGNED_CHAR
 typedef unsigned char UINT8;
-#else /* not HAVE_UNSIGNED_CHAR */
-#ifdef CHAR_IS_UNSIGNED
-typedef char UINT8;
-#else /* not CHAR_IS_UNSIGNED */
-typedef short UINT8;
-#endif /* CHAR_IS_UNSIGNED */
-#endif /* HAVE_UNSIGNED_CHAR */
+typedef unsigned short UINT16;
+typedef unsigned int UINT32;
+
+typedef signed short INT16;
+typedef signed int INT32;
+
+//#ifdef HAVE_UNSIGNED_CHAR
+//typedef unsigned char UINT8;
+//#else /* not HAVE_UNSIGNED_CHAR */
+//#ifdef CHAR_IS_UNSIGNED
+//typedef char UINT8;
+//#else /* not CHAR_IS_UNSIGNED */
+//typedef short UINT8;
+//#endif /* CHAR_IS_UNSIGNED */
+//#endif /* HAVE_UNSIGNED_CHAR */
 
 /* UINT16 must hold at least the values 0..65535. */
 
-#ifdef HAVE_UNSIGNED_SHORT
-typedef unsigned short UINT16;
-#else /* not HAVE_UNSIGNED_SHORT */
-typedef unsigned int UINT16;
-#endif /* HAVE_UNSIGNED_SHORT */
+//#ifdef HAVE_UNSIGNED_SHORT
+//typedef unsigned short UINT16;
+//#else /* not HAVE_UNSIGNED_SHORT */
+//typedef unsigned int UINT16;
+//#endif /* HAVE_UNSIGNED_SHORT */
 
 /* INT16 must hold at least the values -32768..32767. */
 
-#ifndef XMD_H			/* X11/xmd.h correctly defines INT16 */
-typedef short INT16;
-#endif
+//#ifndef XMD_H			/* X11/xmd.h correctly defines INT16 */
+//typedef short INT16;
+//#endif
 
 /* INT32 must hold at least signed 32-bit values. */
 
-#ifndef XMD_H			/* X11/xmd.h correctly defines INT32 */
-#ifndef _BASETSD_H_		/* Microsoft defines it in basetsd.h */
-#ifndef _BASETSD_H		/* MinGW is slightly different */
-#ifndef QGLOBAL_H		/* Qt defines it in qglobal.h */
-typedef long INT32;
-#endif
-#endif
-#endif
-#endif
+//#ifndef XMD_H			/* X11/xmd.h correctly defines INT32 */
+//#ifndef _BASETSD_H_		/* Microsoft defines it in basetsd.h */
+//#ifndef _BASETSD_H		/* MinGW is slightly different */
+//#ifndef QGLOBAL_H		/* Qt defines it in qglobal.h */
+//typedef long INT32;
+//#endif
+//#endif
+//#endif
+//#endif
 
 /* Datatype used for image dimensions.  The JPEG standard only supports
  * images up to 64K*64K due to 16-bit fields in SOF markers.  Therefore

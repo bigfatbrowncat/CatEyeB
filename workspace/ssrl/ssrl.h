@@ -1,6 +1,8 @@
 #ifndef SSRL_H_
 #define SSRL_H_
 
+#include "include/bitmaps/bitmaps.h"
+
 using namespace std;
 
 #undef DllDef
@@ -20,9 +22,7 @@ struct ExtractedRawImage {
 
 struct ExtractedDescription
 {
-	void* thumbnail_data;
-	int data_size;	// in bytes
-	bool is_jpeg;
+	Int8Bitmap* thumbnail;
 
 	float       iso_speed;
     float       shutter;
@@ -36,8 +36,6 @@ struct ExtractedDescription
     char*       camera_maker;
     char*       camera_model;
     int         flip;
-
-	libraw_processed_image_t* libraw_image;
 };
 
 typedef bool ExtractingProgressReporter(float progress);
