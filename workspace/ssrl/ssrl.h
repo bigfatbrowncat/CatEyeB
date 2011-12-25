@@ -1,9 +1,9 @@
 #ifndef SSRL_H_
 #define SSRL_H_
 
-#include "include/bitmaps/bitmaps.h"
+#include <bitmaps.h>
 
-using namespace std;
+//using namespace std;
 
 #undef DllDef
 #ifdef WIN32
@@ -22,7 +22,7 @@ struct ExtractedRawImage {
 
 struct ExtractedDescription
 {
-	Int8Bitmap* thumbnail;
+	Int8Bitmap  thumbnail;
 
 	float       iso_speed;
     float       shutter;

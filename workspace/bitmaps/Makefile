@@ -72,8 +72,8 @@ $(OBJECT_PATH_R)/Int8Bitmap.o: $(SRC_PATH)/Int8Bitmap.cpp $(SRC_PATH)/bitmaps.h 
 ################### Targets ###################
 
 $(target_bin_D)/$(libbitmaps_shared): $(OBJECT_FILES_D) $(target_bin_D)
-	g++ -shared $(OBJECT_FILES_D) -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(LIBS)  
+	g++ -shared $(OBJECT_FILES_D) -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(LIBS) -Wl,--out-implib=$@.a
 
 $(target_bin_R)/$(libbitmaps_shared): $(OBJECT_FILES_R) $(target_bin_R)
-	g++ -shared $(OBJECT_FILES_R) -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(LIBS)  
+	g++ -shared $(OBJECT_FILES_R) -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(LIBS) -Wl,--out-implib=$@.a # -Wl,--export-all-symbols
 	

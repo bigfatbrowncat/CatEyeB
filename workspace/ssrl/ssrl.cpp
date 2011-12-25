@@ -1,14 +1,15 @@
 #include <math.h>
 #include <stdio.h>
-#include <libraw/libraw.h>
 
+#include <bitmaps.h>
+#include <libraw.h>
 #include <jpeglib.h>
 
 #include "ssrl.h"
 
 // ** Private functions **
 
-void decode_jpeg(unsigned char* buffer, unsigned long size)
+Int8Bitmap decode_jpeg(unsigned char* buffer, unsigned long size)
 {
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
@@ -18,7 +19,6 @@ void decode_jpeg(unsigned char* buffer, unsigned long size)
 	cinfo.err = jpeg_std_error(&jerr);
 	jpeg_create_decompress(&cinfo);
 
-	//jpeg_stdio_src(&cinfo, stdin);
 	jpeg_mem_src(&cinfo, buffer, size);
 
 	jpeg_read_header(&cinfo, TRUE);
@@ -35,15 +35,25 @@ void decode_jpeg(unsigned char* buffer, unsigned long size)
 	jpeg_finish_decompress(&cinfo);
 	jpeg_destroy_decompress(&cinfo);
 
-	/*Write a PPM */
+	// Decompositing
+	Int8Bitmap res = Int8Bitmap_Create(cinfo.output_width, cinfo.output_height);
+	for (int i = 0; i < cinfo.output_width * cinfo.output_height; i++)
+	{
+		res.r[i] = image[3 * i];
+		res.g[i] = image[3 * i + 1];
+		res.b[i] = image[3 * i + 2];
+	}
+
+	/*
 	FILE* file = fopen("c:\\test.ppm", "wb");
 
 	fprintf(file, "P6\n%i %i 255\n", cinfo.output_width, cinfo.output_height);
 	fwrite(image, 1, cinfo.output_width * cinfo.output_height * cinfo.num_components, file);
 
 	fclose(file);
-
+	*/
 	free(image);
+	return res;
 }
 
 int internal_callback(void *d, enum LibRaw_progress p, int iteration, int expected)
@@ -148,11 +158,13 @@ int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
 
     // Extracting the picture
 
-    res->thumbnail = NULL;
-
     if (image->type == LIBRAW_IMAGE_JPEG)
     {
-    	decode_jpeg(image->data, image->data_size);
+    	Int8Bitmap decoded = decode_jpeg(image->data, image->data_size);
+    }
+    else
+    {
+    	throw 1;		// Unsupported yet
     }
 
     /*res->thumbnail_data = image->data;
@@ -196,5 +208,6 @@ void ExtractedDescription_Destroy(ExtractedDescription* description)
 	delete[] description->artist;
 	delete[] description->desc;
 	delete[] description->gpsdata;
+	Int8Bitmap_Destroy(description->thumbnail);
 	delete description;
 }

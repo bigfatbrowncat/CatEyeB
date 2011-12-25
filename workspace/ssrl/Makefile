@@ -1,10 +1,12 @@
 OSTYPE := $(shell uname)
 libraw_path = ../LibRaw/lib/r
 libjpeg_path = ../jpeg-8c/lib
+libbitmap_path = ../bitmaps/bin/Release
 target_bin_R = bin/Release
 target_bin_D = bin/Debug
 
-COMMON_CPPFLAGS = -fopenmp -I"$(PWD)/include" -I"$(PWD)/include/jpeg-8c" -static-libgcc -static-libstdc++
+COMMON_CPPFLAGS = -fopenmp -static-libgcc -static-libstdc++
+INCLUDES = -I"$(PWD)/include/libraw" -I"$(PWD)/include/jpeg-8c" -I"$(PWD)/include/bitmaps"
 
 R_FLAGS = -O4
 D_FLAGS = -O0 -g3
@@ -37,8 +39,8 @@ $(target_bin_R):
 	mkdir -p $(target_bin_R)
 
 $(target_bin_D)/$(libssrl_shared): $(target_bin_D) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(LIBS)  
+	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)  
 
 $(target_bin_R)/$(libssrl_shared): $(target_bin_R) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(R_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(LIBS)  
+	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(R_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)
 	
