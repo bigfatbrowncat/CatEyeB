@@ -1,14 +1,17 @@
 OSTYPE := $(shell uname)
-COMMON_CPPFLAGS = -static-libgcc -static-libstdc++
-SRC_PATH = .
+COMMON_CFLAGS = -static-libgcc
+COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
-# TODO: should be an outer variable
 BUILD_CONF = Release
+CPPFLAGS = -O3
 
-FLAGS = -O4				# TODO: should be an outer variable
+CC = gcc $(COMMON_CFLAGS) $(CFLAGS)
+CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS)
+
 LIBS = 
-# for debug use:  FLAGS = -O0 -g3
+INCLUDES = $(SOURCE)/bitmaps.h
 
+SOURCE = .
 TARGET = ../target/$(BUILD_CONF)
 
 TARGET_BIN = $(TARGET)/bin
@@ -42,16 +45,13 @@ $(TARGET_LIB):
 
 ################### Objects ###################
 
-# Release
+$(TARGET_OBJ)/PreciseBitmap.o: $(SOURCE)/PreciseBitmap.cpp $(INCLUDES) $(TARGET_OBJ)
+	$(CPP) -c $(SOURCE)/PreciseBitmap.cpp -o $@
 
-$(TARGET_OBJ)/PreciseBitmap.o: $(SRC_PATH)/PreciseBitmap.cpp $(SRC_PATH)/bitmaps.h $(TARGET_OBJ)
-	g++ -c $(SRC_PATH)/PreciseBitmap.cpp -o $@ $(COMMON_CPPFLAGS) $(FLAGS)
-
-$(TARGET_OBJ)/PreviewBitmap.o: $(SRC_PATH)/PreviewBitmap.cpp $(SRC_PATH)/bitmaps.h $(TARGET_OBJ)
-	g++ -c $(SRC_PATH)/PreviewBitmap.cpp -o $@ $(COMMON_CPPFLAGS) $(FLAGS)
+$(TARGET_OBJ)/PreviewBitmap.o: $(SOURCE)/PreviewBitmap.cpp $(INCLUDES) $(TARGET_OBJ)
+	$(CPP) -c $(SOURCE)/PreviewBitmap.cpp -o $@
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES) $(TARGET_BIN)
-	g++ -shared $(OBJECT_FILES) -o $@ $(COMMON_CPPFLAGS) $(FLAGS) -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
-	
+$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES) $(TARGET_BIN) $(TARGET_LIB)
+	$(CPP) -shared $(OBJECT_FILES) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a

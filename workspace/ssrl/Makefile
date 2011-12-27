@@ -38,8 +38,8 @@ $(target_bin_D):
 $(target_bin_R):
 	mkdir -p $(target_bin_R)
 
-$(target_bin_D)/$(libssrl_shared): $(target_bin_D) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)  
+$(target_bin_D)/$(libssrl_shared): $(target_bin_D) $(SOURCE)/ssrl.cpp $(SOURCE)/ssrl.h
+	g++ -shared $(SOURCE)/ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)  
 
 $(target_bin_R)/$(libssrl_shared): $(target_bin_R) ssrl.cpp ssrl.h
 	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(R_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)
