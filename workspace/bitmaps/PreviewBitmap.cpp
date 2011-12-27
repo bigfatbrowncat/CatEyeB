@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-Int8Bitmap Int8Bitmap_Create(int width, int height)
+PreviewBitmap PreviewBitmap_Create(int width, int height)
 {
-	Int8Bitmap res;
+	PreviewBitmap res;
 	res.width = width;
 	res.height = height;
 
@@ -15,9 +15,9 @@ Int8Bitmap Int8Bitmap_Create(int width, int height)
 	return res;
 }
 
-Int8Bitmap Int8Bitmap_Copy(Int8Bitmap src)
+PreviewBitmap PreviewBitmap_Copy(PreviewBitmap src)
 {
-	Int8Bitmap res = Int8Bitmap_Create(src.width, src.height);
+	PreviewBitmap res = PreviewBitmap_Create(src.width, src.height);
 	memcpy(res.r, src.r, src.width * src.height * sizeof(Int8));
 	memcpy(res.g, src.g, src.width * src.height * sizeof(Int8));
 	memcpy(res.b, src.b, src.width * src.height * sizeof(Int8));
@@ -25,16 +25,16 @@ Int8Bitmap Int8Bitmap_Copy(Int8Bitmap src)
 	return res;
 }
 
-void Int8Bitmap_Destroy(Int8Bitmap ib)
+void PreviewBitmap_Destroy(PreviewBitmap ib)
 {
 	delete [] ib.r;
 	delete [] ib.g;
 	delete [] ib.b;
 }
 
-Int8Bitmap Int8Bitmap_From_FloatBitmap(Int8Bitmap src)
+PreviewBitmap PreviewBitmap_From_FloatBitmap(PreviewBitmap src)
 {
-	Int8Bitmap res = Int8Bitmap_Create(src.width, src.height);
+	PreviewBitmap res = PreviewBitmap_Create(src.width, src.height);
 	for (int k = 0; k < src.width * src.height; k++)
 	{
 		res.r[k] = (Int8)(src.r[k] * 255);

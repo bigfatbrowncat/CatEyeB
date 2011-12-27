@@ -2,9 +2,9 @@
 
 #include <string.h>
 
-FloatBitmap FloatBitmap_Create(int width, int height)
+PreciseBitmap PreciseBitmap_Create(int width, int height)
 {
-	FloatBitmap res;
+	PreciseBitmap res;
 	res.width = width;
 	res.height = height;
 
@@ -15,9 +15,9 @@ FloatBitmap FloatBitmap_Create(int width, int height)
 	return res;
 }
 
-FloatBitmap FloatBitmap_Copy(FloatBitmap src)
+PreciseBitmap PreciseBitmap_Copy(PreciseBitmap src)
 {
-	FloatBitmap res = FloatBitmap_Create(src.width, src.height);
+	PreciseBitmap res = PreciseBitmap_Create(src.width, src.height);
 	memcpy(res.r, src.r, src.width * src.height * sizeof(float));
 	memcpy(res.g, src.g, src.width * src.height * sizeof(float));
 	memcpy(res.b, src.b, src.width * src.height * sizeof(float));
@@ -25,16 +25,16 @@ FloatBitmap FloatBitmap_Copy(FloatBitmap src)
 	return res;
 }
 
-void FloatBitmap_Destroy(FloatBitmap fb)
+void PreciseBitmap_Destroy(PreciseBitmap fb)
 {
 	delete [] fb.r;
 	delete [] fb.g;
 	delete [] fb.b;
 }
 
-FloatBitmap FloatBitmap_FromInt16Bitmap(FloatBitmap src)
+PreciseBitmap PreciseBitmap_FromInt16Bitmap(PreciseBitmap src)
 {
-	FloatBitmap res = FloatBitmap_Create(src.width, src.height);
+	PreciseBitmap res = PreciseBitmap_Create(src.width, src.height);
 	for (int k = 0; k < src.width * src.height; k++)
 	{
 		res.r[k] = (float)(src.r[k]) / 65535;

@@ -2,9 +2,8 @@
 #define BITMAPS_H_
 
 typedef unsigned char Int8;
-typedef unsigned short Int16;
 
-struct FloatBitmap
+struct PreciseBitmap
 {
 	int width;
 	int height;
@@ -13,7 +12,7 @@ struct FloatBitmap
 	float* b;
 };
 
-struct Int8Bitmap
+struct PreviewBitmap
 {
 	int width;
 	int height;
@@ -22,37 +21,17 @@ struct Int8Bitmap
 	Int8* b;
 };
 
-struct Int16Bitmap
-{
-	int width;
-	int height;
-	Int16* r;
-	Int16* g;
-	Int16* b;
-};
+// PreciseBitmap management
+PreciseBitmap PreciseBitmap_Create(int width, int height);
+PreciseBitmap PreciseBitmap_Copy(PreciseBitmap src);
+void PreciseBitmap_Destroy(PreciseBitmap fb);
 
-extern "C"
-{
-	// FloatBitmap management
-	FloatBitmap FloatBitmap_Create(int width, int height);
-	FloatBitmap FloatBitmap_Copy(FloatBitmap src);
-	void FloatBitmap_Destroy(FloatBitmap fb);
+// PreviewBitmap management
+PreviewBitmap PreviewBitmap_Create(int width, int height);
+PreviewBitmap PreviewBitmap_Copy(PreviewBitmap src);
+void PreviewBitmap_Destroy(PreviewBitmap fb);
 
-	// Int16Bitmap management
-	Int16Bitmap Int16Bitmap_Create(int width, int height);
-	Int16Bitmap Int16Bitmap_Copy(Int16Bitmap src);
-	void Int16Bitmap_Destroy(Int16Bitmap fb);
-
-	// Int8Bitmap management
-	Int8Bitmap Int8Bitmap_Create(int width, int height);
-	Int8Bitmap Int8Bitmap_Copy(Int8Bitmap src);
-	void Int8Bitmap_Destroy(Int8Bitmap fb);
-
-	// Converters
-	FloatBitmap FloatBitmap_FromInt16Bitmap(FloatBitmap src);
-	Int16Bitmap Int16Bitmap_FromFloatBitmap(Int16Bitmap src);
-	FloatBitmap FloatBitmap_FromInt8Bitmap(FloatBitmap src);
-	Int16Bitmap Int8Bitmap_FromFloatBitmap(Int16Bitmap src);
-}
+// Converters
+PreviewBitmap PreviewBitmap_FromPreciseBitmap(PreviewBitmap src);
 
 #endif /* BITMAPS_H_ */
