@@ -1,4 +1,4 @@
-package com.bigfatbrowncat.cateye.core.raw;
+package com.bigfatbrowncat.cateye.core.native_;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;

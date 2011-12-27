@@ -1,13 +1,12 @@
-package com.bigfatbrowncat.cateye.core.raw;
+package com.bigfatbrowncat.cateye.core.native_;
 
 import java.util.Date;
 
 import com.bigfatbrowncat.cateye.core.ImageDescription;
-import com.bigfatbrowncat.cateye.core.raw.IBitmapsLibraryNative.Int8Bitmap;
-import com.bigfatbrowncat.cateye.core.raw.IRawLoaderNative.RawImageDescriptionNative;
+import com.bigfatbrowncat.cateye.core.ThumbnailBitmap;
 
 class RawImageDescription extends ImageDescription {
-	protected Int8Bitmap thumbnail;
+	protected ThumbnailBitmap thumbnail;
 
 	protected float isoSpeed;
 	protected float shutter;
@@ -20,12 +19,6 @@ class RawImageDescription extends ImageDescription {
 	protected String cameraMaker;
 	protected String cameraModel;
 	protected int flip;
-
-	private final IBitmapsLibraryNative bitmapsLibrary;
-
-	public RawImageDescription(IBitmapsLibraryNative bitmapsLibrary) {
-		this.bitmapsLibrary = bitmapsLibrary;
-	}
 
 	public void loadFromNative(RawImageDescriptionNative description) {
 		this.isoSpeed = description.iso_speed;
@@ -41,14 +34,14 @@ class RawImageDescription extends ImageDescription {
 		this.flip = description.flip;
 
 		if (description.thumbnail != null) {
-			this.thumbnail = bitmapsLibrary.Int8Bitmap_Copy(description.thumbnail);
+			this.thumbnail = new RawThumbnailImage(description.thumbnail);
 		}
 	}
 
 	/**
 	 * @return the thumbnail
 	 */
-	public Int8Bitmap getThumbnail() {
+	public ThumbnailBitmap getThumbnail() {
 		return thumbnail;
 	}
 
@@ -132,7 +125,7 @@ class RawImageDescription extends ImageDescription {
 	@Override
 	public void dispose() {
 		if (thumbnail != null) {
-			bitmapsLibrary.Int8Bitmap_Destroy(thumbnail);
+			thumbnail.dispose();
 		}
 	}
 }

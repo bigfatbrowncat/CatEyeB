@@ -1,14 +1,11 @@
 package com.bigfatbrowncat.cateye.core;
 import java.util.Date;
 
-import com.bigfatbrowncat.cateye.core.raw.IBitmapsLibraryNative;
-
 public abstract class ImageDescription {
 	/**
 	 * @return the thumbnail
 	 */
-	// TODO: Yeah, I know it's weird. We have to replace Int8Bitmap onto the more appropriate class
-	public abstract IBitmapsLibraryNative.Int8Bitmap getThumbnail();
+	public abstract ThumbnailBitmap getThumbnail();
 
 	/**
 	 * @return the iso speed
