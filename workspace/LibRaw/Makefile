@@ -32,9 +32,9 @@ OBJECT_FILES = dcraw_common.o \
                libraw_c_api.o
 
 PRIVATE_HEADER_FILES = defines.h libraw_bytebuffer.h var_defines.h \
-                       libraw_internal_funcs.h libraw_internal.h
+                       libraw_internal_funcs.h 
 PUBLIC_HEADER_FILES = libraw_alloc.h libraw_const.h \
-                      libraw_datastream.h \
+                      libraw_datastream.h libraw_internal.h \
                       libraw_types.h libraw_version.h libraw.h
 
 OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))

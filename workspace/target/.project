@@ -6,7 +6,7 @@
 		<project>bitmaps</project>
 		<project>CatEyeB</project>
 		<project>jpeg-8c</project>
-		<project>LibRaw</project>
+		<project>libraw</project>
 		<project>ssrl</project>
 	</projects>
 	<buildSpec>

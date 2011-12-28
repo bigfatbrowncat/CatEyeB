@@ -34,7 +34,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LibRaw/internal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LibRaw/libraw}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1532867806" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1532867806" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="LIBRAW_LIBRARY_BUILD"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1894621703" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -44,7 +44,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LibRaw/internal}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/LibRaw/libraw}&quot;"/>
 								</option>
-								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1767039213" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1767039213" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="LIBRAW_LIBRARY_BUILD"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1857578242" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>

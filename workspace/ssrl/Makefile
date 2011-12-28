@@ -10,7 +10,7 @@ CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS)
 
 LIBS = $(TARGET)/lib/raw.a $(TARGET)/lib/jpeg8c.dll.a $(TARGET)/lib/bitmaps.dll.a
 
-INCLUDES = -I"include/libraw" -I"include/jpeg-8c" -I"include/bitmaps"
+INCLUDES = -I"../libraw/libraw" -I"../jpeg-8c/include" -I"../bitmaps/include"
 
 SOURCE = src
 HEADERS = include

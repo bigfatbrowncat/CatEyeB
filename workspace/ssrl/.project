@@ -5,7 +5,7 @@
 	<projects>
 		<project>bitmaps</project>
 		<project>jpeg-8c</project>
-		<project>LibRaw</project>
+		<project>libraw</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

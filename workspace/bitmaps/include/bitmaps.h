@@ -2,9 +2,13 @@
 #define BITMAPS_H_
 
 #ifdef WIN32
-#define DllDef __declspec(dllexport)
+	#ifdef BUILDING_LIBBITMAP
+		#define LIBBITMAP __declspec(dllexport)
+	#else
+		#define LIBBITMAP __declspec(dllimport)
+	#endif
 #else
-#define DllDef
+	#define LIBBITMAP
 #endif
 
 typedef unsigned char Int8;
@@ -30,17 +34,17 @@ struct PreviewBitmap
 extern "C"
 {
 	// PreciseBitmap management
-	DllDef PreciseBitmap PreciseBitmap_Create(int width, int height);
-	DllDef PreciseBitmap PreciseBitmap_Copy(PreciseBitmap src);
-	DllDef void PreciseBitmap_Destroy(PreciseBitmap fb);
+	LIBBITMAP PreciseBitmap PreciseBitmap_Create(int width, int height);
+	LIBBITMAP PreciseBitmap PreciseBitmap_Copy(PreciseBitmap src);
+	LIBBITMAP void PreciseBitmap_Destroy(PreciseBitmap fb);
 
 	// PreviewBitmap management
-	DllDef PreviewBitmap PreviewBitmap_Create(int width, int height);
-	DllDef PreviewBitmap PreviewBitmap_Copy(PreviewBitmap src);
-	DllDef void PreviewBitmap_Destroy(PreviewBitmap fb);
+	LIBBITMAP PreviewBitmap PreviewBitmap_Create(int width, int height);
+	LIBBITMAP PreviewBitmap PreviewBitmap_Copy(PreviewBitmap src);
+	LIBBITMAP void PreviewBitmap_Destroy(PreviewBitmap fb);
 
 	// Converters
-	DllDef PreviewBitmap PreviewBitmap_FromPreciseBitmap(PreviewBitmap src);
+	LIBBITMAP PreviewBitmap PreviewBitmap_FromPreciseBitmap(PreviewBitmap src);
 }
 
 #endif /* BITMAPS_H_ */

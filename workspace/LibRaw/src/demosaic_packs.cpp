@@ -26,7 +26,6 @@ it under the terms of the one of three licenses as you choose:
 #define CLASS LibRaw::
 
 #include "libraw_types.h"
-#define LIBRAW_LIBRARY_BUILD
 #define LIBRAW_IO_REDEFINED
 #include "libraw.h"
 #include "defines.h"

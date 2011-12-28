@@ -1,4 +1,3 @@
-#define LIBRAW_LIBRARY_BUILD
 #include "libraw.h"
 #include "defines.h"
 #include "libraw_datastream.h"
