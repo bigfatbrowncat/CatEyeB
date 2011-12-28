@@ -37,6 +37,7 @@ extern "C"
 	LIBBITMAP PreciseBitmap PreciseBitmap_Create(int width, int height);
 	LIBBITMAP PreciseBitmap PreciseBitmap_Copy(PreciseBitmap src);
 	LIBBITMAP void PreciseBitmap_Destroy(PreciseBitmap fb);
+	LIBBITMAP PreciseBitmap PreciseBitmap_Empty();
 
 	// PreviewBitmap management
 	LIBBITMAP PreviewBitmap PreviewBitmap_Create(int width, int height);

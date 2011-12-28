@@ -3,22 +3,12 @@
 
 #include <bitmaps.h>
 
-//using namespace std;
-
 #undef DllDef
 #ifdef WIN32
 # define DllDef  __declspec( dllexport )
 #else
 # define DllDef
 #endif
-
-struct ExtractedRawImage {
-	int width;
-	int height;
-	int bitsPerChannel;
-	void* data;
-	libraw_processed_image_t* libraw_image;
-};
 
 struct ExtractedDescription
 {
@@ -38,18 +28,25 @@ struct ExtractedDescription
     int         flip;
 };
 
+// Values for "code" parameter of ExtractingResultReporter
+#define EXTRACTING_RESULT_OK						0
+#define EXTRACTING_RESULT_UNSUFFICIENT_MEMORY		1
+#define EXTRACTING_RESULT_DATA_ERROR				2
+#define EXTRACTING_RESULT_IO_ERROR					3
+#define EXTRACTING_RESULT_CANCELLED_BY_CALLBACK		4
+#define EXTRACTING_RESULT_BAD_CROP					5
+#define EXTRACTING_RESULT_UNSUPPORTED_FORMAT		6
+#define EXTRACTING_RESULT_UNKNOWN					100
+
 typedef bool ExtractingProgressReporter(float progress);
-typedef bool ExtractingResultReporter(int code);
+typedef void ExtractingResultReporter(int code, PreciseBitmap res);
 
 extern "C"
 {
-	DllDef int ExtractedRawImage_LoadFromFile(char* filename,
-			bool divide_by_2,
-			ExtractedRawImage* res,
-			ExtractingProgressReporter* progress_reporter,
-			ExtractingResultReporter* result_reporter);
-
-	DllDef void ExtractedRawImage_Destroy(ExtractedRawImage* img);
+	DllDef void ExtractedRawImage_LoadFromFile(char* filename,
+				bool divide_by_2,
+				ExtractingProgressReporter* progress_reporter,
+				ExtractingResultReporter* result_reporter);
 
 	DllDef ExtractedDescription* ExtractedDescription_Create();
 	DllDef int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res);

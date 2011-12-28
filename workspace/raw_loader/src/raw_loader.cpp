@@ -5,7 +5,7 @@
 #include <libraw.h>
 #include <jpeglib.h>
 
-#include "ssrl.h"
+#include "raw_loader.h"
 
 // ** Private functions **
 
@@ -37,6 +37,8 @@ PreviewBitmap decode_jpeg(unsigned char* buffer, unsigned long size)
 
 	// Decompositing
 	PreviewBitmap res = PreviewBitmap_Create(cinfo.output_width, cinfo.output_height);
+	res.width = cinfo.output_width;
+	res.height = cinfo.output_height;
 	for (int i = 0; i < cinfo.output_width * cinfo.output_height; i++)
 	{
 		res.r[i] = image[3 * i];
@@ -67,15 +69,39 @@ int internal_callback(void *d, enum LibRaw_progress p, int iteration, int expect
 
 }
 
+int convert_libraw_code(int libraw_code)
+{
+	switch (libraw_code)
+	{
+	case LIBRAW_SUCCESS:
+		return EXTRACTING_RESULT_OK;
+    case LIBRAW_UNSUFFICIENT_MEMORY:
+    	return EXTRACTING_RESULT_UNSUFFICIENT_MEMORY;
+    case LIBRAW_DATA_ERROR:
+    	return EXTRACTING_RESULT_DATA_ERROR;
+    case LIBRAW_IO_ERROR:
+    	return EXTRACTING_RESULT_IO_ERROR;
+    case LIBRAW_CANCELLED_BY_CALLBACK:
+    	return EXTRACTING_RESULT_CANCELLED_BY_CALLBACK;
+    case LIBRAW_BAD_CROP:
+    	return EXTRACTING_RESULT_BAD_CROP;
+    default:
+    	return EXTRACTING_RESULT_UNKNOWN;
+	}
+}
+
 // ** Public functions **
 
-int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage* res, ExtractingProgressReporter* callback)
+void ExtractedRawImage_LoadFromFile(char* filename,
+			bool divide_by_2,
+			ExtractingProgressReporter* progress_reporter,
+			ExtractingResultReporter* result_reporter)
 {
-	res->data = 0;	// data = 0 means "error during processing"
+	//res->data = 0;	// data = 0 means "error during processing"
 
 	LibRaw RawProcessor;
 
-	RawProcessor.set_progress_handler(internal_callback,(void*)callback);
+	RawProcessor.set_progress_handler(internal_callback, (void*)progress_reporter);
 
 	RawProcessor.imgdata.params.gamm[0] = RawProcessor.imgdata.params.gamm[1] =
 	                                      RawProcessor.imgdata.params.no_auto_bright = 1;
@@ -90,43 +116,60 @@ int ExtractRawImageFromFile(char* filename, bool divide_by_2, ExtractedRawImage*
 	}
 
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
-	if (ret != LIBRAW_SUCCESS)
+	if (LIBRAW_FATAL_ERROR(ret))
 	{
-		fprintf(stderr,"Cannot open the data buffer: %s\n", libraw_strerror(ret));
-		return 1; // no recycle b/c open_file will recycle itself
+		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		return;
 	}
-	if ((ret = RawProcessor.unpack()) != LIBRAW_SUCCESS)
+	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.unpack()))
 	{
-		fprintf(stderr,"Cannot unpack the data: %s\n", libraw_strerror(ret));
-		return 2;
+		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		return;
 	}
-	if (LIBRAW_SUCCESS != (ret = RawProcessor.dcraw_process()))
+	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.dcraw_process()))
 	{
-		fprintf(stderr,"Cannot do postprocessing on the data: %s\n", libraw_strerror(ret));
-		if(LIBRAW_FATAL_ERROR(ret))
-			return 3;
+		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		return;
 	}
 
     libraw_processed_image_t *image = RawProcessor.dcraw_make_mem_image(&ret);
     if (image == 0)
     {
-    	return 4;
+    	(*result_reporter)(EXTRACTING_RESULT_UNSUFFICIENT_MEMORY, PreciseBitmap_Empty());
+    	return;
     }
 
-    res->bitsPerChannel = image->bits;
-    res->width = image->width;
-    res->height = image->height;
-    res->data = image->data;
-    res->libraw_image = image;
+    PreciseBitmap res = PreciseBitmap_Create(image->width, image->height);
+
+    if (image->bits == 8)
+    {
+    	for (int i = 0; i < res.width * res.height; i++)
+    	{
+    		res.r[i] = ((float)image->data[3 * i]) / 255;
+    		res.g[i] = ((float)image->data[3 * i + 1]) / 255;
+    		res.b[i] = ((float)image->data[3 * i + 2]) / 255;
+    	}
+    }
+    else if (image->bits == 16)
+    {
+    	unsigned short* pus = (unsigned short*)image->data;
+    	for (int i = 0; i < res.width * res.height; i++)
+    	{
+    		res.r[i] = ((float)pus[3 * i]) / 65535;
+    		res.g[i] = ((float)pus[3 * i + 1]) / 65535;
+    		res.b[i] = ((float)pus[3 * i + 2]) / 65535;
+    	}
+    }
+    else
+    {
+    	PreciseBitmap_Destroy(res);
+    	(*result_reporter)(EXTRACTING_RESULT_UNSUPPORTED_FORMAT, PreciseBitmap_Empty());
+    	return;
+    }
 
 	RawProcessor.recycle(); // just for show this call
 
-	return 0;
-}
-
-void ExtractedRawImage_Destroy(ExtractedRawImage* img)
-{
-	LibRaw::dcraw_clear_mem(img->libraw_image);
+	(*result_reporter)(EXTRACTING_RESULT_OK, res);
 }
 
 ExtractedDescription* ExtractedDescription_Create()
@@ -164,7 +207,8 @@ int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res)
     }
     else
     {
-    	throw 1;		// Unsupported yet
+    	// TODO: implement plain bitmap decoding
+    	throw 1;
     }
 
     /*res->thumbnail_data = image->data;

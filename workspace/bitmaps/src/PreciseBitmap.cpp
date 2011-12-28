@@ -2,6 +2,18 @@
 
 #include <string.h>
 
+PreciseBitmap PreciseBitmap_Empty()
+{
+	PreciseBitmap res;
+	res.width = 0;
+	res.height = 0;
+	res.r = new float[0];
+	res.g = new float[0];
+	res.b = new float[0];
+	return res;
+}
+
+
 PreciseBitmap PreciseBitmap_Create(int width, int height)
 {
 	PreciseBitmap res;
