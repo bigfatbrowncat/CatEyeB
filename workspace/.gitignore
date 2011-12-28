@@ -6,3 +6,4 @@ obj
 LibRaw/lib
 data/test
 jpeg-8c/lib/
+target/Release
