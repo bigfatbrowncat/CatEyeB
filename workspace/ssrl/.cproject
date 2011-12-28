@@ -23,7 +23,9 @@
 							<builder buildPath="${workspace_loc:/ssrl/Default}" id="cdt.managedbuild.target.gnu.builder.base.435456023" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.base.1100915490" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.base">
 								<option id="gnu.both.asm.option.include.paths.1446799409" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ssrl/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bitmaps/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libraw/libraw}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.654054479" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -31,12 +33,18 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.676439534" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
 								<option id="gnu.cpp.compiler.option.include.paths.1723261781" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ssrl/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bitmaps/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libraw/libraw}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.430991983" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.base.647533059" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.base">
 								<option id="gnu.c.compiler.option.include.paths.1270283114" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ssrl/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/jpeg-8c/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/bitmaps/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/libraw/libraw}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1184593016" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
