@@ -1,174 +1,89 @@
 OSTYPE := $(shell uname)
+COMMON_CFLAGS = -static-libgcc
+COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++ -fopenmp
 
-COMMON_CPPFLAGS = -fopenmp -I"$(PWD)" -O4 -static-libgcc -static-libstdc++
+BUILD_CONF = Release
+CFLAGS = -O3
+CPPFLAGS = -O3
 
-libraw_a_CPPFLAGS = -DLIBRAW_NOTHREADS $(COMMON_CPPFLAGS)
+DEFINES = -DLIBRAW_LIBRARY_BUILD
 
-libraw_a_OUT = lib/a
-libraw_r_OUT = lib/r
+CC = gcc $(COMMON_CFLAGS) $(CFLAGS) $(THREADFLAG) $(DEFINES)
+CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS) $(THREADFLAG) $(DEFINES)
 
-objects_a_OUT = obj/a
-objects_r_OUT = obj/r
 
-samples_a_OUT = bin/a
-samples_r_OUT = bin/r
+INCLUDES = 
 
-SOURCES = internal/dcraw_common.cpp \
-          internal/dcraw_fileio.cpp \
-          internal/demosaic_packs.cpp \
-          src/libraw_cxx.cpp \
-          src/libraw_datastream.cpp \
-          src/libraw_c_api.cpp
+SOURCE = src
+PUBLIC_HEADERS = libraw
+PRIVATE_HEADERS = internal
 
-libraw_a_OBJECTS = $(objects_a_OUT)/dcraw_common.o \
-                   $(objects_a_OUT)/dcraw_fileio.o \
-                   $(objects_a_OUT)/demosaic_packs.o \
-                   $(objects_a_OUT)/libraw_cxx.o \
-                   $(objects_a_OUT)/libraw_datastream.o \
-                   $(objects_a_OUT)/libraw_c_api.o
+TARGET = ../target/$(BUILD_CONF)
 
-libraw_r_OBJECTS = $(objects_r_OUT)/dcraw_common.o \
-                   $(objects_r_OUT)/dcraw_fileio.o \
-                   $(objects_r_OUT)/demosaic_packs.o \
-                   $(objects_r_OUT)/libraw_cxx.o \
-                   $(objects_r_OUT)/libraw_datastream.o \
-                   $(objects_r_OUT)/libraw_c_api.o
+TARGET_BIN = $(TARGET)/bin
+TARGET_OBJ = $(TARGET)/obj
+TARGET_LIB = $(TARGET)/lib
+
+OBJECT_FILES = dcraw_common.o \
+               dcraw_fileio.o \
+               demosaic_packs.o \
+               libraw_cxx.o \
+               libraw_datastream.o \
+               libraw_c_api.o
+
+PRIVATE_HEADER_FILES = defines.h libraw_bytebuffer.h var_defines.h \
+                       libraw_internal_funcs.h libraw_internal.h
+PUBLIC_HEADER_FILES = libraw_alloc.h libraw_const.h \
+                      libraw_datastream.h \
+                      libraw_types.h libraw_version.h libraw.h
+
+OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
+PUBLIC_HEADER_FILES_WITH_PATH = $(addprefix $(PUBLIC_HEADERS)/,$(PUBLIC_HEADER_FILES))
+PRIVATE_HEADER_FILES_WITH_PATH = $(addprefix $(PRIVATE_HEADERS)/,$(PRIVATE_HEADER_FILES))
+
+LIBBITMAPS_STATIC = raw.a
 
 ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
 	# In Windows we need to link to libws2_32
 	LIBS = -lws2_32 -lm
-	# In Windows there is no pthread library
-	libraw_r_CPPFLAGS = $(COMMON_CPPFLAGS)
-	# In Windows shared library is a dll
-	libraw_a_shared = raw.dll
-	libraw_r_shared = raw.dll
-else												# any other case assumed as a POSIX system
+	LIBBITMAPS_SHARED = raw.dll
+else											# any other case assumed as a POSIX system
 	LIBS = -lm
-	libraw_r_CPPFLAGS = -pthread $(COMMON_CPPFLAGS)
-	libraw_a_shared = libraw.so
-	libraw_r_shared = libraw.so
+	THREADFLAG = -pthread
+	LIBBITMAPS_SHARED = libraw.so
 endif
 
+all: shared_lib static_lib
 
+static_lib: $(TARGET_LIB)/$(LIBBITMAPS_STATIC)
+shared_lib: $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
 
-all: library-a library-r samples-a samples-r
+################### Folders ###################
 
+ENSURE_BIN = if [ ! -d "$(TARGET_BIN)" ]; then mkdir -p "$(TARGET_BIN)"; fi
+ENSURE_LIB = if [ ! -d "$(TARGET_LIB)" ]; then mkdir -p "$(TARGET_LIB)"; fi
+ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
-# ===== Clean =====
+################### Objects ###################
 
-clean: clean-a clean-r
+$(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(PUBLIC_HEADER_FILES_WITH_PATH) $(PRIVATE_HEADER_FILES_WITH_PATH)
+	@echo "Compiling $@ ..."
+	$(ENSURE_OBJ)
+	$(CPP) -c $< -o $@ $(INCLUDES) -I"$(PUBLIC_HEADERS)" -I"$(PRIVATE_HEADERS)"
 
-clean-a:
-	rm -f $(libraw_a_OUT)
-	rm -rf $(objects_a_OUT)
-	rm -rf $(samples_a_OUT)
+################### Targets ###################
 
-clean-r:
-	rm -rf $(libraw_r_OUT)
-	rm -rf $(objects_r_OUT)
-	rm -rf $(samples_r_OUT)
+$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building shared library $@ ..."
+	$(ENSURE_BIN)
+	$(ENSURE_LIB)
+	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
 
-# ===== Library =====
+$(TARGET_LIB)/$(LIBBITMAPS_STATIC): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building static library $@ ..."
+	$(ENSURE_LIB)
+	ar crv $@ $(OBJECT_FILES_WITH_PATH)
+	ranlib $@
 
-# --- The thread-unsafe version ---
-
-library-a: $(libraw_a_OUT)/libraw.a $(libraw_a_OUT)/$(libraw_a_shared)
-
-$(libraw_a_OUT):
-	mkdir -p $@
-
-$(objects_a_OUT):
-	mkdir -p $@
-	
-$(libraw_a_OUT)/$(libraw_a_shared): $(libraw_a_OBJECTS) $(libraw_a_OUT)
-	g++ -shared -o $@ $(libraw_a_OBJECTS) $(LIBS)
-
-$(libraw_a_OUT)/libraw.a: $(libraw_a_OBJECTS) $(libraw_a_OUT)
-	ar crv $@ $(libraw_a_OBJECTS)
-	ranlib $(libraw_a_OUT)/libraw.a
-	          
-$(objects_a_OUT)/dcraw_common.o: internal/dcraw_common.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) internal/dcraw_common.cpp -o $@
-
-$(objects_a_OUT)/dcraw_fileio.o: internal/dcraw_fileio.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) internal/dcraw_fileio.cpp -o $@
-
-$(objects_a_OUT)/demosaic_packs.o: internal/demosaic_packs.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) internal/demosaic_packs.cpp -o $@
-
-$(objects_a_OUT)/libraw_cxx.o: src/libraw_cxx.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) src/libraw_cxx.cpp -o $@
-
-$(objects_a_OUT)/libraw_datastream.o: src/libraw_datastream.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) src/libraw_datastream.cpp -o $@
-
-$(objects_a_OUT)/libraw_c_api.o: src/libraw_c_api.cpp $(objects_a_OUT)
-	g++ -c $(libraw_a_CPPFLAGS) src/libraw_c_api.cpp -o $@
-
-# --- The thread-safe version ---
-    
-library-r: $(libraw_r_OUT)/libraw.a $(libraw_r_OUT)/$(libraw_r_shared)
-
-$(libraw_r_OUT):
-	mkdir -p $@
-
-$(objects_r_OUT):
-	mkdir -p $@
-
-$(libraw_r_OUT)/$(libraw_r_shared): $(libraw_r_OBJECTS) $(libraw_r_OUT)
-	g++ -shared -o $@ $(libraw_r_OBJECTS) $(LIBS)
-
-$(libraw_r_OUT)/libraw.a: $(libraw_r_OBJECTS) $(libraw_r_OUT)
-	ar crv $@ $(libraw_r_OBJECTS)
-	ranlib $(libraw_r_OUT)/libraw.a
-       
-$(objects_r_OUT)/dcraw_common.o: internal/dcraw_common.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) internal/dcraw_common.cpp -o $@
-
-$(objects_r_OUT)/dcraw_fileio.o: internal/dcraw_fileio.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) internal/dcraw_fileio.cpp -o $@
-
-$(objects_r_OUT)/demosaic_packs.o: internal/demosaic_packs.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) internal/demosaic_packs.cpp -o $@
-
-$(objects_r_OUT)/libraw_cxx.o: src/libraw_cxx.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) src/libraw_cxx.cpp -o $@
-
-$(objects_r_OUT)/libraw_datastream.o: src/libraw_datastream.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) src/libraw_datastream.cpp -o $@
-
-$(objects_r_OUT)/libraw_c_api.o: src/libraw_c_api.cpp $(objects_r_OUT)
-	g++ -c $(libraw_r_CPPFLAGS) src/libraw_c_api.cpp -o $@
-
-
-
-# ===== Samples =====
-
-
-
-# --- Samples linked with non thread-safe library ---
-
-samples-a: $(samples_a_OUT)/dcraw_emu $(samples_a_OUT)/4channels
-
-$(samples_a_OUT):
-	mkdir -p $@	
-
-$(samples_a_OUT)/4channels: samples/4channels.cpp $(libraw_a_OUT)/libraw.a $(samples_a_OUT)
-	g++ -static samples/4channels.cpp -o $@ $(COMMON_CPPFLAGS) -L$(libraw_a_OUT) -lraw $(LIBS)
-
-$(samples_a_OUT)/dcraw_emu: samples/dcraw_emu.cpp $(libraw_a_OUT)/libraw.a $(samples_a_OUT)
-	g++ -static samples/dcraw_emu.cpp -o $@ $(COMMON_CPPFLAGS) -L$(libraw_a_OUT) -lraw $(LIBS)
-	
-# --- Samples linked with thread-safe library ---
-
-samples-r: $(samples_r_OUT)/dcraw_emu $(samples_r_OUT)/4channels
-
-$(samples_r_OUT):
-	mkdir -p $@	
-
-$(samples_r_OUT)/4channels: samples/4channels.cpp $(libraw_r_OUT)/libraw.a $(samples_r_OUT)
-	g++ -static samples/4channels.cpp -o $@ $(COMMON_CPPFLAGS) -L$(libraw_r_OUT) -lraw $(LIBS)
-
-$(samples_r_OUT)/dcraw_emu: samples/dcraw_emu.cpp $(libraw_r_OUT)/libraw.a $(samples_r_OUT)
-	g++ -static samples/dcraw_emu.cpp -o $@ $(COMMON_CPPFLAGS) -L$(libraw_r_OUT) -lraw $(LIBS)
-	
+.PHONY: all shared_lib static_lib
+.SILENT:

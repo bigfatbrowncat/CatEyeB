@@ -3,55 +3,69 @@ COMMON_CFLAGS = -static-libgcc
 COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
 BUILD_CONF = Release
-CPPFLAGS = -O3
+CFLAGS = -O3
 
 CC = gcc $(COMMON_CFLAGS) $(CFLAGS)
 CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS)
 
 LIBS = 
-INCLUDES = $(SOURCE)/bitmaps.h
+INCLUDES =
 
-SOURCE = .
+SOURCE = src
+HEADERS = include
 TARGET = ../target/$(BUILD_CONF)
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
 TARGET_LIB = $(TARGET)/lib
 
-OBJECT_FILES = $(TARGET_OBJ)/PreciseBitmap.o		\
-               $(TARGET_OBJ)/PreviewBitmap.o
+OBJECT_FILES = PreciseBitmap.o PreviewBitmap.o
 
-ifneq (,$(findstring MINGW32, $(OSTYPE)))			# OS type is MinGW 32
-	# In Windows shared library is a dll
+HEADER_FILES = bitmaps.h
+
+OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
+HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
+
+LIBBITMAPS_STATIC = bitmaps.a
+
+ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
+	# In Windows we need to link to libws2_32
 	LIBBITMAPS_SHARED = bitmaps.dll
-else												# any other case assumed as a POSIX system
+else											# any other case assumed as a POSIX system
 	LIBBITMAPS_SHARED = libbitmaps.so
 endif
 
-all: shared_lib
+all: shared_lib static_lib
 
+static_lib: $(TARGET_LIB)/$(LIBBITMAPS_STATIC)
 shared_lib: $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
 
 ################### Folders ###################
 
-$(TARGET_BIN):
-	mkdir -p $(TARGET_BIN)
-
-$(TARGET_OBJ):
-	mkdir -p $(TARGET_OBJ)
-
-$(TARGET_LIB):
-	mkdir -p $(TARGET_LIB)
+ENSURE_BIN = if [ ! -d "$(TARGET_BIN)" ]; then mkdir -p "$(TARGET_BIN)"; fi
+ENSURE_LIB = if [ ! -d "$(TARGET_LIB)" ]; then mkdir -p "$(TARGET_LIB)"; fi
+ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 ################### Objects ###################
 
-$(TARGET_OBJ)/PreciseBitmap.o: $(SOURCE)/PreciseBitmap.cpp $(INCLUDES) $(TARGET_OBJ)
-	$(CPP) -c $(SOURCE)/PreciseBitmap.cpp -o $@
-
-$(TARGET_OBJ)/PreviewBitmap.o: $(SOURCE)/PreviewBitmap.cpp $(INCLUDES) $(TARGET_OBJ)
-	$(CPP) -c $(SOURCE)/PreviewBitmap.cpp -o $@
+$(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(HEADER_FILES_WITH_PATH)
+	@echo "Compiling $@ ..."
+	$(ENSURE_OBJ)
+	$(CPP) -c $< -o $@ $(INCLUDES) -I"$(HEADERS)"
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES) $(TARGET_BIN) $(TARGET_LIB)
-	$(CPP) -shared $(OBJECT_FILES) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
+$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building shared library $@ ..."
+	$(ENSURE_BIN)
+	$(ENSURE_LIB)
+	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
+
+$(TARGET_LIB)/$(LIBBITMAPS_STATIC): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building static library $@ ..."
+	$(ENSURE_LIB)
+	ar crv $@ $(OBJECT_FILES_WITH_PATH)
+	ranlib $@
+
+.PHONY: all shared_lib static_lib
+.SILENT:

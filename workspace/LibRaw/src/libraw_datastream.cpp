@@ -1,8 +1,8 @@
 #define LIBRAW_LIBRARY_BUILD
-#include "libraw/libraw.h"
-#include "internal/defines.h"
-#include "libraw/libraw_datastream.h"
-#include "internal/libraw_bytebuffer.h"
+#include "libraw.h"
+#include "defines.h"
+#include "libraw_datastream.h"
+#include "libraw_bytebuffer.h"
 
 LibRaw_byte_buffer::LibRaw_byte_buffer(unsigned sz)
 { 

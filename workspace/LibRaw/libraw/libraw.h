@@ -40,7 +40,7 @@ it under the terms of the one of three licenses as you choose:
 #include "libraw_datastream.h"
 #include "libraw_types.h"
 #include "libraw_const.h"
-#include "libraw_internal.h"
+#include <libraw_internal.h>
 #include "libraw_alloc.h"
 
 #ifdef __cplusplus
@@ -250,7 +250,7 @@ class DllDef LibRaw
 
 
 #ifdef LIBRAW_LIBRARY_BUILD 
-#include "internal/libraw_internal_funcs.h"
+#include "libraw_internal_funcs.h"
 #endif
 
 };

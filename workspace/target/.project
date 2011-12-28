@@ -3,9 +3,10 @@
 	<name>target</name>
 	<comment></comment>
 	<projects>
-		<project>LibRaw</project>
 		<project>bitmaps</project>
+		<project>CatEyeB</project>
 		<project>jpeg-8c</project>
+		<project>LibRaw</project>
 		<project>ssrl</project>
 	</projects>
 	<buildSpec>

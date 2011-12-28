@@ -1,46 +1,74 @@
 OSTYPE := $(shell uname)
-libraw_path = ../LibRaw/lib/r
-libjpeg_path = ../jpeg-8c/lib
-libbitmap_path = ../bitmaps/bin/Release
-target_bin_R = bin/Release
-target_bin_D = bin/Debug
+COMMON_CFLAGS = -static-libgcc
+COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
-COMMON_CPPFLAGS = -fopenmp -static-libgcc -static-libstdc++
-INCLUDES = -I"$(PWD)/include/libraw" -I"$(PWD)/include/jpeg-8c" -I"$(PWD)/include/bitmaps"
+BUILD_CONF = Release
+CFLAGS = -O3
 
-R_FLAGS = -O4
-D_FLAGS = -O0 -g3
+CC = gcc $(COMMON_CFLAGS) $(CFLAGS)
+CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS)
 
-libraw_a_CPPFLAGS = -DLIBRAW_NOTHREADS $(COMMON_CPPFLAGS)
+LIBS = $(TARGET)/lib/raw.a $(TARGET)/lib/jpeg8c.dll.a $(TARGET)/lib/bitmaps.dll.a
 
-ifneq (,$(findstring MINGW32, $(OSTYPE)))			# OS type is MinGW 32
+INCLUDES = -I"include/libraw" -I"include/jpeg-8c" -I"include/bitmaps"
+
+SOURCE = src
+HEADERS = include
+TARGET = ../target/$(BUILD_CONF)
+
+TARGET_BIN = $(TARGET)/bin
+TARGET_OBJ = $(TARGET)/obj
+TARGET_LIB = $(TARGET)/lib
+
+OBJECT_FILES = ssrl.o
+
+HEADER_FILES = ssrl.h
+
+OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
+HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
+
+LIBSSRL_STATIC = ssrl.a
+
+ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
 	# In Windows we need to link to libws2_32
-	LIBS = -lws2_32 -lm
-	# In Windows there is no pthread library
-	libraw_r_CPPFLAGS = $(COMMON_CPPFLAGS)
-	# In Windows shared library is a dll
-	libssrl_shared = ssrl.dll
-else												# any other case assumed as a POSIX system
-	LIBS = -lm
-	libraw_r_CPPFLAGS = -pthread $(COMMON_CPPFLAGS)
-	libssrl_shared = libssrl.so
+	LIBSSRL_SHARED = ssrl.dll
+	LIBS_ADD = -lws2_32 -lm
+else											# any other case assumed as a POSIX system
+	LIBSSRL_SHARED = libssrl.so
+	LIBS_ADD = 
 endif
 
-all: debug release
+all: shared_lib static_lib
 
-debug: $(target_bin_D)/$(libssrl_shared)
+static_lib: $(TARGET_LIB)/$(LIBSSRL_STATIC)
+shared_lib: $(TARGET_BIN)/$(LIBSSRL_SHARED)
 
-release: $(target_bin_R)/$(libssrl_shared)
+################### Folders ###################
 
-$(target_bin_D):
-	mkdir -p $(target_bin_D)
+ENSURE_BIN = if [ ! -d "$(TARGET_BIN)" ]; then mkdir -p "$(TARGET_BIN)"; fi
+ENSURE_LIB = if [ ! -d "$(TARGET_LIB)" ]; then mkdir -p "$(TARGET_LIB)"; fi
+ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
-$(target_bin_R):
-	mkdir -p $(target_bin_R)
+################### Objects ###################
 
-$(target_bin_D)/$(libssrl_shared): $(target_bin_D) $(SOURCE)/ssrl.cpp $(SOURCE)/ssrl.h
-	g++ -shared $(SOURCE)/ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(D_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)  
+$(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(HEADER_FILES_WITH_PATH)
+	@echo "Compiling $@ ..."
+	$(ENSURE_OBJ)
+	$(CPP) -c $< -o $@ $(INCLUDES) -I"$(HEADERS)"
 
-$(target_bin_R)/$(libssrl_shared): $(target_bin_R) ssrl.cpp ssrl.h
-	g++ -shared ssrl.cpp -o $@ $(COMMON_CPPFLAGS) $(INCLUDES) $(R_FLAGS) $(libjpeg_path)/libjpeg8c.a $(libraw_path)/libraw.a $(libbitmap_path)/bitmaps.dll.a $(LIBS)
-	
+################### Targets ###################
+
+$(TARGET_BIN)/$(LIBSSRL_SHARED): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building shared library $@ ..."
+	$(ENSURE_BIN)
+	$(ENSURE_LIB)
+	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) $(LIBS_ADD) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBSSRL_SHARED).a
+
+$(TARGET_LIB)/$(LIBSSRL_STATIC): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building static library $@ ..."
+	$(ENSURE_LIB)
+	ar crv $@ $(OBJECT_FILES_WITH_PATH)
+	ranlib $@
+
+.PHONY: all shared_lib static_lib
+.SILENT:

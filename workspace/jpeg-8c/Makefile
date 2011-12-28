@@ -6,12 +6,13 @@ BUILD_CONF = Release
 CFLAGS = -O3
 
 CC = gcc $(COMMON_CFLAGS) $(CFLAGS)
-CPP = g++ $(COMMON_CFLAGS) $(CFLAGS) $(COMMON_CPPFLAGS) $(CPPFLAGS)
+CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS)
 
 LIBS = 
-INCLUDES = -Iinclude
+INCLUDES =
 
 SOURCE = src
+HEADERS = include
 TARGET = ../target/$(BUILD_CONF)
 
 TARGET_BIN = $(TARGET)/bin
@@ -27,9 +28,11 @@ OBJECT_FILES = jaricom.o jcapimin.o jcapistd.o jcarith.o jccoefct.o jccolor.o \
                jfdctfst.o jfdctint.o jidctflt.o jidctfst.o jidctint.o jquant1.o \
                jquant2.o jutils.o jmemmgr.o jmemnobs.o
 
-OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
+HEADER_FILES = jconfig.h jdct.h jerror.h jinclude.h jmemsys.h                  \
+               jmorecfg.h jpegint.h jpeglib.h jversion.h transupp.h            
 
-HEADER_FILES = $(INCLUDE)/
+OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
+HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
 
 LIBJPEG_STATIC = jpeg8c.a
 
@@ -47,30 +50,33 @@ shared_lib: $(TARGET_BIN)/$(LIBJPEG_SHARED)
 
 ################### Folders ###################
 
-$(TARGET_BIN):
-	mkdir -p $(TARGET_BIN)
-
-$(TARGET_OBJ):
-	mkdir -p $(TARGET_OBJ)
-
-$(TARGET_LIB):
-	mkdir -p $(TARGET_LIB)
+ENSURE_BIN = if [ ! -d "$(TARGET_BIN)" ]; then mkdir -p "$(TARGET_BIN)"; fi
+ENSURE_LIB = if [ ! -d "$(TARGET_LIB)" ]; then mkdir -p "$(TARGET_LIB)"; fi
+ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 ################### Objects ###################
 
-$(addprefix $(TARGET_OBJ)/,$(filter %.o,$(OBJECT_FILES))) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.c $(TARGET_OBJ)
-	$(CC) -c $< -o $@ $(INCLUDES)
+$(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.c $(HEADER_FILES_WITH_PATH)
+	@echo "Compiling $@ ..."
+	$(ENSURE_OBJ)
+	$(CC) -c $< -o $@ $(INCLUDES) -I"$(HEADERS)"
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBJPEG_SHARED): $(OBJECT_FILES_WITH_PATH) $(TARGET_BIN) $(TARGET_LIB)
+$(TARGET_BIN)/$(LIBJPEG_SHARED): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building shared library $@ ..."
+	$(ENSURE_BIN)
+	$(ENSURE_LIB)
 	$(CC) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBJPEG_SHARED).a
 
-$(TARGET_LIB)/$(LIBJPEG_STATIC): $(OBJECT_FILES_WITH_PATH) $(TARGET_LIB)
+$(TARGET_LIB)/$(LIBJPEG_STATIC): $(OBJECT_FILES_WITH_PATH)
+	@echo "Building static library $@ ..."
+	$(ENSURE_LIB)
 	ar crv $@ $(OBJECT_FILES_WITH_PATH)
 	ranlib $@
 
 .PHONY: all shared_lib static_lib
+.SILENT:
 
 # ===== Samples =====
 
