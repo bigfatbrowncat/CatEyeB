@@ -16,7 +16,7 @@ import com.cateye.core.IOnProgressListener;
 import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
 import com.cateye.core.native_.ImageLoaderModule;
-import com.cateye.core.native_.RawImageSaverModule;
+import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.tests.utils.DateAssert;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -27,7 +27,7 @@ public class RawLoaderNativeTests {
 
 	public RawLoaderNativeTests() {
 		injector = Guice.createInjector(Modules.combine(
-				new ImageLoaderModule(), new RawImageSaverModule()));
+				new ImageLoaderModule(), new ImageSaverModule()));
 	}
 
 	@Test
@@ -57,7 +57,7 @@ public class RawLoaderNativeTests {
 
 	@Test
 	public void test_load_image_from_raw_file() throws InterruptedException {
-		final CountDownLatch lock = new CountDownLatch(2);
+		//final CountDownLatch lock = new CountDownLatch(2);
 		IImageLoader loader = injector.getInstance(IImageLoader.class);
 		progressInvoked = false;
 		imageLoaded = false;
@@ -65,12 +65,8 @@ public class RawLoaderNativeTests {
 		loader.addOnProgressListener(new IOnProgressListener() {
 			@Override
 			public void invoke(Object sender, float progress) {
-				if (!progressInvoked) {
-					synchronized (lock) {
-						lock.countDown();
-						progressInvoked = true;
-					}
-				}
+				System.out.println(progress);
+				progressInvoked = true;
 			}
 		});
 
@@ -102,27 +98,20 @@ public class RawLoaderNativeTests {
 					throw e;
 				} finally {
 					image.dispose();
-					synchronized (lock) {
-						lock.countDown();
-					}
 				}
 			}
 		});
 
 		loader.load("..\\data\\test\\IMG_5196.CR2");
 
-		synchronized (lock) {
-			lock.await(30, TimeUnit.SECONDS);
-		}
-
 		Assert.assertTrue("Image should be loaded", imageLoaded);
+		Assert.assertTrue("Progress callback should be invoked", progressInvoked);
 	}
 
 	private boolean imageSaved;
 
 	@Test
 	public void test_load_and_save() throws InterruptedException {
-		final CountDownLatch lock = new CountDownLatch(1);
 		final IImageLoader loader = injector.getInstance(IImageLoader.class);
 		final IImageSaver saver = injector.getInstance(IImageSaver.class);
 		imageSaved = false;
@@ -130,23 +119,16 @@ public class RawLoaderNativeTests {
 		loader.addOnImageLoadedListener(new IOnImageLoadedListener() {
 			@Override
 			public void invoke(Object sender, Image image) {
-				try {
-					File file = new File("..\\data\\test\\"
-							+ UUID.randomUUID().toString());
-					String fileName = file.getAbsolutePath();
-					saver.save(fileName, image);
-					imageSaved = file.exists();
-					file.delete();
-				} finally {
-					lock.countDown();
-				}
+				File file = new File("..\\data\\test\\"
+						+ UUID.randomUUID().toString());
+				String fileName = file.getAbsolutePath();
+				saver.save(fileName, image);
+				imageSaved = file.exists();
+				file.delete();
 			}
 		});
 
 		loader.load("..\\data\\test\\IMG_5196.CR2");
-		synchronized (lock) {
-			lock.await(30, TimeUnit.SECONDS);
-		}
 
 		Assert.assertTrue("Image should be saved", imageSaved);
 	}

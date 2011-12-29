@@ -3,6 +3,7 @@ package com.cateye.tests.functional;
 import org.junit.Test;
 
 import com.cateye.core.native_.ImageLoaderModule;
+import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.core.stage.Stage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.core.stage.StageModule;
@@ -17,7 +18,9 @@ public class StageTests {
 
 	public StageTests() {
 		injector = Guice.createInjector(Modules.combine(
-				new ImageLoaderModule(), new StageModule(),
+				new ImageLoaderModule(),
+				new ImageSaverModule(),
+				new StageModule(),
 				new BrightnessStageOperationModule()));
 	}
 
@@ -26,6 +29,7 @@ public class StageTests {
 		Stage stage = injector.getInstance(StageFactory.class).create();
 		BrightnessStageOperation operation = new BrightnessStageOperation();
 		stage.addStageOperation(operation);
+		stage.loadImage("..\\data\\test\\IMG_5196.CR2");
 		stage.processImage();
 		stage.removeStageOperation(operation);
 	}

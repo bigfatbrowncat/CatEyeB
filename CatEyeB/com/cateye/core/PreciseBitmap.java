@@ -18,5 +18,7 @@ public abstract class PreciseBitmap {
 		return height;
 	}
 	
+	public abstract PreciseBitmap clone();
+	
 	public abstract void dispose();
 }

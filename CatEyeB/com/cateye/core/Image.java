@@ -18,6 +18,10 @@ public abstract class Image {
 		return bitmap;
 	}
 	
+	public void setBitmap(PreciseBitmap bitmap) {
+		this.bitmap = bitmap;
+	}
+	
 	public Image(ImageDescription imageDescription, PreciseBitmap bitmap) {
 		this.description = imageDescription;
 		this.bitmap = bitmap;

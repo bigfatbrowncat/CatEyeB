@@ -14,7 +14,7 @@ public class BrightnessStageOperation extends StageOperation {
 		if (brightness < 0.01f || brightness > 100f) {
 			throw new ArgumentOutOfRangeException("brightness");
 		}
-		
+
 		if ((brightness - this.brightness) >= Float.MIN_NORMAL) {
 			this.brightness = brightness;
 			fireOnPropertyChanged("brightness", brightness);

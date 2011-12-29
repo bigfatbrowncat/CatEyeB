@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.cateye.core.IOnProgressListener;
+import com.cateye.core.PreciseBitmap;
 
 public abstract class StageOperationProcessor<T extends StageOperation> {
 	protected List<IOnProgressListener> progressListeners = new ArrayList<IOnProgressListener>();
-	
-	public abstract int calculateEffort();
 	
 	public void addOnProgressListener(IOnProgressListener listener) {
 		progressListeners.add(listener);
@@ -24,5 +23,22 @@ public abstract class StageOperationProcessor<T extends StageOperation> {
 		}
 	}
 	
-	public abstract void process(T stageOperation);
+	protected List<IOnImageProcessedListener> imageProcessedListeners = new ArrayList<IOnImageProcessedListener>();
+	
+	public void addOnImageProcessedListener(IOnImageProcessedListener listener) {
+		imageProcessedListeners.add(listener);
+	}
+	
+	public void removeOnImageProcessedListener(IOnImageProcessedListener listener) {
+		imageProcessedListeners.remove(listener);
+	}
+	
+	protected void fireOnImageProcessed(int code, PreciseBitmap bitmap) {
+		for (IOnImageProcessedListener listener : imageProcessedListeners) {
+			listener.invoke(this, code, bitmap);
+		}
+	}
+	
+	public abstract int calculateEffort();
+	public abstract void process(T stageOperation, PreciseBitmap bitmap);
 }

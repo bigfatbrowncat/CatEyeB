@@ -1,5 +1,7 @@
 package com.cateye.core.native_;
 
+import com.cateye.core.PreciseBitmap;
+
 class RawPreciseBitmap extends com.cateye.core.PreciseBitmap {
 	private $PreciseBitmap bitmap;
 
@@ -20,5 +22,10 @@ class RawPreciseBitmap extends com.cateye.core.PreciseBitmap {
 	public void dispose() {
 		$BitmapsLibrary.PreciseBitmap_Destroy(this.bitmap);
 		this.bitmap = null;
+	}
+
+	@Override
+	public PreciseBitmap clone() {
+		return new RawPreciseBitmap($BitmapsLibrary.PreciseBitmap_Copy(this.bitmap));
 	}
 }
