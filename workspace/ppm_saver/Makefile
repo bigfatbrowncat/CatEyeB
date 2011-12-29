@@ -4,7 +4,7 @@ COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
 BUILD_CONF = Release
 CFLAGS = -O3
-CDEFINES = -DBUILDING_RAW_LOADER
+CDEFINES = -DBUILDING_PPM_SAVER
 
 CPPFLAGS = $(CFLAGS)
 CPPDEFINES = $(CDEFINES)
@@ -12,9 +12,9 @@ CPPDEFINES = $(CDEFINES)
 CC = gcc $(COMMON_CFLAGS) $(CFLAGS) $(CDEFINES)
 CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS) $(CPPDEFINES)
 
-LIBS = $(TARGET)/lib/raw.a $(TARGET)/lib/jpeg8c.dll.a $(TARGET)/lib/bitmaps.dll.a
+LIBS = $(TARGET)/lib/bitmaps.dll.a
 
-INCLUDES = -I"../libraw/libraw" -I"../jpeg-8c/include" -I"../bitmaps/include"
+INCLUDES = -I"../bitmaps/include"
 
 SOURCE = src
 HEADERS = include
@@ -24,20 +24,17 @@ TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
 TARGET_LIB = $(TARGET)/lib
 
-OBJECT_FILES = raw_loader.o
+OBJECT_FILES = ppm_saver.o
 
-HEADER_FILES = raw_loader.h
+HEADER_FILES = ppm_saver.h
 
 OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
 HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
 
 ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
-	# In Windows we need to link to libws2_32
-	LIBRAW_LOADER_SHARED = raw.CatEyeLoader
-	LIBS_ADD = -lws2_32
+	LIBRAW_LOADER_SHARED = ppm.CatEyeSaver
 else											# any other case assumed as a POSIX system
-	LIBRAW_LOADER_SHARED = raw.CatEyeLoader
-	LIBS_ADD = 
+	LIBRAW_LOADER_SHARED = ppm.CatEyeSaver
 endif
 
 all: shared_lib

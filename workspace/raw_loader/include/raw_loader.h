@@ -3,11 +3,14 @@
 
 #include <bitmaps.h>
 
-#undef DllDef
 #ifdef WIN32
-# define DllDef  __declspec( dllexport )
+	#ifdef BUILDING_RAW_LOADER
+		#define RAW_LOADER __declspec(dllexport)
+	#else
+		#define RAW_LOADER __declspec(dllimport)
+	#endif
 #else
-# define DllDef
+	#define RAW_LOADER
 #endif
 
 struct ExtractedDescription
@@ -43,14 +46,13 @@ typedef void ExtractingResultReporter(int code, PreciseBitmap res);
 
 extern "C"
 {
-	DllDef void ExtractedRawImage_LoadFromFile(char* filename,
-				bool divide_by_2,
-				ExtractingProgressReporter* progress_reporter,
-				ExtractingResultReporter* result_reporter);
+	RAW_LOADER void ExtractedRawImage_LoadFromFile(char* filename, bool divide_by_2,
+	                                              ExtractingProgressReporter* progress_reporter,
+	                                              ExtractingResultReporter* result_reporter);
 
-	DllDef ExtractedDescription* ExtractedDescription_Create();
-	DllDef int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res);
-	DllDef void ExtractedDescription_Destroy(ExtractedDescription* description);
+	RAW_LOADER ExtractedDescription* ExtractedDescription_Create();
+	RAW_LOADER int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res);
+	RAW_LOADER void ExtractedDescription_Destroy(ExtractedDescription* description);
 }
 
 
