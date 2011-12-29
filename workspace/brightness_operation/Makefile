@@ -4,7 +4,7 @@ COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
 BUILD_CONF = Release
 CFLAGS = -O3
-CDEFINES = -DBUILDING_PPM_SAVER
+CDEFINES = -DBUILDING_BRIGHTNESS_OPERATION
 
 CPPFLAGS = $(CFLAGS)
 CPPDEFINES = $(CDEFINES)
@@ -24,22 +24,24 @@ TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
 TARGET_LIB = $(TARGET)/lib
 
-OBJECT_FILES = ppm_saver.o
+OBJECT_FILES = brightness_operation.o
 
-HEADER_FILES = ppm_saver.h
+HEADER_FILES = brightness_operation.h
 
 OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
 HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
 
 ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
-	LIBPPM_SAVER_SHARED = ppm.CatEyeSaver
+	LIBBRIGHTNESS_OPERATION_SHARED = brightness.CatEyeOperation
+	LIBS_ADD = -lm
 else											# any other case assumed as a POSIX system
-	LIBPPM_SAVER_SHARED = ppm.CatEyeSaver
+	LIBBRIGHTNESS_OPERATION_SHARED = brightness.CatEyeOperation
+	LIBS_ADD = -lm
 endif
 
 all: shared_lib
 
-shared_lib: $(TARGET_BIN)/$(LIBPPM_SAVER_SHARED)
+shared_lib: $(TARGET_BIN)/$(LIBBRIGHTNESS_OPERATION_SHARED)
 
 ################### Folders ###################
 
@@ -56,11 +58,11 @@ $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(HEADER_FILES_W
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBPPM_SAVER_SHARED): $(OBJECT_FILES_WITH_PATH)
+$(TARGET_BIN)/$(LIBBRIGHTNESS_OPERATION_SHARED): $(OBJECT_FILES_WITH_PATH)
 	@echo "Building shared library $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
 	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) $(LIBS_ADD) -o $@
 
-.PHONY: all shared_lib static_lib
+.PHONY: all shared_lib
 .SILENT:
