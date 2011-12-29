@@ -15,7 +15,7 @@
 
 struct ExtractedDescription
 {
-	PreviewBitmap  thumbnail;
+	PreviewBitmap* thumbnail;
 
 	float       iso_speed;
     float       shutter;
@@ -41,18 +41,16 @@ struct ExtractedDescription
 #define EXTRACTING_RESULT_UNSUPPORTED_FORMAT		6
 #define EXTRACTING_RESULT_UNKNOWN					100
 
-typedef bool ExtractingProgressReporter(float progress);
-typedef void ExtractingResultReporter(int code, PreciseBitmap* res);
+typedef bool ProgressReporter(float progress);
 
 extern "C"
 {
-	RAW_LOADER void ExtractedRawImage_LoadFromFile(char* filename, bool divide_by_2,
-	                                              ExtractingProgressReporter* progress_reporter,
-	                                              ExtractingResultReporter* result_reporter);
+	RAW_LOADER int ExtractedRawImage_LoadFromFile(char* filename, bool divide_by_2,
+	                                              PreciseBitmap* res,
+	                                              ProgressReporter* progress_reporter);
 
-	RAW_LOADER ExtractedDescription* ExtractedDescription_Create();
 	RAW_LOADER int ExtractedDescription_LoadFromFile(char* filename, ExtractedDescription* res);
-	RAW_LOADER void ExtractedDescription_Destroy(ExtractedDescription* description);
+	RAW_LOADER void ExtractedDescription_Free(ExtractedDescription* description);
 }
 
 
