@@ -99,7 +99,7 @@ void ExtractedRawImage_LoadFromFile(char* filename,
 {
 	//res->data = 0;	// data = 0 means "error during processing"
 
-	LibRaw RawProcessor;
+	LibRaw &RawProcessor = *(new LibRaw);
 
 	RawProcessor.set_progress_handler(internal_callback, (void*)progress_reporter);
 
@@ -118,24 +118,24 @@ void ExtractedRawImage_LoadFromFile(char* filename,
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
 	if (LIBRAW_FATAL_ERROR(ret))
 	{
-		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
 		return;
 	}
 	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.unpack()))
 	{
-		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
 		return;
 	}
 	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.dcraw_process()))
 	{
-		(*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
 		return;
 	}
 
     libraw_processed_image_t *image = RawProcessor.dcraw_make_mem_image(&ret);
     if (image == 0)
     {
-    	(*result_reporter)(EXTRACTING_RESULT_UNSUFFICIENT_MEMORY, PreciseBitmap_Empty());
+    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUFFICIENT_MEMORY, PreciseBitmap_Empty());
     	return;
     }
 
@@ -163,13 +163,14 @@ void ExtractedRawImage_LoadFromFile(char* filename,
     else
     {
     	PreciseBitmap_Destroy(res);
-    	(*result_reporter)(EXTRACTING_RESULT_UNSUPPORTED_FORMAT, PreciseBitmap_Empty());
+    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUPPORTED_FORMAT, PreciseBitmap_Empty());
     	return;
     }
 
 	RawProcessor.recycle(); // just for show this call
 
-	(*result_reporter)(EXTRACTING_RESULT_OK, res);
+	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_OK, res);
+	delete &RawProcessor;
 }
 
 ExtractedDescription* ExtractedDescription_Create()
