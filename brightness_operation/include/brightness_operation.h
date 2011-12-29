@@ -18,16 +18,14 @@
 #endif
 
 typedef bool BrightnessOperationProgressReporter(float progress);
-typedef void BrightnessOperationResultReporter(int code, PreciseBitmap* res);
 
 #define BRIGHTNESS_OPERATION_RESULT_OK							0
 #define BRIGHTNESS_OPERATION_RESULT_CANCELLED_BY_CALLBACK		1
 
 extern "C"
 {
-	BRIGHTNESS_OPERATION void Process(PreciseBitmap* bmp, double brightness,
-			BrightnessOperationProgressReporter* progress_reporter,
-			BrightnessOperationResultReporter* result_reporter);
+	BRIGHTNESS_OPERATION int Process(PreciseBitmap* bmp, double brightness,
+	                                 BrightnessOperationProgressReporter* progress_reporter);
 }
 
 #endif /* BRIGHTNESS_OPERATION_H_ */
