@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="/ExternalLibs/lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/jna.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/mockito-all-1.9.0.jar"/>
-	<classpathentry kind="src" path="/CatEyeB"/>
-	<classpathentry kind="src" path="/CatEyeB.RawImageLoader"/>
+	<classpathentry kind="src" path="/CatEyeB.Core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

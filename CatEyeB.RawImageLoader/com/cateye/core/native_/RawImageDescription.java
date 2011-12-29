@@ -2,12 +2,13 @@ package com.cateye.core.native_;
 
 import java.util.Date;
 
+import com.cateye.core.IThumbnailBitmap;
 import com.cateye.core.ImageDescription;
-import com.cateye.core.ThumbnailBitmap;
 
-class RawImageDescription extends ImageDescription {
-	protected ThumbnailBitmap thumbnail;
-
+class RawImageDescription extends ImageDescription
+{
+	protected IThumbnailBitmap thumbnail;
+	
 	protected float isoSpeed;
 	protected float shutter;
 	protected float aperture;
@@ -19,8 +20,9 @@ class RawImageDescription extends ImageDescription {
 	protected String cameraMaker;
 	protected String cameraModel;
 	protected int flip;
-
-	public void loadFromNative($RawImageDescription description) {
+	
+	public void loadFromNative($RawImageDescription description)
+	{
 		this.isoSpeed = description.iso_speed;
 		this.shutter = description.shutter;
 		this.aperture = description.aperture;
@@ -32,99 +34,114 @@ class RawImageDescription extends ImageDescription {
 		this.cameraMaker = description.camera_maker;
 		this.cameraModel = description.camera_model;
 		this.flip = description.flip;
-
-		if (description.thumbnail != null) {
-			this.thumbnail = new RawThumbnailImage(description.thumbnail);
+		
+		if (description.thumbnail != null)
+		{
+			this.thumbnail = description.thumbnail.clone(); // TODO: Clone?
 		}
 	}
-
+	
 	/**
 	 * @return the thumbnail
 	 */
-	public ThumbnailBitmap getThumbnail() {
+	public IThumbnailBitmap getThumbnail()
+	{
 		return thumbnail;
 	}
-
+	
 	/**
 	 * @return the iso speed
 	 */
-	public float getIsoSpeed() {
+	public float getIsoSpeed()
+	{
 		return isoSpeed;
 	}
-
+	
 	/**
 	 * @return the shutter
 	 */
-	public float getShutter() {
+	public float getShutter()
+	{
 		return shutter;
 	}
-
+	
 	/**
 	 * @return the aperture
 	 */
-	public float getAperture() {
+	public float getAperture()
+	{
 		return aperture;
 	}
-
+	
 	/**
 	 * @return the focal length
 	 */
-	public float getFocalLength() {
+	public float getFocalLength()
+	{
 		return focalLength;
 	}
-
+	
 	/**
 	 * @return the timestamp
 	 */
-	public Date getTimestamp() {
+	public Date getTimestamp()
+	{
 		return timestamp;
 	}
-
+	
 	/**
 	 * @return the shot order
 	 */
-	public int getShotOrder() {
+	public int getShotOrder()
+	{
 		return shotOrder;
 	}
-
+	
 	/**
 	 * @return the description
 	 */
-	public String getDescription() {
+	public String getDescription()
+	{
 		return description;
 	}
-
+	
 	/**
 	 * @return the artist
 	 */
-	public String getArtist() {
+	public String getArtist()
+	{
 		return artist;
 	}
-
+	
 	/**
 	 * @return the camera maker
 	 */
-	public String getCameraMaker() {
+	public String getCameraMaker()
+	{
 		return cameraMaker;
 	}
-
+	
 	/**
 	 * @return the camera model
 	 */
-	public String getCameraModel() {
+	public String getCameraModel()
+	{
 		return cameraModel;
 	}
-
+	
 	/**
 	 * @return the flip
 	 */
-	public int getFlip() {
+	public int getFlip()
+	{
 		return flip;
 	}
-
+	
 	@Override
-	public void dispose() {
-		if (thumbnail != null) {
+	public void dispose()
+	{
+		if (thumbnail != null)
+		{
 			thumbnail.dispose();
 		}
 	}

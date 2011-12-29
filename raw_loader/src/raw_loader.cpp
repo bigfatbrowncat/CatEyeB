@@ -169,8 +169,7 @@ int ExtractedRawImage_LoadFromFile(char* filename,
 }
 
 int ExtractedDescription_LoadFromFile(char* filename,
-                                      ExtractedDescription* res,
-                                      ProgressReporter* progress_reporter)
+                                      ExtractedDescription* res)
 {
 	LibRaw& RawProcessor = *(new LibRaw());
 
