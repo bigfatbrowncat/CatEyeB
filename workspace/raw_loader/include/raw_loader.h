@@ -42,7 +42,7 @@ struct ExtractedDescription
 #define EXTRACTING_RESULT_UNKNOWN					100
 
 typedef bool ExtractingProgressReporter(float progress);
-typedef void ExtractingResultReporter(int code, PreciseBitmap res);
+typedef void ExtractingResultReporter(int code, PreciseBitmap* res);
 
 extern "C"
 {

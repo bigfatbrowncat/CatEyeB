@@ -99,7 +99,7 @@ void ExtractedRawImage_LoadFromFile(char* filename,
 {
 	//res->data = 0;	// data = 0 means "error during processing"
 
-	LibRaw &RawProcessor = *(new LibRaw);
+	LibRaw& RawProcessor = *(new LibRaw());
 
 	RawProcessor.set_progress_handler(internal_callback, (void*)progress_reporter);
 
@@ -118,58 +118,60 @@ void ExtractedRawImage_LoadFromFile(char* filename,
 	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
 	if (LIBRAW_FATAL_ERROR(ret))
 	{
-		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), NULL);
 		return;
 	}
 	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.unpack()))
 	{
-		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), NULL);
 		return;
 	}
 	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.dcraw_process()))
 	{
-		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), PreciseBitmap_Empty());
+		if (result_reporter != NULL) (*result_reporter)(convert_libraw_code(ret), NULL);
 		return;
 	}
 
     libraw_processed_image_t *image = RawProcessor.dcraw_make_mem_image(&ret);
     if (image == 0)
     {
-    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUFFICIENT_MEMORY, PreciseBitmap_Empty());
+    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUFFICIENT_MEMORY, NULL);
     	return;
     }
 
-    PreciseBitmap res = PreciseBitmap_Create(image->width, image->height);
+    PreciseBitmap* res = new PreciseBitmap();
+    *res = PreciseBitmap_Create(image->width, image->height);
 
     if (image->bits == 8)
     {
-    	for (int i = 0; i < res.width * res.height; i++)
+    	for (int i = 0; i < res->width * res->height; i++)
     	{
-    		res.r[i] = ((float)image->data[3 * i]) / 255;
-    		res.g[i] = ((float)image->data[3 * i + 1]) / 255;
-    		res.b[i] = ((float)image->data[3 * i + 2]) / 255;
+    		res->r[i] = ((float)image->data[3 * i]) / 255;
+    		res->g[i] = ((float)image->data[3 * i + 1]) / 255;
+    		res->b[i] = ((float)image->data[3 * i + 2]) / 255;
     	}
     }
     else if (image->bits == 16)
     {
     	unsigned short* pus = (unsigned short*)image->data;
-    	for (int i = 0; i < res.width * res.height; i++)
+    	for (int i = 0; i < res->width * res->height; i++)
     	{
-    		res.r[i] = ((float)pus[3 * i]) / 65535;
-    		res.g[i] = ((float)pus[3 * i + 1]) / 65535;
-    		res.b[i] = ((float)pus[3 * i + 2]) / 65535;
+    		res->r[i] = ((float)pus[3 * i]) / 65535;
+    		res->g[i] = ((float)pus[3 * i + 1]) / 65535;
+    		res->b[i] = ((float)pus[3 * i + 2]) / 65535;
     	}
     }
     else
     {
-    	PreciseBitmap_Destroy(res);
-    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUPPORTED_FORMAT, PreciseBitmap_Empty());
+    	PreciseBitmap_Destroy(*res);
+    	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_UNSUPPORTED_FORMAT, NULL);
     	return;
     }
 
 	RawProcessor.recycle(); // just for show this call
 
 	if (result_reporter != NULL) (*result_reporter)(EXTRACTING_RESULT_OK, res);
+	delete res;
 	delete &RawProcessor;
 }
 
