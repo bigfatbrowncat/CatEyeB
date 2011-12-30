@@ -15,7 +15,7 @@
 
 extern "C"
 {
-	PPM_SAVER void SaveImage(char* filename, PreciseBitmap* bitmap);
+	PPM_SAVER void SaveImage(char* filename, PreciseBitmap* bitmap, double limit_a);
 }
 
 #endif /* PPM_SAVER_H_ */

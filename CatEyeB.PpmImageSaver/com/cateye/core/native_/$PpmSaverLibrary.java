@@ -7,7 +7,7 @@ import com.sun.jna.Native;
 public class $PpmSaverLibrary implements Library
 {
 	// PPM_SAVER void SaveImage(char* filename, PreciseBitmap bitmap);
-	public static native void SaveImage(String fileName, $PreciseBitmap bitmap);
+	public static native void SaveImage(String fileName, $PreciseBitmap bitmap, double limit_a);
 	
 	static
 	{

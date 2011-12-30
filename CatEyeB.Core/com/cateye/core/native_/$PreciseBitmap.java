@@ -52,9 +52,13 @@ public class $PreciseBitmap extends BaseStructure implements IPreciseBitmap,
 		return result;
 	}
 	
-	public static native void PreciseBitmap_Init($PreciseBitmap bmp, int width, int height);
-	public static native void PreciseBitmap_Copy($PreciseBitmap src, $PreciseBitmap res);
-	public static native void PreciseBitmap_Free($PreciseBitmap fb);
+	public static final int BITMAP_RESULT_OK = 0;
+	public static final int BITMAP_RESULT_OUT_OF_MEMORY = 1;
+	public static final int BITMAP_RESULT_INCORRECT_DATA = 2;
+	
+	public static native int PreciseBitmap_Init($PreciseBitmap bmp, int width, int height);
+	public static native int PreciseBitmap_Copy($PreciseBitmap src, $PreciseBitmap res);
+	public static native int PreciseBitmap_Free($PreciseBitmap fb);
 	
 	static
 	{

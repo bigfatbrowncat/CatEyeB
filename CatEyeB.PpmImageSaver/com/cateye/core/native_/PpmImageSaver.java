@@ -12,6 +12,6 @@ class PpmImageSaver implements IImageSaver
 	{
 		$PreciseBitmap bitmap = ($PreciseBitmap) image.getBitmap();
 		fileName = new File(fileName).getAbsolutePath();
-		$PpmSaverLibrary.SaveImage(fileName, bitmap);
+		$PpmSaverLibrary.SaveImage(fileName, bitmap, 3);
 	}
 }

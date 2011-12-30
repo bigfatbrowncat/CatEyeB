@@ -30,7 +30,7 @@ public class StageTests
 	{
 		Stage stage = injector.getInstance(StageFactory.class).create();
 		BrightnessStageOperation operation = new BrightnessStageOperation();
-		operation.setBrightness(4d);
+		operation.setBrightness(30d);
 		
 		stage.addOnProgressListener(new IOnProgressListener()
 		{
@@ -42,9 +42,9 @@ public class StageTests
 		});
 		
 		stage.addStageOperation(operation);
-		stage.loadImage("..\\data\\test\\IMG_5697.CR2");
+		stage.loadImage("..\\data\\test\\IMG_5196.CR2");
 		stage.processImage();
-		stage.saveImage("..\\data\\test\\IMG_5697.processed.ppm");
+		stage.saveImage("..\\data\\test\\IMG_5196.processed.ppm");
 	}
 	
 }

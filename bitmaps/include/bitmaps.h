@@ -31,20 +31,24 @@ struct PreviewBitmap
 	Int8* b;
 };
 
+#define BITMAP_RESULT_OK					0
+#define BITMAP_RESULT_OUT_OF_MEMORY			1
+#define BITMAP_RESULT_INCORRECT_DATA		2
+
 extern "C"
 {
 	// PreciseBitmap management
-	LIBBITMAP void PreciseBitmap_Init(PreciseBitmap* bmp, int width, int height);
-	LIBBITMAP void PreciseBitmap_Copy(PreciseBitmap* src, PreciseBitmap* res);
-	LIBBITMAP void PreciseBitmap_Free(PreciseBitmap* fb);
+	LIBBITMAP int PreciseBitmap_Init(PreciseBitmap* bmp, int width, int height);
+	LIBBITMAP int PreciseBitmap_Copy(PreciseBitmap* src, PreciseBitmap* res);
+	LIBBITMAP int PreciseBitmap_Free(PreciseBitmap* fb);
 
 	// PreviewBitmap management
-	LIBBITMAP void PreviewBitmap_Init(PreviewBitmap* bmp, int width, int height);
-	LIBBITMAP void PreviewBitmap_Copy(PreviewBitmap* src, PreviewBitmap* res);
-	LIBBITMAP void PreviewBitmap_Free(PreviewBitmap* fb);
+	LIBBITMAP int PreviewBitmap_Init(PreviewBitmap* bmp, int width, int height);
+	LIBBITMAP int PreviewBitmap_Copy(PreviewBitmap* src, PreviewBitmap* res);
+	LIBBITMAP int PreviewBitmap_Free(PreviewBitmap* fb);
 
 	// Converters
-	LIBBITMAP void PreviewBitmap_FromPreciseBitmap(PreciseBitmap* src, PreviewBitmap* res);
+	LIBBITMAP int PreviewBitmap_FromPreciseBitmap(PreciseBitmap* src, PreviewBitmap* res);
 }
 
 #endif /* BITMAPS_H_ */

@@ -1,4 +1,5 @@
 #include "brightness_operation.h"
+#include <math.h>
 
 int Process(PreciseBitmap* bmp, double brightness,
              BrightnessOperationProgressReporter* progress_reporter)
@@ -6,9 +7,17 @@ int Process(PreciseBitmap* bmp, double brightness,
 	int pixels_per_percent = bmp->width * bmp->height / 100 + 1;		// 1 added for zero exclusion
 	for (int i = 0; i < bmp->width * bmp->height; i++)
 	{
-		bmp->r[i] *= brightness;
-		bmp->g[i] *= brightness;
-		bmp->b[i] *= brightness;
+		double r = bmp->r[i];
+		double g = bmp->g[i];
+		double b = bmp->b[i];
+
+		r *= brightness;
+		g *= brightness;
+		b *= brightness;
+
+		bmp->r[i] = r;
+		bmp->g[i] = g;
+		bmp->b[i] = b;
 
 		// Reporting progress
 		if (i % pixels_per_percent == 0 && progress_reporter != NULL)
@@ -21,6 +30,7 @@ int Process(PreciseBitmap* bmp, double brightness,
 				return BRIGHTNESS_OPERATION_RESULT_CANCELLED_BY_CALLBACK;
 			}
 		}
+
 
 	}
 	return BRIGHTNESS_OPERATION_RESULT_OK;
