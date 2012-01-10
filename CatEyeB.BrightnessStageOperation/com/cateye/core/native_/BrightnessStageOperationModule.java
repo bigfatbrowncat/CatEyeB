@@ -1,6 +1,7 @@
-package com.cateye.stageoperations.brightness;
+package com.cateye.core.native_;
 
 import com.cateye.core.stage.StageOperationModule;
+import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
 public class BrightnessStageOperationModule extends StageOperationModule
 {
@@ -8,6 +9,6 @@ public class BrightnessStageOperationModule extends StageOperationModule
 	protected void configure()
 	{
 		bindProcessor(BrightnessStageOperation.class,
-				BrightnessStageOperationProcessor.class);
+				$BrightnessStageOperationProcessor.class);
 	}
 }

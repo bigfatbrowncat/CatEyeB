@@ -3,22 +3,22 @@ package com.cateye.tests.functional;
 import org.junit.Test;
 
 import com.cateye.core.IOnProgressListener;
+import com.cateye.core.native_.BrightnessStageOperationModule;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.core.stage.Stage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.core.stage.StageModule;
 import com.cateye.stageoperations.brightness.BrightnessStageOperation;
-import com.cateye.stageoperations.brightness.BrightnessStageOperationModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
 
-public class StageTests
+public class StageOperationTests
 {
 	public Injector injector;
 	
-	public StageTests()
+	public StageOperationTests()
 	{
 		injector = Guice.createInjector(Modules.combine(
 				new ImageLoaderModule(), new ImageSaverModule(),
@@ -42,9 +42,8 @@ public class StageTests
 		});
 		
 		stage.addStageOperation(operation);
-		stage.loadImage("..\\data\\test\\IMG_5196.CR2");
+		stage.loadImage("..\\data\\test\\IMG_5697.CR2");
 		stage.processImage();
-		stage.saveImage("..\\data\\test\\IMG_5196.processed.ppm");
+		stage.saveImage("..\\data\\test\\IMG_5697.processed.ppm");
 	}
-	
 }
