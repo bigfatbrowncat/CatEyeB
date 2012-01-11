@@ -44,21 +44,39 @@ class PreviewBitmap implements IPreviewBitmap
 	@Override
 	public void dispose()
 	{
-		Free(this);
+		checkResult(Free(this));
 	}
 	
 	@Override
 	public IPreviewBitmap clone()
 	{
 		PreviewBitmap result = new PreviewBitmap();
-		Copy(this, result);
+		checkResult(Copy(this, result));
 		
 		return result;
 	}
+	
+	/**
+	 * Check result and if it is wrong throw the exception
+	 */
+	private void checkResult(int resultCode)
+	{
+		switch (resultCode)
+		{
+			case BITMAP_RESULT_OUT_OF_MEMORY:
+				throw new OutOfMemoryError();
+			case BITMAP_RESULT_INCORRECT_DATA:
+				throw new IncorrectDataException();
+		}
+	}
+	
+	static final int BITMAP_RESULT_OK = 0;
+	static final int BITMAP_RESULT_OUT_OF_MEMORY = 1;
+	static final int BITMAP_RESULT_INCORRECT_DATA = 2;
 
-	static native void Init(PreviewBitmap bmp, int width, int height);
-	static native void Copy(PreviewBitmap src, PreviewBitmap res);
-	static native void Free(PreviewBitmap fb);
+	static native int Init(PreviewBitmap bmp, int width, int height);
+	static native int Copy(PreviewBitmap src, PreviewBitmap res);
+	static native int Free(PreviewBitmap fb);
 	
 	static
 	{

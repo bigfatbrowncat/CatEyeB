@@ -51,9 +51,24 @@ class PreciseBitmap implements IPreciseBitmap
 	public IPreciseBitmap clone()
 	{
 		PreciseBitmap result = new PreciseBitmap();
-		Copy(this, result);
+		int resultCode = Copy(this, result);
+		checkResult(resultCode);
 		
 		return result;
+	}
+	
+	/**
+	 * Check result and if it is wrong throw the exception
+	 */
+	private void checkResult(int resultCode)
+	{
+		switch (resultCode)
+		{
+			case BITMAP_RESULT_OUT_OF_MEMORY:
+				throw new OutOfMemoryError();
+			case BITMAP_RESULT_INCORRECT_DATA:
+				throw new IncorrectDataException();
+		}
 	}
 	
 	static final int BITMAP_RESULT_OK = 0;

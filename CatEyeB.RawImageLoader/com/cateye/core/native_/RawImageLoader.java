@@ -3,15 +3,20 @@ package com.cateye.core.native_;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cateye.core.BadCropException;
+import com.cateye.core.BadFileException;
+import com.cateye.core.CorruptedImageException;
 import com.cateye.core.IImageLoadedListener;
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
+import com.cateye.core.LoadingCancelledException;
+import com.cateye.core.UnsupportedFormatException;
 
 class RawImageLoader implements IImageLoader
 {
+	//# Progress listeners
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
-	private final List<IImageLoadedListener> imageLoadedListeners = new ArrayList<IImageLoadedListener>();
 	private final ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
 	
 	@Override
@@ -26,6 +31,15 @@ class RawImageLoader implements IImageLoader
 		progressListeners.remove(listener);
 	}
 	
+	protected void raiseProgress(float progress)
+	{
+		for (IProgressListener listener : progressListeners)
+			listener.invoke(this, progress);
+	}
+	
+	//# Image loaded listeners
+	private final List<IImageLoadedListener> imageLoadedListeners = new ArrayList<IImageLoadedListener>();
+	
 	@Override
 	public void addImageLoadedListener(IImageLoadedListener listener)
 	{
@@ -38,30 +52,17 @@ class RawImageLoader implements IImageLoader
 		imageLoadedListeners.remove(listener);
 	}
 	
-	protected void raiseProgress(float progress)
-	{
-		for (IProgressListener listener : progressListeners)
-			listener.invoke(this, progress);
-	}
-	
 	protected void raiseImageLoaded(Image image)
 	{
 		for (IImageLoadedListener listener : imageLoadedListeners)
 			listener.invoke(this, image);
 	}
 	
+	//# Methods
 	@Override
 	public Boolean canLoad(String fileName)
 	{
-		return true; // TODO: implement checking if loading is available
-	}
-	
-	/**
-	 * Returns a path to the file
-	 */
-	protected String getPathToFile(String fileName)
-	{
-		return new java.io.File(fileName).getAbsolutePath();
+		return true; // TODO: implement a check of loading possibility
 	}
 	
 	@Override
@@ -71,8 +72,8 @@ class RawImageLoader implements IImageLoader
 		RawImageDescription description = loadDescription(fileName);
 		
 		// load bitmap
-		PreciseBitmap bitmap = new PreciseBitmap(); 
-		LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter);
+		PreciseBitmap bitmap = new PreciseBitmap();
+		checkLoadingResult(LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter));
 		
 		// raise an event
 		raiseImageLoaded(new Image(description, bitmap));
@@ -86,6 +87,47 @@ class RawImageLoader implements IImageLoader
 		
 		return description;
 	}
+	
+	/**
+	 * Returns a path to the file
+	 */
+	protected String getPathToFile(String fileName)
+	{
+		return new java.io.File(fileName).getAbsolutePath();
+	}
+	
+	protected void checkLoadingResult(int resultCode)
+	{
+		switch (resultCode)
+		{
+			case EXTRACTING_RESULT_OK:
+				return;
+			case EXTRACTING_RESULT_UNSUFFICIENT_MEMORY:
+				throw new OutOfMemoryError();
+			case EXTRACTING_RESULT_DATA_ERROR:
+				throw new CorruptedImageException();
+			case EXTRACTING_RESULT_IO_ERROR:
+				throw new BadFileException();
+			case EXTRACTING_RESULT_CANCELLED_BY_CALLBACK:
+				throw new LoadingCancelledException();
+			case EXTRACTING_RESULT_BAD_CROP:
+				throw new BadCropException();
+			case EXTRACTING_RESULT_UNSUPPORTED_FORMAT:
+				throw new UnsupportedFormatException();
+			default:
+				throw new UnknownResultException(resultCode);
+		}
+	}
+	
+	//# Native
+	static final int EXTRACTING_RESULT_OK = 0;
+	static final int EXTRACTING_RESULT_UNSUFFICIENT_MEMORY = 1;
+	static final int EXTRACTING_RESULT_DATA_ERROR = 2;
+	static final int EXTRACTING_RESULT_IO_ERROR = 3;
+	static final int EXTRACTING_RESULT_CANCELLED_BY_CALLBACK = 4;
+	static final int EXTRACTING_RESULT_BAD_CROP = 5;
+	static final int EXTRACTING_RESULT_UNSUPPORTED_FORMAT = 6;
+	static final int EXTRACTING_RESULT_UNKNOWN = 100;
 	
 	static native int LoadFromFile(String fileName, boolean divideBy2, PreciseBitmap res, ExtractingProgressReporter progressReporter);
 	static native int LoadDescriptionFromFile(String filename, RawImageDescription res);
