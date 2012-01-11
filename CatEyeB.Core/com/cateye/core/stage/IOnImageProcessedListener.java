@@ -4,5 +4,5 @@ import com.cateye.core.IPreciseBitmap;
 
 public interface IOnImageProcessedListener
 {
-	void invoke(Object sender, int code, IPreciseBitmap bitmap);
+	void invoke(Object sender, IPreciseBitmap bitmap);
 }

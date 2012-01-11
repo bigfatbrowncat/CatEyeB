@@ -157,7 +157,7 @@ public class Stage
 		}
 		
 		@Override
-		public void invoke(Object sender, int code, IPreciseBitmap bitmap)
+		public void invoke(Object sender, IPreciseBitmap bitmap)
 		{
 			stage.processedBitmap = bitmap;
 		}

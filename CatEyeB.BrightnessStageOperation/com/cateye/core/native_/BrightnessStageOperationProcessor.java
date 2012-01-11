@@ -20,12 +20,9 @@ class BrightnessStageOperationProcessor extends StageOperationProcessor<Brightne
 	}
 
 	@Override
-	public void process(BrightnessStageOperation stageOperation,
-			IPreciseBitmap bitmap) {
-		PreciseBitmap rawBitmap = (PreciseBitmap) bitmap;
+	public void process(BrightnessStageOperation params, IPreciseBitmap bitmap) {
+		Process((PreciseBitmap)bitmap, params);
 		
-		Process(rawBitmap, stageOperation);
-		
-		fireOnImageProcessed(0, rawBitmap);
+		fireOnImageProcessed(bitmap);
 	}
 }
