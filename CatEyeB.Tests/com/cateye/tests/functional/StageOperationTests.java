@@ -2,7 +2,7 @@ package com.cateye.tests.functional;
 
 import org.junit.Test;
 
-import com.cateye.core.IOnProgressListener;
+import com.cateye.core.IProgressListener;
 import com.cateye.core.native_.BrightnessStageOperationModule;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
@@ -32,7 +32,7 @@ public class StageOperationTests
 		BrightnessStageOperation operation = new BrightnessStageOperation();
 		operation.setBrightness(30d);
 		
-		stage.addOnProgressListener(new IOnProgressListener()
+		stage.addOnProgressListener(new IProgressListener()
 		{
 			@Override
 			public void invoke(Object sender, float progress)

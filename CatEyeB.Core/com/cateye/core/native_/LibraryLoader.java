@@ -1,15 +1,20 @@
 package com.cateye.core.native_;
 
-import com.sun.jna.NativeLibrary;
-
 /**
  * Helper for library loading. It loads libraries from a directory specified in configuration.
  */
 public class LibraryLoader
 {
-	public static NativeLibrary load(String libraryName)
+	static String getPathToLibrary(String libraryName)
 	{
-		return NativeLibrary.getInstance(new java.io.File(
-				"..\\target\\Release\\bin\\" + libraryName).getAbsolutePath());
+		return new java.io.File("..\\target\\Release\\bin\\" + libraryName).getAbsolutePath();
+	}
+	
+	/**
+	 * Loads a library and attach it to the native methods of the current class
+	 */
+	public static void attach(String libraryName)
+	{
+		System.loadLibrary(getPathToLibrary(libraryName));
 	}
 }

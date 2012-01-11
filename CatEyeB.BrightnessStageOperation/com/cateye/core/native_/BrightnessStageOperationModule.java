@@ -9,6 +9,6 @@ public class BrightnessStageOperationModule extends StageOperationModule
 	protected void configure()
 	{
 		bindProcessor(BrightnessStageOperation.class,
-				$BrightnessStageOperationProcessor.class);
+				BrightnessStageOperationProcessor.class);
 	}
 }

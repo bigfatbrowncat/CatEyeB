@@ -5,7 +5,6 @@
 	<classpathentry kind="lib" path="/ExternalLibs/lib/guice-3.0-no_aop.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/guice-multibindings-3.0.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/javax.inject.jar"/>
-	<classpathentry kind="lib" path="/ExternalLibs/lib/jna.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/mockito-all-1.9.0.jar"/>
 	<classpathentry kind="src" path="/CatEyeB.Core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>

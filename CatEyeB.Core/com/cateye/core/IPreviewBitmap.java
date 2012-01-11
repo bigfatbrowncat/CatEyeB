@@ -1,6 +1,6 @@
 package com.cateye.core;
 
-public interface IThumbnailBitmap
+public interface IPreviewBitmap
 {
 	/**
 	 * @return the width
@@ -12,7 +12,7 @@ public interface IThumbnailBitmap
 	 */
 	int getHeight();
 	
-	IThumbnailBitmap clone();
+	IPreviewBitmap clone();
 	
 	void dispose();
 }

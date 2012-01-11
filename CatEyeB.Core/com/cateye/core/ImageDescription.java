@@ -7,7 +7,7 @@ public abstract class ImageDescription
 	/**
 	 * @return the thumbnail
 	 */
-	public abstract IThumbnailBitmap getThumbnail();
+	public abstract IPreviewBitmap getThumbnail();
 	
 	/**
 	 * @return the iso speed

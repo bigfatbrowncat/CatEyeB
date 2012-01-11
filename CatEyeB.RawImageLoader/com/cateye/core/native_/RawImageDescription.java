@@ -2,12 +2,12 @@ package com.cateye.core.native_;
 
 import java.util.Date;
 
-import com.cateye.core.IThumbnailBitmap;
+import com.cateye.core.IPreviewBitmap;
 import com.cateye.core.ImageDescription;
 
 class RawImageDescription extends ImageDescription
 {
-	protected IThumbnailBitmap thumbnail;
+	protected IPreviewBitmap thumbnail;
 	
 	protected float isoSpeed;
 	protected float shutter;
@@ -21,30 +21,15 @@ class RawImageDescription extends ImageDescription
 	protected String cameraModel;
 	protected int flip;
 	
-	public void loadFromNative($RawImageDescription description)
+	protected void setDate(int value)
 	{
-		this.isoSpeed = description.iso_speed;
-		this.shutter = description.shutter;
-		this.aperture = description.aperture;
-		this.focalLength = description.focal_len;
-		this.timestamp = description.timestamp.getDate();
-		this.shotOrder = description.shot_order;
-		this.description = description.desc;
-		this.artist = description.artist;
-		this.cameraMaker = description.camera_maker;
-		this.cameraModel = description.camera_model;
-		this.flip = description.flip;
-		
-		if (description.thumbnail != null)
-		{
-			this.thumbnail = description.thumbnail.clone(); // TODO: Clone?
-		}
+		this.timestamp = new Date(value * 1000L);
 	}
 	
 	/**
 	 * @return the thumbnail
 	 */
-	public IThumbnailBitmap getThumbnail()
+	public IPreviewBitmap getThumbnail()
 	{
 		return thumbnail;
 	}

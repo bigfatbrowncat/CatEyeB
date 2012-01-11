@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IImageSaver;
-import com.cateye.core.IOnImageLoadedListener;
-import com.cateye.core.IOnProgressListener;
+import com.cateye.core.IImageLoadedListener;
+import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
 import com.cateye.core.IPreciseBitmap;
 import com.google.inject.Inject;
@@ -18,21 +18,21 @@ public class Stage
 	private final IImageLoader imageLoader;
 	private final IImageSaver imageSaver;
 	
-	private final List<IOnProgressListener> progressListeners = new ArrayList<IOnProgressListener>();
+	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
 
-	public void addOnProgressListener(IOnProgressListener listener)
+	public void addOnProgressListener(IProgressListener listener)
 	{
 		progressListeners.add(listener);
 	}
 	
-	public void removeOnProgressListener(IOnProgressListener listener)
+	public void removeOnProgressListener(IProgressListener listener)
 	{
 		progressListeners.remove(listener);
 	}
 	
 	protected void invokeOnProgress(float progress)
 	{
-		for (IOnProgressListener listener : progressListeners)
+		for (IProgressListener listener : progressListeners)
 			listener.invoke(this, progress);
 	}
 	
@@ -68,7 +68,7 @@ public class Stage
 	{
 		disposeLoadedImage();
 		
-		imageLoader.addOnProgressListener(new IOnProgressListener()
+		imageLoader.addProgressListener(new IProgressListener()
 		{
 			@Override
 			public void invoke(Object sender, float progress)
@@ -77,7 +77,7 @@ public class Stage
 			}
 		});
 		
-		imageLoader.addOnImageLoadedListener(new IOnImageLoadedListener()
+		imageLoader.addImageLoadedListener(new IImageLoadedListener()
 		{
 			@Override
 			public void invoke(Object sender, Image img)
@@ -118,7 +118,7 @@ public class Stage
 					.create(stageOperation);
 			
 			// TODO: we should create unified method of working with on progress listeners
-			processor.addOnProgressListener(new IOnProgressListener()
+			processor.addOnProgressListener(new IProgressListener()
 			{
 				@Override
 				public void invoke(Object sender, float progress)

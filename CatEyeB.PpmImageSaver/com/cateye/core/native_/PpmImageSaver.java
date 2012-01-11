@@ -10,8 +10,15 @@ class PpmImageSaver implements IImageSaver
 	@Override
 	public void save(String fileName, Image image)
 	{
-		$PreciseBitmap bitmap = ($PreciseBitmap) image.getBitmap();
 		fileName = new File(fileName).getAbsolutePath();
-		$PpmSaverLibrary.SaveImage(fileName, bitmap, 3);
+		PreciseBitmap bitmap = (PreciseBitmap) image.getBitmap();
+		SaveImage(fileName, bitmap, 3);
+	}
+	
+	static native void SaveImage(String fileName, PreciseBitmap bitmap, double limit_a);
+	
+	static
+	{
+		LibraryLoader.attach("ppm.CatEyeSaver");
 	}
 }

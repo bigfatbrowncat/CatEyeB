@@ -1,6 +1,6 @@
 package com.cateye.core;
 
-public interface IOnPropertyChangedListener
+public interface IPropertyChangedListener
 {
 	void invoke(Object sender, String propertyName, Object newValue);
 }

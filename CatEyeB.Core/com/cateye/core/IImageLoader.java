@@ -2,13 +2,13 @@ package com.cateye.core;
 
 public interface IImageLoader
 {
-	void addOnProgressListener(IOnProgressListener listener);
+	void addProgressListener(IProgressListener listener);
 	
-	void removeOnProgressListener(IOnProgressListener listener);
+	void removeProgressListener(IProgressListener listener);
 	
-	void addOnImageLoadedListener(IOnImageLoadedListener listener);
+	void addImageLoadedListener(IImageLoadedListener listener);
 	
-	void removeOnImageLoadedListener(IOnImageLoadedListener listener);
+	void removeImageLoadedListener(IImageLoadedListener listener);
 	
 	/**
 	 * Should return true if current loader can load a specified file

@@ -1,6 +1,6 @@
 package com.cateye.core;
 
-public interface IOnImageLoadedListener
+public interface IImageLoadedListener
 {
 	void invoke(Object sender, Image image);
 }

@@ -3,54 +3,51 @@ package com.cateye.core.native_;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.cateye.core.IImageLoadedListener;
 import com.cateye.core.IImageLoader;
-import com.cateye.core.IOnImageLoadedListener;
-import com.cateye.core.IOnProgressListener;
+import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
 
 class RawImageLoader implements IImageLoader
 {
-	private final List<IOnProgressListener> progressListeners = new ArrayList<IOnProgressListener>();
-	private final List<IOnImageLoadedListener> imageLoadedListeners = new ArrayList<IOnImageLoadedListener>();
+	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
+	private final List<IImageLoadedListener> imageLoadedListeners = new ArrayList<IImageLoadedListener>();
+	private final ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
 	
 	@Override
-	public void addOnProgressListener(IOnProgressListener listener)
+	public void addProgressListener(IProgressListener listener)
 	{
 		progressListeners.add(listener);
 	}
 	
 	@Override
-	public void removeOnProgressListener(IOnProgressListener listener)
+	public void removeProgressListener(IProgressListener listener)
 	{
 		progressListeners.remove(listener);
 	}
 	
 	@Override
-	public void addOnImageLoadedListener(IOnImageLoadedListener listener)
+	public void addImageLoadedListener(IImageLoadedListener listener)
 	{
 		imageLoadedListeners.add(listener);
 	}
 	
 	@Override
-	public void removeOnImageLoadedListener(IOnImageLoadedListener listener)
+	public void removeImageLoadedListener(IImageLoadedListener listener)
 	{
 		imageLoadedListeners.remove(listener);
 	}
 	
-	protected void invokeOnProgress(float progress)
+	protected void raiseProgress(float progress)
 	{
-		for (IOnProgressListener listener : progressListeners)
-		{
+		for (IProgressListener listener : progressListeners)
 			listener.invoke(this, progress);
-		}
 	}
 	
-	protected void invokeOnImageLoaded(Image image)
+	protected void raiseImageLoaded(Image image)
 	{
-		for (IOnImageLoadedListener listener : imageLoadedListeners)
-		{
+		for (IImageLoadedListener listener : imageLoadedListeners)
 			listener.invoke(this, image);
-		}
 	}
 	
 	@Override
@@ -59,40 +56,50 @@ class RawImageLoader implements IImageLoader
 		return true; // TODO: implement checking if loading is available
 	}
 	
+	/**
+	 * Returns a path to the file
+	 */
+	protected String getPathToFile(String fileName)
+	{
+		return new java.io.File(fileName).getAbsolutePath();
+	}
+	
 	@Override
 	public void load(String fileName)
 	{
+		// load description
 		RawImageDescription description = loadDescription(fileName);
-		$PreciseBitmap bitmap = new $PreciseBitmap(); 
-		$RawImage.ExtractedRawImage_LoadFromFile(fileName, true, bitmap, progressReporter);
-		invokeOnImageLoaded(new Image(description, bitmap));
+		
+		// load bitmap
+		PreciseBitmap bitmap = new PreciseBitmap(); 
+		LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter);
+		
+		// raise an event
+		raiseImageLoaded(new Image(description, bitmap));
 	}
 	
 	@Override
 	public RawImageDescription loadDescription(String fileName)
 	{
-		String filePath = new java.io.File(fileName).getAbsolutePath();
+		RawImageDescription description = new RawImageDescription();
+		LoadDescriptionFromFile(getPathToFile(fileName), description);
 		
-		// load description to java structure
-		$RawImageDescription description = new $RawImageDescription();
-		$RawImageDescription.ExtractedDescription_LoadFromFile(filePath,
-				description);
-		
-		RawImageDescription result = new RawImageDescription();
-		result.loadFromNative(description);
-		
-		$RawImageDescription.ExtractedDescription_Free(description);
-		
-		return result;
+		return description;
 	}
 	
-	ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
+	static native int LoadFromFile(String fileName, boolean divideBy2, PreciseBitmap res, ExtractingProgressReporter progressReporter);
+	static native int LoadDescriptionFromFile(String filename, RawImageDescription res);
+	static native void FreeDescription(RawImageDescription description); // TODO: Do we need it?
+	
+	static
+	{
+		LibraryLoader.attach("raw.CatEyeLoader");
+	}
 	
 	/**
 	 * Implementation of native extracting progress reporter
 	 */
-	static class ExtractingProgressReporter implements
-			$IExtractingProgressReporter
+	static class ExtractingProgressReporter
 	{
 		private final RawImageLoader loader;
 		
@@ -101,10 +108,9 @@ class RawImageLoader implements IImageLoader
 			this.loader = loader;
 		}
 		
-		@Override
 		public boolean invoke(float progress)
 		{
-			loader.invokeOnProgress(progress);
+			loader.raiseProgress(progress);
 			return true;
 		}
 	}

@@ -3,26 +3,26 @@ package com.cateye.core.stage;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cateye.core.IOnProgressListener;
+import com.cateye.core.IProgressListener;
 import com.cateye.core.IPreciseBitmap;
 
 public abstract class StageOperationProcessor<T extends StageOperation>
 {
-	protected List<IOnProgressListener> progressListeners = new ArrayList<IOnProgressListener>();
+	protected List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
 	
-	public void addOnProgressListener(IOnProgressListener listener)
+	public void addOnProgressListener(IProgressListener listener)
 	{
 		progressListeners.add(listener);
 	}
 	
-	public void removeOnProgressListener(IOnProgressListener listener)
+	public void removeOnProgressListener(IProgressListener listener)
 	{
 		progressListeners.remove(listener);
 	}
 	
 	protected void fireOnProgress(float progress)
 	{
-		for (IOnProgressListener listener : progressListeners)
+		for (IProgressListener listener : progressListeners)
 		{
 			listener.invoke(this, progress);
 		}

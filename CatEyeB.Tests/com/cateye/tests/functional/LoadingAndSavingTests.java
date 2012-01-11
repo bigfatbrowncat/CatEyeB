@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IImageSaver;
-import com.cateye.core.IOnImageLoadedListener;
-import com.cateye.core.IOnProgressListener;
+import com.cateye.core.IImageLoadedListener;
+import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
 import com.cateye.core.native_.ImageLoaderModule;
@@ -68,7 +68,7 @@ public class LoadingAndSavingTests
 		progressInvoked = false;
 		imageLoaded = false;
 		
-		loader.addOnProgressListener(new IOnProgressListener()
+		loader.addProgressListener(new IProgressListener()
 		{
 			@Override
 			public void invoke(Object sender, float progress)
@@ -78,7 +78,7 @@ public class LoadingAndSavingTests
 			}
 		});
 		
-		loader.addOnImageLoadedListener(new IOnImageLoadedListener()
+		loader.addImageLoadedListener(new IImageLoadedListener()
 		{
 			@Override
 			public void invoke(Object sender, Image image)
@@ -118,7 +118,7 @@ public class LoadingAndSavingTests
 		final IImageSaver saver = injector.getInstance(IImageSaver.class);
 		imageSaved = false;
 		
-		loader.addOnImageLoadedListener(new IOnImageLoadedListener()
+		loader.addImageLoadedListener(new IImageLoadedListener()
 		{
 			@Override
 			public void invoke(Object sender, Image image)

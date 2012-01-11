@@ -1,6 +1,6 @@
 package com.cateye.core;
 
-public interface IOnProgressListener
+public interface IProgressListener
 {
 	void invoke(Object sender, float progress);
 }
