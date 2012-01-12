@@ -15,6 +15,6 @@ public class LibraryLoader
 	 */
 	public static void attach(String libraryName)
 	{
-		System.loadLibrary(getPathToLibrary(libraryName));
+		System.load(getPathToLibrary(libraryName));
 	}
 }
