@@ -29,7 +29,7 @@ OBJECTS = com/cateye/core/native_/PreciseBitmap \
 
 JAVA_FILES := $(wildcard com/cateye/core/*.java com/cateye/core/native_/*.java)
 
-CLASS_FILES = $(addsuffix .class,$(basename $(JAVA_FILES)))
+CLASS_FILES = $(addprefix $(TARGET_BIN)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
 OBJECT_FILES_WITH_PATH = $(addsuffix .o,$(addprefix $(TARGET_OBJ)/,$(OBJECTS)))
 JNI_HEADERS_WITH_PATH = $(addsuffix .h,$(addprefix $(TARGET_GEN)/,$(OBJECTS)))
@@ -55,7 +55,7 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 classes: $(CLASS_FILES)
 
-com/cateye/core/%.class : com/cateye/core/%.java
+bin/%.class : %.java
 	@echo "Compiling java class $@ ..."
 	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
 	"$(JAVA_HOME)/bin/javac" $< -d bin 
