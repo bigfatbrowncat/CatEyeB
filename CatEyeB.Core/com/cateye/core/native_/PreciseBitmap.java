@@ -81,6 +81,6 @@ class PreciseBitmap implements IPreciseBitmap
 	
 	static
 	{
-		LibraryLoader.attach("bitmaps.dll");
+		LibraryLoader.attach("CatEyeB.Core", "CatEyeB.Core.native");
 	}
 }

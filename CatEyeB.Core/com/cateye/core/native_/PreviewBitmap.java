@@ -80,6 +80,7 @@ class PreviewBitmap implements IPreviewBitmap
 	
 	static
 	{
-		LibraryLoader.attach("bitmaps.dll");
+		LibraryLoader.attach("CatEyeB.Core", "CatEyeB.Core.native");
 	}
+
 }
