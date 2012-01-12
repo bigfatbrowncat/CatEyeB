@@ -3,6 +3,7 @@
 	<name>CatEyeB.Core</name>
 	<comment></comment>
 	<projects>
+		<project>bitmaps</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -17,7 +18,6 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
-			<triggers>auto,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>?name?</key>
@@ -33,7 +33,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
-					<value></value>
+					<value>-j</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildCommand</key>
@@ -49,7 +49,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableAutoBuild</key>
-					<value>false</value>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
