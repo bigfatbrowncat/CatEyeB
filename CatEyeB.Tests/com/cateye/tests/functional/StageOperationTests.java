@@ -6,7 +6,7 @@ import com.cateye.core.IProgressListener;
 import com.cateye.core.native_.BrightnessStageOperationModule;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
-import com.cateye.core.stage.Stage;
+import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.core.stage.StageModule;
 import com.cateye.stageoperations.brightness.BrightnessStageOperation;
@@ -28,7 +28,7 @@ public class StageOperationTests
 	@Test
 	public void test_process_brightness_operation()
 	{
-		Stage stage = injector.getInstance(StageFactory.class).create();
+		IStage stage = injector.getInstance(StageFactory.class).create();
 		BrightnessStageOperation operation = new BrightnessStageOperation();
 		operation.setBrightness(30d);
 		

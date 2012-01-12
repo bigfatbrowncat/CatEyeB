@@ -7,8 +7,8 @@ public class StageModule extends AbstractModule
 	@Override
 	protected void configure()
 	{
-		bind(IStageOperationProcessorsFactory.class).to(
-				StageOperationProcessorsFactory.class).asEagerSingleton();
+		bind(IStageOperationProcessorsProvider.class).to(
+				StageOperationProcessorsProvider.class).asEagerSingleton();
 		bind(StageFactory.class);
 	}
 }

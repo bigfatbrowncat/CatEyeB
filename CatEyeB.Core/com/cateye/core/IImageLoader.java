@@ -6,10 +6,6 @@ public interface IImageLoader
 	
 	void removeProgressListener(IProgressListener listener);
 	
-	void addImageLoadedListener(IImageLoadedListener listener);
-	
-	void removeImageLoadedListener(IImageLoadedListener listener);
-	
 	/**
 	 * Should return true if current loader can load a specified file
 	 */
@@ -18,7 +14,7 @@ public interface IImageLoader
 	/**
 	 * Loads the image by a specified file name
 	 */
-	void load(String fileName);
+	Image load(String fileName);
 	
 	/**
 	 * Loads the description of an image

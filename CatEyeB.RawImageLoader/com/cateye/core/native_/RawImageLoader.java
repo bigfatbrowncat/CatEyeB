@@ -6,7 +6,6 @@ import java.util.List;
 import com.cateye.core.BadCropException;
 import com.cateye.core.BadFileException;
 import com.cateye.core.CorruptedImageException;
-import com.cateye.core.IImageLoadedListener;
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
@@ -37,27 +36,6 @@ class RawImageLoader implements IImageLoader
 			listener.invoke(this, progress);
 	}
 	
-	//# Image loaded listeners
-	private final List<IImageLoadedListener> imageLoadedListeners = new ArrayList<IImageLoadedListener>();
-	
-	@Override
-	public void addImageLoadedListener(IImageLoadedListener listener)
-	{
-		imageLoadedListeners.add(listener);
-	}
-	
-	@Override
-	public void removeImageLoadedListener(IImageLoadedListener listener)
-	{
-		imageLoadedListeners.remove(listener);
-	}
-	
-	protected void raiseImageLoaded(Image image)
-	{
-		for (IImageLoadedListener listener : imageLoadedListeners)
-			listener.invoke(this, image);
-	}
-	
 	//# Methods
 	@Override
 	public Boolean canLoad(String fileName)
@@ -66,7 +44,7 @@ class RawImageLoader implements IImageLoader
 	}
 	
 	@Override
-	public void load(String fileName)
+	public Image load(String fileName)
 	{
 		// load description
 		RawImageDescription description = loadDescription(fileName);
@@ -76,7 +54,7 @@ class RawImageLoader implements IImageLoader
 		checkLoadingResult(LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter));
 		
 		// raise an event
-		raiseImageLoaded(new Image(description, bitmap));
+		return new Image(description, bitmap);
 	}
 	
 	@Override

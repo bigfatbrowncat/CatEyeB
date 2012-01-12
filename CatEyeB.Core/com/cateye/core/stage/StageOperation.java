@@ -23,8 +23,6 @@ public abstract class StageOperation
 	protected void fireOnPropertyChanged(String propertyName, Object newValue)
 	{
 		for (IPropertyChangedListener listener : propertyChangedListeners)
-		{
 			listener.invoke(this, propertyName, newValue);
-		}
 	}
 }

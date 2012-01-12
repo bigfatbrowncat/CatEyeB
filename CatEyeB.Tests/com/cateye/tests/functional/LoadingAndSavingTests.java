@@ -7,9 +7,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.cateye.core.BadFileException;
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IImageSaver;
-import com.cateye.core.IImageLoadedListener;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
@@ -26,11 +26,11 @@ public class LoadingAndSavingTests
 	
 	public LoadingAndSavingTests()
 	{
-		injector = Guice.createInjector(Modules.combine(
-				new ImageLoaderModule(), new ImageSaverModule()));
+		injector = Guice.createInjector(Modules.combine(new ImageLoaderModule(), new ImageSaverModule()));
 	}
 	
-	protected void assertImageDescription(ImageDescription description) {
+	protected void assertImageDescription(ImageDescription description)
+	{
 		Assert.assertEquals(3.22f, description.getAperture(), 0.001);
 		Assert.assertEquals("", description.getArtist());
 		Assert.assertEquals("Canon", description.getCameraMaker());
@@ -41,8 +41,7 @@ public class LoadingAndSavingTests
 		Assert.assertEquals(1600f, description.getIsoSpeed());
 		Assert.assertEquals(0, description.getShotOrder());
 		Assert.assertEquals(0.03125, description.getShutter(), 0.00001f);
-		DateAssert.assertEquals("10/19/11 6:51:56 PM MSK",
-				description.getTimestamp());
+		DateAssert.assertEquals("10/19/11 6:51:56 PM MSK", description.getTimestamp());
 	}
 	
 	@Test
@@ -50,8 +49,7 @@ public class LoadingAndSavingTests
 	{
 		IImageLoader loader = injector.getInstance(IImageLoader.class);
 		
-		ImageDescription description = loader
-				.loadDescription("..\\data\\test\\IMG_5697.CR2");
+		ImageDescription description = loader.loadDescription("..\\data\\test\\IMG_5697.CR2");
 		assertImageDescription(description);
 		
 		description.dispose();
@@ -63,7 +61,6 @@ public class LoadingAndSavingTests
 	@Test
 	public void test_load_image_from_raw_file() throws InterruptedException
 	{
-		// final CountDownLatch lock = new CountDownLatch(2);
 		IImageLoader loader = injector.getInstance(IImageLoader.class);
 		progressInvoked = false;
 		imageLoaded = false;
@@ -78,35 +75,29 @@ public class LoadingAndSavingTests
 			}
 		});
 		
-		loader.addImageLoadedListener(new IImageLoadedListener()
-		{
-			@Override
-			public void invoke(Object sender, Image image)
-			{
-				try
-				{
-					ImageDescription description = image.getDescription();
-					assertImageDescription(description);
-					
-					Assert.assertEquals(1733, image.getWidth());
-					Assert.assertEquals(2601, image.getHeight());
-					
-					imageLoaded = true;
-				} catch (RuntimeException e)
-				{
-					throw e;
-				} finally
-				{
-					image.dispose();
-				}
-			}
-		});
+		Image image = loader.load("..\\data\\test\\IMG_5697.CR2");
 		
-		loader.load("..\\data\\test\\IMG_5697.CR2");
+		try
+		{
+			ImageDescription description = image.getDescription();
+			assertImageDescription(description);
+			
+			Assert.assertEquals(1733, image.getWidth());
+			Assert.assertEquals(2601, image.getHeight());
+			
+			imageLoaded = true;
+		}
+		catch (RuntimeException e)
+		{
+			throw e;
+		}
+		finally
+		{
+			image.dispose();
+		}
 		
 		Assert.assertTrue("Image should be loaded", imageLoaded);
-		Assert.assertTrue("Progress callback should be invoked",
-				progressInvoked);
+		Assert.assertTrue("Progress callback should be invoked", progressInvoked);
 	}
 	
 	private boolean imageSaved;
@@ -114,34 +105,25 @@ public class LoadingAndSavingTests
 	@Test
 	public void test_load_and_save() throws InterruptedException
 	{
-		final IImageLoader loader = injector.getInstance(IImageLoader.class);
-		final IImageSaver saver = injector.getInstance(IImageSaver.class);
+		IImageLoader loader = injector.getInstance(IImageLoader.class);
+		IImageSaver saver = injector.getInstance(IImageSaver.class);
 		imageSaved = false;
 		
-		loader.addImageLoadedListener(new IImageLoadedListener()
-		{
-			@Override
-			public void invoke(Object sender, Image image)
-			{
-				File file = new File("..\\data\\test\\"
-						+ UUID.randomUUID().toString());
-				String fileName = file.getAbsolutePath();
-				saver.save(fileName, image);
-				imageSaved = file.exists();
-				file.delete();
-			}
-		});
+		Image image = loader.load("..\\data\\test\\IMG_5697.CR2");
+		File file = new File("..\\data\\test\\" + UUID.randomUUID().toString());
+		String fileName = file.getAbsolutePath();
 		
-		loader.load("..\\data\\test\\IMG_5697.CR2");
+		saver.save(fileName, image);
+		imageSaved = file.exists();
+		file.delete();
 		
 		Assert.assertTrue("Image should be saved", imageSaved);
 	}
 	
-	@Test
+	@Test(expected = BadFileException.class)
 	public void test_load_non_existing_image() throws InterruptedException
 	{
-		final IImageLoader loader = injector.getInstance(IImageLoader.class);
-		
+		IImageLoader loader = injector.getInstance(IImageLoader.class);
 		loader.load(UUID.randomUUID().toString());
 	}
 }

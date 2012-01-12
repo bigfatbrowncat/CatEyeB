@@ -6,12 +6,12 @@ import com.google.inject.Inject;
 
 public class StageFactory
 {
-	private final IStageOperationProcessorsFactory processorsFactory;
+	private final IStageOperationProcessorsProvider processorsFactory;
 	private final IImageLoader loader;
 	private final IImageSaver saver;
 	
 	@Inject
-	public StageFactory(IStageOperationProcessorsFactory processorsFactory,
+	public StageFactory(IStageOperationProcessorsProvider processorsFactory,
 			IImageLoader loader, IImageSaver saver)
 	{
 		this.processorsFactory = processorsFactory;
@@ -19,7 +19,7 @@ public class StageFactory
 		this.saver = saver;
 	}
 	
-	public Stage create()
+	public IStage create()
 	{
 		return new Stage(processorsFactory, loader, saver);
 	}

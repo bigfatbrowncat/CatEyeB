@@ -1,10 +1,11 @@
 package com.cateye.core.native_;
 
 import com.cateye.core.IPreciseBitmap;
-import com.cateye.core.stage.StageOperationProcessor;
+import com.cateye.core.IProgressListener;
+import com.cateye.core.stage.IStageOperationProcessor;
 import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
-class BrightnessStageOperationProcessor extends StageOperationProcessor<BrightnessStageOperation>
+class BrightnessStageOperationProcessor implements IStageOperationProcessor<BrightnessStageOperation>
 {
 	static native void Process(PreciseBitmap bmp, BrightnessStageOperation operation);
 	
@@ -20,9 +21,7 @@ class BrightnessStageOperationProcessor extends StageOperationProcessor<Brightne
 	}
 
 	@Override
-	public void process(BrightnessStageOperation params, IPreciseBitmap bitmap) {
+	public void process(BrightnessStageOperation params, IPreciseBitmap bitmap, IProgressListener progressListener) {
 		Process((PreciseBitmap)bitmap, params);
-		
-		fireOnImageProcessed(bitmap);
 	}
 }

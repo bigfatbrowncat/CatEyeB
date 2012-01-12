@@ -5,132 +5,73 @@ import java.util.List;
 
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IImageSaver;
-import com.cateye.core.IImageLoadedListener;
+import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
-import com.cateye.core.IPreciseBitmap;
 import com.google.inject.Inject;
 
-public class Stage
+class Stage implements IStage
 {
-	private final IStageOperationProcessorsFactory operationProcessorsFactory;
-	private final List<StageOperation> stageOperations = new ArrayList<StageOperation>();
+	private final IStageOperationProcessorsProvider operationProcessorsProvider;
 	private final IImageLoader imageLoader;
 	private final IImageSaver imageSaver;
 	
+	private final List<StageOperation> stageOperations = new ArrayList<StageOperation>();
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
-
-	public void addOnProgressListener(IProgressListener listener)
-	{
-		progressListeners.add(listener);
-	}
 	
-	public void removeOnProgressListener(IProgressListener listener)
-	{
-		progressListeners.remove(listener);
-	}
-	
-	protected void invokeOnProgress(float progress)
-	{
-		for (IProgressListener listener : progressListeners)
-			listener.invoke(this, progress);
-	}
-	
-	@Inject
-	public Stage(IStageOperationProcessorsFactory operationProcessorsFactory,
-			IImageLoader imageLoader, IImageSaver imageSaver)
-	{
-		this.operationProcessorsFactory = operationProcessorsFactory;
-		this.imageLoader = imageLoader;
-		this.imageSaver = imageSaver;
-	}
-	
-	public void addStageOperation(StageOperation operation)
-	{
-		stageOperations.add(operation);
-	}
-	
-	public void removeStageOperation(StageOperation operation)
-	{
-		stageOperations.remove(operation);
-	}
-	
+	private final IProgressListener imageLoadingProgressListener;
 	protected Image image;
+	
 	protected IPreciseBitmap originalBitmap;
 	protected IPreciseBitmap processedBitmap;
 	
-	protected boolean isImageLoaded()
+	@Inject
+	public Stage(IStageOperationProcessorsProvider operationProcessorsProvider,
+			IImageLoader imageLoader, IImageSaver imageSaver)
 	{
-		return image != null;
-	}
-	
-	public void loadImage(String fileName)
-	{
-		disposeLoadedImage();
+		this.operationProcessorsProvider = operationProcessorsProvider;
+		this.imageLoader = imageLoader;
+		this.imageSaver = imageSaver;
 		
-		imageLoader.addProgressListener(new IProgressListener()
+		imageLoadingProgressListener = new IProgressListener()
 		{
 			@Override
 			public void invoke(Object sender, float progress)
 			{
 				invokeOnProgress(progress);
 			}
-		});
-		
-		imageLoader.addImageLoadedListener(new IImageLoadedListener()
-		{
-			@Override
-			public void invoke(Object sender, Image img)
-			{
-				image = img;
-				originalBitmap = img.getBitmap();
-			}
-		});
-		
-		try
-		{
-			imageLoader.load(fileName);
-		} catch (Exception e)
-		{
-			throw new ImageLoadingException(e);
-		}
+		};
 	}
 	
-	public void saveImage(String fileName)
+	@Override
+	public void addOnProgressListener(IProgressListener listener)
 	{
-		this.image.setBitmap(processedBitmap == null ? originalBitmap : processedBitmap);
-		imageSaver.save(fileName, this.image);
+		progressListeners.add(listener);
 	}
 	
-	public void processImage()
+	@Override
+	public void addStageOperation(StageOperation operation)
 	{
-		if (!isImageLoaded())
-			throw new ImageNotLoadedException();
-		
-		if (processedBitmap != null)
-			processedBitmap.dispose();
-		
-		processedBitmap = image.getBitmap().clone();
+		stageOperations.add(operation);
+	}
+	
+	/**
+	 * Returns summary efforts of the passed stage operations
+	 */
+	private int calculateEfforts(List<StageOperation> stageOperations)
+	{
+		int summaryEfforts = 0;
 		
 		for (StageOperation stageOperation : stageOperations)
 		{
-			StageOperationProcessor<StageOperation> processor = operationProcessorsFactory
-					.create(stageOperation);
-			
-			// TODO: we should create unified method of working with on progress listeners
-			processor.addOnProgressListener(new IProgressListener()
-			{
-				@Override
-				public void invoke(Object sender, float progress)
-				{
-					invokeOnProgress(progress);
-				}
-			});
-			processor.addOnImageProcessedListener(stageOperationProcessedListener);
-			processor.process(stageOperation, processedBitmap);
+			IStageOperationProcessor<StageOperation> processor = operationProcessorsProvider.create(stageOperation);
+			summaryEfforts += processor.calculateEffort();
 		}
+		
+		return summaryEfforts;
 	}
 	
+	@Override
 	public void dispose()
 	{
 		disposeLoadedImage();
@@ -142,24 +83,79 @@ public class Stage
 			this.image.dispose();
 	}
 	
-	protected StageOperationProcessedListener stageOperationProcessedListener = new StageOperationProcessedListener(this);
+	protected void invokeOnProgress(float progress)
+	{
+		for (IProgressListener listener : progressListeners)
+			listener.invoke(this, progress);
+	}
 	
 	/**
-	 * Private class for the operation processed listener
+	 * Returns true if image is loaded
 	 */
-	static class StageOperationProcessedListener implements IOnImageProcessedListener
+	public boolean isImageLoaded()
 	{
-		private final Stage stage;
-
-		public StageOperationProcessedListener(Stage stage)
-		{
-			this.stage = stage;
-		}
+		return image != null && image.getBitmap() != null;
+	}
+	
+	@Override
+	public void loadImage(String fileName)
+	{
+		disposeLoadedImage();
+		imageLoader.addProgressListener(imageLoadingProgressListener);
 		
-		@Override
-		public void invoke(Object sender, IPreciseBitmap bitmap)
+		try
 		{
-			stage.processedBitmap = bitmap;
+			image = imageLoader.load(fileName);
+			originalBitmap = image.getBitmap();
 		}
+		catch (Exception e)
+		{
+			throw new ImageLoadingException(e);
+		}
+		finally
+		{
+			imageLoader.removeProgressListener(imageLoadingProgressListener);
+		}
+	}
+	
+	@Override
+	public void processImage()
+	{
+		if (!isImageLoaded())
+			throw new ImageNotLoadedException();
+		
+		if (processedBitmap != null)
+			processedBitmap.dispose();
+		
+		processedBitmap = image.getBitmap().clone();
+		int summaryEfforts = calculateEfforts(stageOperations);
+		
+		for (StageOperation stageOperation : stageOperations)
+		{
+			IStageOperationProcessor<StageOperation> processor = operationProcessorsProvider.create(stageOperation);
+			int processorEffort = processor.calculateEffort();
+			
+			IProgressListener progressListener = new StageOperationProgressListener(this, processorEffort, summaryEfforts);
+			processor.process(stageOperation, processedBitmap, progressListener);
+		}
+	}
+	
+	@Override
+	public void removeOnProgressListener(IProgressListener listener)
+	{
+		progressListeners.remove(listener);
+	}
+	
+	@Override
+	public void removeStageOperation(StageOperation operation)
+	{
+		stageOperations.remove(operation);
+	}
+	
+	@Override
+	public void saveImage(String fileName)
+	{
+		this.image.setBitmap(processedBitmap == null ? originalBitmap : processedBitmap);
+		imageSaver.save(fileName, this.image);
 	}
 }
