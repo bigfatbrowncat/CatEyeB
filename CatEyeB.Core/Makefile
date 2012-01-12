@@ -27,13 +27,16 @@ TARGET_GEN = $(TARGET)/gen
 OBJECTS = com/cateye/core/native_/PreciseBitmap \
           com/cateye/core/native_/PreviewBitmap
 
+JAVA_FILES := $(wildcard com/cateye/core/*.java com/cateye/core/native_/*.java)
+
+CLASS_FILES = $(addsuffix .class,$(basename $(JAVA_FILES)))
 
 OBJECT_FILES_WITH_PATH = $(addsuffix .o,$(addprefix $(TARGET_OBJ)/,$(OBJECTS)))
 JNI_HEADERS_WITH_PATH = $(addsuffix .h,$(addprefix $(TARGET_GEN)/,$(OBJECTS)))
 
 LIBBITMAPS_SHARED = CatEyeB.Core.native
 
-all: shared_lib
+all: shared_lib classes
 clean:
 	rm -rf $(TARGET_GEN)
 	rm $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
@@ -50,20 +53,21 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 ################ Java classes #################
 
-classes:
-	@echo "Compiling java classes ..."
-	$(ENSURE_BIN)
-	"$(JAVA_HOME)/bin/javac" com/cateye/core/*.java -d bin 
-	"$(JAVA_HOME)/bin/javac" com/cateye/core/native_/*.java -d bin 
+classes: $(CLASS_FILES)
+
+com/cateye/core/%.class : com/cateye/core/%.java
+	@echo "Compiling java class $@ ..."
+	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
+	"$(JAVA_HOME)/bin/javac" $< -d bin 
 
 ################# JNI Headers #################
 
-$(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java classes
+$(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java
 	@echo "Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
 	"$(JAVA_HOME)/bin/javah" -o $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h com.cateye.core.native_.PreciseBitmap
 
-$(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java classes
+$(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java
 	@echo "Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
 	"$(JAVA_HOME)/bin/javah" -o $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h com.cateye.core.native_.PreviewBitmap
