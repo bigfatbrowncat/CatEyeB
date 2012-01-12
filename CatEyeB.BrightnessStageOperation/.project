@@ -3,6 +3,7 @@
 	<name>CatEyeB.BrightnessStageOperation</name>
 	<comment></comment>
 	<projects>
+		<project>CatEyeB.Core</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
