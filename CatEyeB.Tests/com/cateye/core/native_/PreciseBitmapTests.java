@@ -48,7 +48,7 @@ public class PreciseBitmapTests {
 		}
 	}
 	
-	@Test
+	@Test(timeout=5000)
 	public void test_precisebitmap_outofmemory()
 	{
 		final int W = 300, H = 300;

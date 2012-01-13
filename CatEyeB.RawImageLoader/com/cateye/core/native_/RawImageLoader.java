@@ -113,7 +113,7 @@ class RawImageLoader implements IImageLoader
 	
 	static
 	{
-		LibraryLoader.attach("raw.CatEyeLoader");
+		LibraryLoader.attach("CatEyeB.RawImageLoader", "raw.CatEyeLoader");
 	}
 	
 	/**

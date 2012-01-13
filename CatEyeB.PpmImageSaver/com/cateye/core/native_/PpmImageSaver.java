@@ -19,6 +19,6 @@ class PpmImageSaver implements IImageSaver
 	
 	static
 	{
-		LibraryLoader.attach("ppm.CatEyeSaver");
+		LibraryLoader.attach("CatEyeB.PpmImageSaver", "ppm.CatEyeSaver");
 	}
 }
