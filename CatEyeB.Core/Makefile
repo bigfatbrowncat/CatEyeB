@@ -27,8 +27,9 @@ TARGET_GEN = $(TARGET)/gen
 OBJECTS = com/cateye/core/native_/PreciseBitmap \
           com/cateye/core/native_/PreviewBitmap
 
-JAVA_FILES := $(wildcard com/cateye/core/*.java com/cateye/core/native_/*.java)
+EXTERNAL_JARS = $(shell find ../ExternalLibs/lib -name \*.jar -printf "%p;")
 
+JAVA_FILES := $(shell find . -name \*.java)
 CLASS_FILES = $(addprefix $(TARGET_BIN)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
 OBJECT_FILES_WITH_PATH = $(addsuffix .o,$(addprefix $(TARGET_OBJ)/,$(OBJECTS)))
@@ -39,9 +40,8 @@ LIBBITMAPS_SHARED = CatEyeB.Core.native
 all: shared_lib classes
 clean:
 	rm -rf $(TARGET_GEN)
-	rm $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
-	rm $(OBJECT_FILES_WITH_PATH)
-	rm $(JNI_HEADERS_WITH_PATH)
+	rm -rf $(TARGET_BIN)
+	rm -rf $(TARGET_OBJ)
 
 shared_lib: $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
 
@@ -58,7 +58,7 @@ classes: $(CLASS_FILES)
 bin/%.class : %.java
 	@echo "Compiling java class $@ ..."
 	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
-	"$(JAVA_HOME)/bin/javac" $< -d bin 
+	"$(JAVA_HOME)/bin/javac" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
 
 ################# JNI Headers #################
 
@@ -82,7 +82,7 @@ $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(TARGET_GEN)/%.
 ################### Targets ###################
 
 $(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
-	@echo "Building shared library $@ ..."
+	@echo "Building native part: $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
 	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias
