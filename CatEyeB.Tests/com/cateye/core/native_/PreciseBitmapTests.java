@@ -1,5 +1,7 @@
 package com.cateye.core.native_;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 
 import org.junit.Test;
@@ -7,6 +9,18 @@ import org.junit.Test;
 import com.cateye.core.native_.PreciseBitmap;
 
 public class PreciseBitmapTests {
+	@Test
+	public void test_precisebitmap_init_and_free()
+	{
+		PreciseBitmap pbmp = new PreciseBitmap();
+		PreciseBitmap.Init(pbmp, 3000, 3000);
+		
+		assertEquals(3000, pbmp.width);
+		assertEquals(3000, pbmp.height);
+		
+		PreciseBitmap.Free(pbmp);
+	}
+	
 	@Test
 	public void test_precisebitmap_big_leak()
 	{
