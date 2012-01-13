@@ -1,5 +1,7 @@
 OSTYPE := $(shell uname)
 
+PROJ = bitmaps
+
 # CC macros
 COMMON_CFLAGS = -static-libgcc
 CFLAGS = -O3
@@ -53,20 +55,20 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 ################### Objects ###################
 
 $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(HEADER_FILES_WITH_PATH)
-	@echo "Compiling $@ ..."
+	@echo "[$(PROJ)] Compiling $@ ..."
 	$(ENSURE_OBJ)
 	$(CPP) -c $< -o $@ $(INCLUDES) -I"$(HEADERS)"
 
 ################### Targets ###################
 
 $(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
-	@echo "Building shared library $@ ..."
+	@echo "[$(PROJ)] Building shared library $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
 	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
 
 $(TARGET_LIB)/$(LIBBITMAPS_STATIC): $(OBJECT_FILES_WITH_PATH)
-	@echo "Building static library $@ ..."
+	@echo "[$(PROJ)] Building static library $@ ..."
 	$(ENSURE_LIB)
 	ar crv $@ $(OBJECT_FILES_WITH_PATH)
 	ranlib $@

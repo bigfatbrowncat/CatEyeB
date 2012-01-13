@@ -1,6 +1,6 @@
 OSTYPE := $(shell uname)
 
-BUILD_CONF = Release
+PROJ = CatEyeB.Core
 
 # CC macros
 COMMON_CFLAGS = -static-libgcc
@@ -18,7 +18,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a
 INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" -I"../bitmaps/include"
 
 SOURCE = .
-TARGET = ../target/
+TARGET = ../target
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
@@ -39,7 +39,9 @@ JNI_HEADERS_WITH_PATH = $(addsuffix .h,$(addprefix $(TARGET_GEN)/,$(OBJECTS)))
 LIBBITMAPS_SHARED = CatEyeB.Core.native
 
 all: shared_lib classes
+
 clean:
+	@echo "[$(PROJ) Cleaning...]"
 	rm -rf $(TARGET_GEN)
 	rm -rf $(TARGET_BIN)
 	rm -rf $(TARGET_OBJ)
@@ -57,35 +59,34 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 classes: $(CLASS_FILES)
 
 $(TARGET_BIN)/%.class : %.java
-	@echo "Compiling java class $@ ..."
+	@echo "[$(PROJ)] Compiling java class $@ ..."
 	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
 	"$(JAVA_HOME)/bin/javac" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
 
 ################# JNI Headers #################
 
 $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreciseBitmap.class
-	@echo "Generating $@ ..."
+	@echo "[$(PROJ)] Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
 	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h com.cateye.core.native_.PreciseBitmap
 
 $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreviewBitmap.class
-	@echo "Generating $@ ..."
+	@echo "[$(PROJ)] Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
 	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h com.cateye.core.native_.PreviewBitmap
 
 ################### Objects ###################
 
 $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(TARGET_GEN)/%.h 
-	@echo "Compiling $@ ..."
+	@echo "[$(PROJ)] Compiling $@ ..."
 	if [ ! -d "$(TARGET_OBJ)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_OBJ)/com/cateye/core/native_"; fi
 	$(CPP) -c $< -o $@ -I"$(TARGET_GEN)" $(INCLUDES)
 
 ################### Targets ###################
 
 $(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH) deplibs
-	@echo "Building native part: $@ ..."
+	@echo "[$(PROJ)] Building native part: $@ ..."
 	$(ENSURE_BIN)
-	$(ENSURE_LIB)
 	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias
 
 ############### Dependent libs ################
@@ -93,8 +94,8 @@ $(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH) deplibs
 deplibs: $(TARGET_BIN)/bitmaps.dll
 
 $(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
-	@echo $@ needed. Making it ...
+	@echo [$(PROJ)] $@ needed. Making it ...
 	make --directory=../bitmaps	
 
-.PHONY: all shared_lib deplibs clean
+.PHONY: all classes shared_lib deplibs clean
 .SILENT:
