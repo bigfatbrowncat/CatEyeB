@@ -7,7 +7,7 @@ public class LibraryLoader
 {
 	static String getPathToLibrary(String projectName, String libraryName)
 	{
-		return new java.io.File("..\\" + projectName + "\\bin\\" + libraryName).getAbsolutePath();
+		return new java.io.File(libraryName).getAbsolutePath();
 	}
 	
 	/**

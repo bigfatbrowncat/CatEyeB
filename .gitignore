@@ -7,5 +7,7 @@ LibRaw/lib
 data/test
 jpeg-8c/lib/
 target/Release
+target/lib
+target/gen
 /CatEyeB.Core/gen/com/cateye/core/native_/PreciseBitmap.h
 /CatEyeB.Core/gen/com/cateye/core/native_/PreviewBitmap.h
