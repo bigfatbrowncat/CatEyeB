@@ -14,14 +14,15 @@ CPPFLAGS = $(CFLAGS)
 CPPDEFINES = $(CDEFINES)
 CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS) $(CPPDEFINES)
 
-LIBS = 
-INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" 
+LIBS = $(TARGET_LIB)/bitmaps.dll.a
+INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" -I"../bitmaps/include"
 
 SOURCE = .
-TARGET = .
+TARGET = ../target/
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
+TARGET_LIB = $(TARGET)/lib
 TARGET_GEN = $(TARGET)/gen
 
 OBJECTS = com/cateye/core/native_/PreciseBitmap \
@@ -55,7 +56,7 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 classes: $(CLASS_FILES)
 
-bin/%.class : %.java
+$(TARGET_BIN)/%.class : %.java
 	@echo "Compiling java class $@ ..."
 	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
 	"$(JAVA_HOME)/bin/javac" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
@@ -81,11 +82,19 @@ $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(TARGET_GEN)/%.
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
+$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH) deplibs
 	@echo "Building native part: $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
 	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias
 
-.PHONY: all shared_lib clean
+############### Dependent libs ################
+
+deplibs: $(TARGET_BIN)/bitmaps.dll
+
+$(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
+	@echo $@ needed. Making it ...
+	make --directory=../bitmaps	
+
+.PHONY: all shared_lib deplibs clean
 .SILENT:

@@ -1,7 +1,5 @@
 OSTYPE := $(shell uname)
 
-BUILD_CONF = Release
-
 # CC macros
 COMMON_CFLAGS = -static-libgcc
 CFLAGS = -O3
@@ -19,7 +17,7 @@ INCLUDES =
 
 SOURCE = src
 HEADERS = include
-TARGET = ../target/$(BUILD_CONF)
+TARGET = ../target
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
@@ -65,7 +63,7 @@ $(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH)
 	@echo "Building shared library $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
-	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
+	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias -Wl,--out-implib=$(TARGET_LIB)/$(LIBBITMAPS_SHARED).a
 
 $(TARGET_LIB)/$(LIBBITMAPS_STATIC): $(OBJECT_FILES_WITH_PATH)
 	@echo "Building static library $@ ..."

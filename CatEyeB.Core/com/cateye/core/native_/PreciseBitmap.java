@@ -5,27 +5,32 @@ import com.cateye.core.IPreciseBitmap;
 class PreciseBitmap implements IPreciseBitmap
 {
 	/**
-	 * Width of bitmap
+	 * Width of bitmap. 
+	 * Never change this form Java code.
 	 */
 	int width;
 	
 	/**
-	 * Height of bitmap
+	 * Height of bitmap.
+	 * Never change this form Java code.
 	 */
 	int height;
 	
 	/**
-	 * Pointer to the red channel in memory
+	 * Pointer to the red channel in memory.
+	 * Never change this form Java code.
 	 */
 	long r;
 	
 	/**
-	 * Pointer to the green channel in memory
+	 * Pointer to the green channel in memory.
+	 * Never change this form Java code.
 	 */
 	long g;
 	
 	/**
-	 * Pointer to the blue channel in memory
+	 * Pointer to the blue channel in memory.
+	 * Never change this form Java code.
 	 */
 	long b;
 	
@@ -81,6 +86,6 @@ class PreciseBitmap implements IPreciseBitmap
 	
 	static
 	{
-		LibraryLoader.attach("CatEyeB.Core", "CatEyeB.Core.native");
+		LibraryLoader.attach("target", "CatEyeB.Core.native");
 	}
 }
