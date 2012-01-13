@@ -62,15 +62,15 @@ bin/%.class : %.java
 
 ################# JNI Headers #################
 
-$(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java
+$(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreciseBitmap.class
 	@echo "Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
-	"$(JAVA_HOME)/bin/javah" -o $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h com.cateye.core.native_.PreciseBitmap
+	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h com.cateye.core.native_.PreciseBitmap
 
-$(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java
+$(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreviewBitmap.class
 	@echo "Generating $@ ..."
 	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
-	"$(JAVA_HOME)/bin/javah" -o $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h com.cateye.core.native_.PreviewBitmap
+	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h com.cateye.core.native_.PreviewBitmap
 
 ################### Objects ###################
 
