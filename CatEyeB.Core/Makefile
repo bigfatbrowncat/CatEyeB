@@ -5,7 +5,7 @@ PROJ = CatEyeB.Core
 # CC macros
 COMMON_CFLAGS = -static-libgcc
 CFLAGS = -O3
-CDEFINES = -DBUILDING_LIBBITMAP
+CDEFINES =
 CC = gcc $(COMMON_CFLAGS) $(CFLAGS) $(CDEFINES)
 
 # CPP macros
@@ -15,36 +15,46 @@ CPPDEFINES = $(CDEFINES)
 CPP = g++ $(COMMON_CPPFLAGS) $(CPPFLAGS) $(CPPDEFINES)
 
 LIBS = $(TARGET_LIB)/bitmaps.dll.a
-INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" -I"../bitmaps/include"
+JNI_INCLUDES = -I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"  
+INCLUDES = $(JNI_INCLUDES) -I"../bitmaps/include"
 
-SOURCE = .
+SOURCE = src
 TARGET = ../target
+JAVA_JNI_CLASSES = com.cateye.core.native_.PreciseBitmap \
+                   com.cateye.core.native_.PreviewBitmap
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
 TARGET_LIB = $(TARGET)/lib
 TARGET_GEN = $(TARGET)/gen
 
-OBJECTS = com/cateye/core/native_/PreciseBitmap \
-          com/cateye/core/native_/PreviewBitmap
-
 EXTERNAL_JARS = $(shell find ../ExternalLibs/lib -name \*.jar -printf "%p;")
 
-JAVA_FILES := $(shell find . -name \*.java)
+JAVA_FILES := $(shell cd $(SOURCE); find . -name \*.java)
 CLASS_FILES = $(addprefix $(TARGET_BIN)/,$(addsuffix .class,$(basename $(JAVA_FILES))))
 
-OBJECT_FILES_WITH_PATH = $(addsuffix .o,$(addprefix $(TARGET_OBJ)/,$(OBJECTS)))
-JNI_HEADERS_WITH_PATH = $(addsuffix .h,$(addprefix $(TARGET_GEN)/,$(OBJECTS)))
+                   
+JAVA_JNI_HEADERS = $(addprefix $(TARGET_GEN)/,$(addsuffix .h,$(subst .,/,$(JAVA_JNI_CLASSES))))
+JAVA_JNI_JAVA = $(addprefix $(SOURCE)/,$(addsuffix .java,$(subst .,/,$(JAVA_JNI_CLASSES))))
+JAVA_JNI_CPP = $(addprefix $(SOURCE)/,$(addsuffix .cpp,$(subst .,/,$(JAVA_JNI_CLASSES))))
+JAVA_JNI_OBJ = $(addprefix $(TARGET_OBJ)/,$(addsuffix .o,$(subst .,/,$(JAVA_JNI_CLASSES))))
 
 LIBBITMAPS_SHARED = CatEyeB.Core.native
 
-all: shared_lib classes
+all: shared_lib classes $(JAVA_JNI_HEADERS)
 
 clean:
-	@echo "[$(PROJ) Cleaning...]"
-	rm -rf $(TARGET_GEN)
-	rm -rf $(TARGET_BIN)
-	rm -rf $(TARGET_OBJ)
+	@echo "[$(PROJ)] Removing Java classes..."
+	rm $(foreach NAME, $(basename $(CLASS_FILES)), $(shell echo "$(NAME)\$$\*.class"))
+	
+	@echo "[$(PROJ)] Removing JNI headers..."
+	rm $(JAVA_JNI_HEADERS)
+	
+	@echo "[$(PROJ)] Removing JNI objects..."
+	rm $(JAVA_JNI_OBJ)
+	
+	@echo "[$(PROJ)] Removing native library..."
+	rm $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
 
 shared_lib: $(TARGET_BIN)/$(LIBBITMAPS_SHARED)
 
@@ -58,36 +68,31 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 
 classes: $(CLASS_FILES)
 
-$(TARGET_BIN)/%.class : %.java
+$(TARGET_BIN)/%.class : $(SOURCE)/%.java
 	@echo "[$(PROJ)] Compiling java class $@ ..."
-	if [ ! -d "$(TARGET_BIN)/com/cateye/core" ]; then mkdir -p "$(TARGET_BIN)/com/cateye/core"; fi
-	"$(JAVA_HOME)/bin/javac" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
+	$(ENSURE_BIN)
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
 
 ################# JNI Headers #################
 
-$(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h : $(SOURCE)/com/cateye/core/native_/PreciseBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreciseBitmap.class
+$(JAVA_JNI_HEADERS) : $(TARGET_GEN)/%.h : $(TARGET_BIN)/%.class
 	@echo "[$(PROJ)] Generating $@ ..."
-	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
-	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreciseBitmap.h com.cateye.core.native_.PreciseBitmap
-
-$(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h : $(SOURCE)/com/cateye/core/native_/PreviewBitmap.java $(TARGET_BIN)/com/cateye/core/native_/PreviewBitmap.class
-	@echo "[$(PROJ)] Generating $@ ..."
-	if [ ! -d "$(TARGET_GEN)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_GEN)/com/cateye/core/native_"; fi
-	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $(TARGET_GEN)/com/cateye/core/native_/PreviewBitmap.h com.cateye.core.native_.PreviewBitmap
+	$(ENSURE_GEN)
+	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $@ $(subst /,.,$(basename $(patsubst $(TARGET_GEN)/%, %, $@)))
 
 ################### Objects ###################
 
-$(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(TARGET_GEN)/%.h 
+$(JAVA_JNI_OBJ) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.cpp $(TARGET_GEN)/%.h 
 	@echo "[$(PROJ)] Compiling $@ ..."
-	if [ ! -d "$(TARGET_OBJ)/com/cateye/core/native_" ]; then mkdir -p "$(TARGET_OBJ)/com/cateye/core/native_"; fi
+	if [ ! -d $(dir $@) ]; then mkdir -p $(dir $@); fi
 	$(CPP) -c $< -o $@ -I"$(TARGET_GEN)" $(INCLUDES)
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(OBJECT_FILES_WITH_PATH) deplibs
+$(TARGET_BIN)/$(LIBBITMAPS_SHARED): $(JAVA_JNI_OBJ) deplibs
 	@echo "[$(PROJ)] Building native part: $@ ..."
 	$(ENSURE_BIN)
-	$(CPP) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--add-stdcall-alias
+	$(CPP) -shared $(JAVA_JNI_OBJ) $(LIBS) -o $@ -Wl,--add-stdcall-alias
 
 ############### Dependent libs ################
 
@@ -98,4 +103,4 @@ $(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
 	make --directory=../bitmaps	
 
 .PHONY: all classes shared_lib deplibs clean
-.SILENT:
+#.SILENT:
