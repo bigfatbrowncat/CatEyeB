@@ -45,7 +45,8 @@ all: shared_lib classes $(JAVA_JNI_HEADERS)
 
 clean:
 	@echo "[$(PROJ)] Removing Java classes..."
-	rm $(foreach NAME, $(basename $(CLASS_FILES)), $(shell echo "$(NAME)\$$\*.class"))
+	rm -f $(foreach NAME, $(basename $(CLASS_FILES)), $(shell echo $(NAME)'\$$'\*.class))
+	rm $(CLASS_FILES) 
 	
 	@echo "[$(PROJ)] Removing JNI headers..."
 	rm $(JAVA_JNI_HEADERS)
@@ -103,4 +104,4 @@ $(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
 	make --directory=../bitmaps	
 
 .PHONY: all classes shared_lib deplibs clean
-#.SILENT:
+.SILENT:
