@@ -125,7 +125,7 @@ class Stage implements IStage
 			throw new ImageNotLoadedException();
 		
 		if (processedBitmap != null)
-			processedBitmap.dispose();
+			processedBitmap.free();
 		
 		processedBitmap = image.getBitmap().clone();
 		int summaryEfforts = calculateEfforts(stageOperations);

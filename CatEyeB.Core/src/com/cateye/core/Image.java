@@ -46,7 +46,7 @@ public class Image
 	{
 		if (this.bitmap != null)
 		{
-			this.bitmap.dispose();
+			this.bitmap.free();
 		}
 		
 		if (this.description != null)

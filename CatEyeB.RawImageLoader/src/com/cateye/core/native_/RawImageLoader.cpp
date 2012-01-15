@@ -10,24 +10,6 @@
 // ** Private functions **
 
 
-JNIEXPORT jint JNICALL Java_com_cateye_core_native_1_RawImageLoader_LoadFromFile
-  (JNIEnv *, jclass, jstring, jboolean, jobject, jobject)
-{
-
-}
-
-JNIEXPORT jint JNICALL Java_com_cateye_core_native_1_RawImageLoader_LoadDescriptionFromFile
-  (JNIEnv *, jclass, jstring, jobject)
-{
-
-}
-
-JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageLoader_FreeDescription
-  (JNIEnv *, jclass, jobject)
-{
-
-}
-
 //void decode_jpeg(PreviewBitmap* res, unsigned char* buffer, unsigned long size)
 //{
 //	struct jpeg_decompress_struct cinfo;

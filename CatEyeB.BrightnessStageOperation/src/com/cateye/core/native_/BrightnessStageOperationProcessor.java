@@ -11,7 +11,7 @@ class BrightnessStageOperationProcessor implements IStageOperationProcessor<Brig
 	
 	static
 	{
-		LibraryLoader.attach("CatEyeB.BrightnessStageOperation", "brightness.CatEyeOperation");
+		LibraryLoader.attach("brightness.CatEyeOperation");
 	}
 
 	@Override

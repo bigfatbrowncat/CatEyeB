@@ -130,4 +130,12 @@ class RawImageDescription extends ImageDescription
 			thumbnail.dispose();
 		}
 	}
+	
+	static
+	{
+		LibraryLoader.attach("Raw.CatEyeImageLoader");		
+	}
+	
+	@Override
+	public native void loadFromFile(String filename);
 }

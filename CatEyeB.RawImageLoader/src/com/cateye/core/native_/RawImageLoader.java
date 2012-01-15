@@ -3,14 +3,9 @@ package com.cateye.core.native_;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cateye.core.BadCropException;
-import com.cateye.core.BadFileException;
-import com.cateye.core.CorruptedImageException;
 import com.cateye.core.IImageLoader;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
-import com.cateye.core.LoadingCancelledException;
-import com.cateye.core.UnsupportedFormatException;
 
 class RawImageLoader implements IImageLoader
 {
@@ -46,7 +41,7 @@ class RawImageLoader implements IImageLoader
 	@Override
 	public Image load(String fileName)
 	{
-		// load description
+	/*	// load description
 		RawImageDescription description = loadDescription(fileName);
 		
 		// load bitmap
@@ -54,27 +49,23 @@ class RawImageLoader implements IImageLoader
 		checkLoadingResult(LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter));
 		
 		// raise an event
-		return new Image(description, bitmap);
+		return new Image(description, bitmap);*/
+		return null;
 	}
 	
 	@Override
 	public RawImageDescription loadDescription(String fileName)
 	{
-		RawImageDescription description = new RawImageDescription();
+		/*RawImageDescription description = new RawImageDescription();
 		LoadDescriptionFromFile(getPathToFile(fileName), description);
 		
-		return description;
+		return description;*/
+		return null;
 	}
 	
-	/**
-	 * Returns a path to the file
-	 */
-	protected String getPathToFile(String fileName)
-	{
-		return new java.io.File(fileName).getAbsolutePath();
-	}
 	
-	protected void checkLoadingResult(int resultCode)
+	
+/*	protected void checkLoadingResult(int resultCode)
 	{
 		switch (resultCode)
 		{
@@ -110,10 +101,10 @@ class RawImageLoader implements IImageLoader
 	static native int LoadFromFile(String fileName, boolean divideBy2, PreciseBitmap res, ExtractingProgressReporter progressReporter);
 	static native int LoadDescriptionFromFile(String filename, RawImageDescription res);
 	static native void FreeDescription(RawImageDescription description); // TODO: Do we need it?
-	
+*/	
 	static
 	{
-		LibraryLoader.attach("CatEyeB.RawImageLoader", "raw.CatEyeLoader");
+		LibraryLoader.attach("Raw.CatEyeImageLoader");
 	}
 	
 	/**
