@@ -59,7 +59,7 @@ classes: $(CLASS_FILES)
 $(TARGET_BIN)/%.class : $(SOURCE)/%.java
 	@echo "[$(PROJ)] Compiling java class $@ ..."
 	$(ENSURE_BIN)
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS)" -d "$(TARGET_BIN)" $<
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS);$(TARGET_BIN)" -d "$(TARGET_BIN)" $<
 
 ################# JNI Headers #################
 
@@ -84,11 +84,11 @@ $(TARGET_BIN)/$(NATIVE_LIB): $(JAVA_JNI_OBJ)
 
 ############### Dependent libs ################
 
-deplibs: $(TARGET_BIN)/bitmaps.dll
+#deplibs: $(TARGET_BIN)/bitmaps.dll
 
-$(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
-	@echo [$(PROJ)] $@ needed. Making it ...
-	make --directory=../bitmaps	
+#$(TARGET_BIN)/bitmaps.dll: ../bitmaps/Makefile
+#	@echo [$(PROJ)] $@ needed. Making it ...
+#	make --directory=../bitmaps	
 
-.PHONY: all classes shared_lib deplibs clean
+.PHONY: all classes shared_lib clean #deplibs 
 .SILENT:

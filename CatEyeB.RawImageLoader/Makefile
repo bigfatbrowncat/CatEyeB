@@ -17,8 +17,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a
 CUSTOM_INCLUDES = -I"../bitmaps/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.core.native_.PreciseBitmap \
-                   com.cateye.core.native_.PreviewBitmap
-NATIVE_LIB = CatEyeB.Core.Native
+JAVA_JNI_CLASSES = com.cateye.core.native_.RawImageLoader
+NATIVE_LIB = Raw.CatEyeImageLoader
 
 include ../target/makefiles/cpp_java_cross.mk

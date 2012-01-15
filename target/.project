@@ -4,12 +4,14 @@
 	<comment></comment>
 	<projects>
 		<project>bitmaps</project>
-		<project>brightness_operation</project>
-		<project>CatEyeB</project>
+		<project>CatEyeB.BrightnessStageOperation</project>
+		<project>CatEyeB.Core</project>
+		<project>CatEyeB.PpmImageSaver</project>
+		<project>CatEyeB.RawImageLoader</project>
+		<project>CatEyeB.Tests</project>
+		<project>ExternalLibs</project>
 		<project>jpeg-8c</project>
 		<project>libraw</project>
-		<project>ppm_saver</project>
-		<project>raw_loader</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

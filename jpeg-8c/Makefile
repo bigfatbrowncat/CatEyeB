@@ -1,8 +1,9 @@
+PROJ = jpeg8c
+
 OSTYPE := $(shell uname)
 COMMON_CFLAGS = -static-libgcc
 COMMON_CPPFLAGS = $(COMMON_CFLAGS) -static-libstdc++
 
-BUILD_CONF = Release
 CFLAGS = -O3
 
 CC = gcc $(COMMON_CFLAGS) $(CFLAGS)
@@ -13,7 +14,7 @@ INCLUDES =
 
 SOURCE = src
 HEADERS = include
-TARGET = ../target/$(BUILD_CONF)
+TARGET = ../target
 
 TARGET_BIN = $(TARGET)/bin
 TARGET_OBJ = $(TARGET)/obj
@@ -34,19 +35,43 @@ HEADER_FILES = jconfig.h jdct.h jerror.h jinclude.h jmemsys.h                  \
 OBJECT_FILES_WITH_PATH = $(addprefix $(TARGET_OBJ)/,$(OBJECT_FILES))
 HEADER_FILES_WITH_PATH = $(addprefix $(HEADERS)/,$(HEADER_FILES))
 
-LIBJPEG_STATIC = jpeg8c.a
+LIBNAME = jpeg8c
+
+LIB_STATIC_NAME = $(LIBNAME).a
 
 ifneq (,$(findstring MINGW, $(OSTYPE)))			# OS type is MinGW 32
 	# In Windows we need to link to libws2_32
-	LIBJPEG_SHARED = jpeg8c.dll
+	LIBS = -lws2_32 -lm
+	LIB_SHARED_NAME = $(LIBNAME).dll
 else											# any other case assumed as a POSIX system
-	LIBJPEG_SHARED = libjpeg8c.so
+	LIBS = -lm
+	THREADFLAG = -pthread
+	LIB_SHARED_NAME = lib$(LIBNAME).so
 endif
+
+
+SHARED_LIB = $(LIB_SHARED_NAME)
+STATIC_LIB = $(LIB_STATIC_NAME)
+SHARED_LINK = $(LIB_SHARED_NAME).a
 
 all: shared_lib static_lib
 
-static_lib: $(TARGET_LIB)/$(LIBJPEG_STATIC)
-shared_lib: $(TARGET_BIN)/$(LIBJPEG_SHARED)
+clean:
+	@echo "[$(PROJ)] Removing static library..."
+	rm -f $(TARGET_LIB)/$(STATIC_LIB)
+	rm -f $(TARGET_LIB)/$(SHARED_LINK)
+
+	@echo "[$(PROJ)] Removing shared library..."
+	rm -f $(TARGET_BIN)/$(SHARED_LIB)
+
+	@echo "[$(PROJ)] Removing object files..."
+	rm -f $(OBJECT_FILES_WITH_PATH)
+
+	@echo "[$(PROJ)] Removing empty directories..."
+	find $(TARGET) -depth -empty -type d -exec rmdir {} \;
+
+static_lib: $(TARGET_LIB)/$(STATIC_LIB)
+shared_lib: $(TARGET_BIN)/$(SHARED_LIB)
 
 ################### Folders ###################
 
@@ -57,20 +82,20 @@ ENSURE_OBJ = if [ ! -d "$(TARGET_OBJ)" ]; then mkdir -p "$(TARGET_OBJ)"; fi
 ################### Objects ###################
 
 $(OBJECT_FILES_WITH_PATH) : $(TARGET_OBJ)/%.o : $(SOURCE)/%.c $(HEADER_FILES_WITH_PATH)
-	@echo "Compiling $@ ..."
+	@echo "[$(PROJ)] Compiling $@ ..."
 	$(ENSURE_OBJ)
 	$(CC) -c $< -o $@ $(INCLUDES) -I"$(HEADERS)"
 
 ################### Targets ###################
 
-$(TARGET_BIN)/$(LIBJPEG_SHARED): $(OBJECT_FILES_WITH_PATH)
-	@echo "Building shared library $@ ..."
+$(TARGET_BIN)/$(SHARED_LIB): $(OBJECT_FILES_WITH_PATH)
+	@echo "[$(PROJ)] Building shared library $@ ..."
 	$(ENSURE_BIN)
 	$(ENSURE_LIB)
-	$(CC) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(LIBJPEG_SHARED).a
+	$(CC) -shared $(OBJECT_FILES_WITH_PATH) $(LIBS) -o $@ -Wl,--out-implib=$(TARGET_LIB)/$(SHARED_LINK)
 
-$(TARGET_LIB)/$(LIBJPEG_STATIC): $(OBJECT_FILES_WITH_PATH)
-	@echo "Building static library $@ ..."
+$(TARGET_LIB)/$(STATIC_LIB): $(OBJECT_FILES_WITH_PATH)
+	@echo "[$(PROJ)] Building static library $@ ..."
 	$(ENSURE_LIB)
 	ar crv $@ $(OBJECT_FILES_WITH_PATH)
 	ranlib $@

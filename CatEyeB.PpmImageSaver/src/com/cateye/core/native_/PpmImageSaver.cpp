@@ -1,4 +1,4 @@
-#include "ppm_saver.h"
+#include "com/cateye/core/native_/PpmImageSaver.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -11,7 +11,7 @@ inline double luminosity(double r, double g, double b)
 /*
  * limit_a should be in range 2..4
  */
-PPM_SAVER void SaveImage(char* filename, PreciseBitmap* bitmap, double limit_a)
+/*void SaveImage(char* filename, PreciseBitmap* bitmap, double limit_a)
 {
 	FILE* file = fopen(filename, "wb");
 
@@ -36,4 +36,10 @@ PPM_SAVER void SaveImage(char* filename, PreciseBitmap* bitmap, double limit_a)
 	delete [] buf;
 
 	fclose(file);
+}
+*/
+
+JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PpmImageSaver_SaveImage
+  (JNIEnv *, jclass, jstring, jobject, jdouble)
+{
 }

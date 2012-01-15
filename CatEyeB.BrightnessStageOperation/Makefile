@@ -1,6 +1,6 @@
 #################### Macros #####################
 
-PROJ = CatEyeB.Core
+PROJ = CatEyeB.BrightnessStageOperation
 
 # CC macros
 COMMON_CFLAGS = -static-libgcc
@@ -17,8 +17,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a
 CUSTOM_INCLUDES = -I"../bitmaps/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.core.native_.PreciseBitmap \
-                   com.cateye.core.native_.PreviewBitmap
-NATIVE_LIB = CatEyeB.Core.Native
+JAVA_JNI_CLASSES = com.cateye.core.native_.BrightnessStageOperationProcessor
+NATIVE_LIB = Brightness.CatEyeStageOperation
 
 include ../target/makefiles/cpp_java_cross.mk

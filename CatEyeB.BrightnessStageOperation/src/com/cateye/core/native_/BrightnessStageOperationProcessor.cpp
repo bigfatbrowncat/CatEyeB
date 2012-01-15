@@ -1,9 +1,12 @@
-#include "brightness_operation.h"
+#include "com/cateye/core/native_/BrightnessStageOperationProcessor.h"
 #include <math.h>
 
-int Process(PreciseBitmap* bmp, double brightness,
-             BrightnessOperationProgressReporter* progress_reporter)
+JNIEXPORT void JNICALL Java_com_cateye_core_native_1_BrightnessStageOperationProcessor_Process
+  (JNIEnv *, jclass, jobject, jobject)
+/*int Process(PreciseBitmap* bmp, double brightness,
+             BrightnessOperationProgressReporter* progress_reporter)*/
 {
+	/*
 	int pixels_per_percent = bmp->width * bmp->height / 100 + 1;		// 1 added for zero exclusion
 	for (int i = 0; i < bmp->width * bmp->height; i++)
 	{
@@ -33,5 +36,5 @@ int Process(PreciseBitmap* bmp, double brightness,
 
 
 	}
-	return BRIGHTNESS_OPERATION_RESULT_OK;
+	return BRIGHTNESS_OPERATION_RESULT_OK;*/
 }
