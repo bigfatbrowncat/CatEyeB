@@ -3,6 +3,10 @@
 	<name>CatEyeB.Tests</name>
 	<comment></comment>
 	<projects>
+		<project>CatEyeB.BrightnessStageOperation</project>
+		<project>CatEyeB.Core</project>
+		<project>CatEyeB.PpmImageSaver</project>
+		<project>CatEyeB.RawImageLoader</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

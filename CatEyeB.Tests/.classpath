@@ -14,7 +14,7 @@
 	<classpathentry kind="src" path="/CatEyeB.RawImageLoader"/>
 	<classpathentry kind="src" path="/CatEyeB.PpmImageSaver"/>
 	<classpathentry kind="src" path="/CatEyeB.BrightnessStageOperation"/>
-	<classpathentry kind="lib" path="/target/bin"/>
+	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.Core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

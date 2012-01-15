@@ -7,3 +7,5 @@ public class BadFileException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 }
+
+// TODO: Remove that IOException would be enough

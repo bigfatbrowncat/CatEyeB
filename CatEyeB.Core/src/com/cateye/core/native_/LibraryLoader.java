@@ -5,7 +5,7 @@ package com.cateye.core.native_;
  */
 public class LibraryLoader
 {
-	static String getPathToLibrary(String projectName, String libraryName)
+	static String getPathToLibrary(String libraryName)
 	{
 		return new java.io.File(libraryName).getAbsolutePath();
 	}
@@ -13,8 +13,8 @@ public class LibraryLoader
 	/**
 	 * Loads a library and attach it to the native methods of the current class
 	 */
-	public static void attach(String projectName, String libraryName)
+	public static void attach(String libraryName)
 	{
-		System.load(getPathToLibrary(projectName, libraryName));
+		System.load(getPathToLibrary(libraryName));
 	}
 }

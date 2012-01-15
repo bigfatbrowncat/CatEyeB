@@ -38,14 +38,14 @@ struct PreviewBitmap
 extern "C"
 {
 	// PreciseBitmap management
-	LIBBITMAP int PreciseBitmap_Init(PreciseBitmap* bmp, int width, int height);
-	LIBBITMAP int PreciseBitmap_Copy(PreciseBitmap* src, PreciseBitmap* res);
-	LIBBITMAP int PreciseBitmap_Free(PreciseBitmap* fb);
+	LIBBITMAP int PreciseBitmap_Init(PreciseBitmap& bmp, int width, int height);
+	LIBBITMAP int PreciseBitmap_Copy(PreciseBitmap& src, PreciseBitmap& res);
+	LIBBITMAP int PreciseBitmap_Free(PreciseBitmap& fb);
 
 	// PreviewBitmap management
-	LIBBITMAP int PreviewBitmap_Init(PreviewBitmap* bmp, int width, int height);
-	LIBBITMAP int PreviewBitmap_Copy(PreviewBitmap* src, PreviewBitmap* res);
-	LIBBITMAP int PreviewBitmap_Free(PreviewBitmap* fb);
+	LIBBITMAP int PreviewBitmap_Init(PreviewBitmap& bmp, int width, int height);
+	LIBBITMAP int PreviewBitmap_Copy(PreviewBitmap& src, PreviewBitmap& res);
+	LIBBITMAP int PreviewBitmap_Free(PreviewBitmap& fb);
 
 	// Converters
 	LIBBITMAP int PreviewBitmap_FromPreciseBitmap(PreciseBitmap* src, PreviewBitmap* res);

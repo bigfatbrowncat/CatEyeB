@@ -13,12 +13,18 @@ public interface IPreciseBitmap
 	int getHeight();
 	
 	/**
+	 * Allocates native resources
+	 */
+	void alloc(int width, int height) throws NativeHeapAllocationException;
+	
+	/**
 	 * Creates a clone of the bitmap
 	 */
-	IPreciseBitmap clone();
+	IPreciseBitmap clone() throws NativeHeapAllocationException, InvalidDataException;
 	
 	/**
 	 * Releases native resources
+	 * @throws InvalidDataException 
 	 */
-	void dispose();
+	void free() throws InvalidDataException;
 }

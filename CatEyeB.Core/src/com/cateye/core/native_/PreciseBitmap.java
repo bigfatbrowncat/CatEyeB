@@ -1,6 +1,8 @@
 package com.cateye.core.native_;
 
 import com.cateye.core.IPreciseBitmap;
+import com.cateye.core.InvalidDataException;
+import com.cateye.core.NativeHeapAllocationException;
 
 class PreciseBitmap implements IPreciseBitmap
 {
@@ -47,45 +49,22 @@ class PreciseBitmap implements IPreciseBitmap
 	}
 	
 	@Override
-	public void dispose()
-	{
-		Free(this);
-	}
+	public native void alloc(int width, int height) throws NativeHeapAllocationException;
+
+	@Override
+	public native void free() throws InvalidDataException;
 	
 	@Override
-	public IPreciseBitmap clone()
-	{
-		PreciseBitmap result = new PreciseBitmap();
-		int resultCode = Copy(this, result);
-		checkResult(resultCode);
-		
-		return result;
+	public native IPreciseBitmap clone() throws NativeHeapAllocationException, InvalidDataException;
+
+	@Override
+	protected void finalize() throws Throwable {
+		free();
+		super.finalize();
 	}
-	
-	/**
-	 * Check result and if it is wrong throw the exception
-	 */
-	private void checkResult(int resultCode)
-	{
-		switch (resultCode)
-		{
-			case BITMAP_RESULT_OUT_OF_MEMORY:
-				throw new OutOfMemoryError();
-			case BITMAP_RESULT_INCORRECT_DATA:
-				throw new IncorrectDataException();
-		}
-	}
-	
-	static final int BITMAP_RESULT_OK = 0;
-	static final int BITMAP_RESULT_OUT_OF_MEMORY = 1;
-	static final int BITMAP_RESULT_INCORRECT_DATA = 2;
-	
-	static native int Init(PreciseBitmap bmp, int width, int height);
-	static native int Copy(PreciseBitmap src, PreciseBitmap res);
-	static native int Free(PreciseBitmap fb);
 	
 	static
 	{
-		LibraryLoader.attach("target", "CatEyeB.Core.native");
+		LibraryLoader.attach("CatEyeB.Core.Native");
 	}
 }
