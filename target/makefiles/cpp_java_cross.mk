@@ -59,13 +59,15 @@ classes: $(CLASS_FILES)
 $(TARGET_BIN)/%.class : $(SOURCE)/%.java
 	@echo "[$(PROJ)] Compiling java class $@ ..."
 	$(ENSURE_BIN)
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS);$(TARGET_BIN)" -d "$(TARGET_BIN)" $<
+	#@echo "Custom jars: $(CUSTOM_JARS)"
+	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS);$(CUSTOM_JARS);$(TARGET_BIN)" -d "$(TARGET_BIN)" $<
 
 ################# JNI Headers #################
 
 $(JAVA_JNI_HEADERS) : $(TARGET_GEN)/%.h : $(TARGET_BIN)/%.class
 	@echo "[$(PROJ)] Generating $@ ..."
 	$(ENSURE_GEN)
+	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
 	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $@ $(subst /,.,$(basename $(patsubst $(TARGET_GEN)/%, %, $@)))
 
 ################### Objects ###################
