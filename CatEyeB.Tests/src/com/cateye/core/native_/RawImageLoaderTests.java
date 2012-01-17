@@ -1,5 +1,7 @@
 package com.cateye.core.native_;
 
+import java.util.Date;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -40,6 +42,7 @@ public class RawImageLoaderTests
 		Assert.assertEquals(1600f, description.getIsoSpeed());
 		Assert.assertEquals(0, description.getShotOrder());
 		Assert.assertEquals(0.03125, description.getShutter(), 0.00001f);
-		DateAssert.assertEquals("10/19/11 6:51:56 PM MSK", description.getTimestamp());
+		System.out.printf("%1$s", description.getTimestamp());
+		DateAssert.assertEquals(new Date("10/19/11 6:51:56 PM MSK"), description.getTimestamp());
 	}
 }

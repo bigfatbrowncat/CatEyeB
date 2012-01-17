@@ -94,16 +94,21 @@ void decode_jpeg(PreviewBitmap& res, unsigned char* buffer, unsigned long size)
 		res.b[i] = image[3 * i + 2];
 	}
 
-	/*
-	FILE* file = fopen("c:\\test.ppm", "wb");
-
-	fprintf(file, "P6\n%i %i 255\n", cinfo.output_width, cinfo.output_height);
-	fwrite(image, 1, cinfo.output_width * cinfo.output_height * cinfo.num_components, file);
-
-	fclose(file);
-	*/
 	free(image);
 }
+
+void decode_plain(PreviewBitmap& res, int width, int height, unsigned char* buffer, unsigned long size)
+{
+	// Decompositing
+	PreviewBitmap_Init(res, width, height);
+	for (int i = 0; i < width * height; i++)
+	{
+		res.r[i] = buffer[3 * i];
+		res.g[i] = buffer[3 * i + 1];
+		res.b[i] = buffer[3 * i + 2];
+	}
+}
+
 
 JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFromFile
 	(JNIEnv * env, jobject obj, jstring filename)
@@ -111,10 +116,11 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	// Getting the classes
 	jclass cls = env->GetObjectClass(obj);
 	jclass previewBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreviewBitmap;");
+	jclass date_class = env->FindClass("Ljava/util/Date;");
 
 	// Getting the methods
 	jmethodID previewBitmap_init = env->GetMethodID(previewBitmap_class, "<init>", "()V");
-
+	jmethodID date_init = env->GetMethodID(date_class, "<init>", "(J)V");
 
 	// Getting the field ids
 	jfieldID thumbnail_id = env->GetFieldID(cls, "thumbnail", "Lcom/cateye/core/IPreviewBitmap;"),
@@ -131,7 +137,10 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	         cameraModel_id = env->GetFieldID(cls, "cameraModel", "Ljava/lang/String;");
 
 	jobject previewBitmap;
+	jobject date = NULL;
+
     const char* fn;
+    long time_con;
     int ret;
 
     LibRaw* RawProcessor = NULL;
@@ -169,16 +178,21 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	env->SetFloatField(obj, focalLength_id, RawProcessor->imgdata.other.focal_len);
 	printf("[Native] shot order = %d\n", RawProcessor->imgdata.other.shot_order);
 	env->SetIntField(obj, shotOrder_id, RawProcessor->imgdata.other.shot_order);
+	printf("[Native] timestamp = %d\n", RawProcessor->imgdata.other.timestamp / 1000);
+	time_con = 1000L * (long)RawProcessor->imgdata.other.timestamp;
+	date = env->NewObject(date_class, date_init, time_con);
+
+	fflush(stdout);
 
 	previewBitmap = env->NewObject(previewBitmap_class, previewBitmap_init);
 
 	// Getting bitmap field ids
 	jfieldID r_id, g_id, b_id, width_id, height_id;
-	r_id = env->GetFieldID(cls, "r", "J");
-	g_id = env->GetFieldID(cls, "g", "J");
-	b_id = env->GetFieldID(cls, "b", "J");
-	width_id = env->GetFieldID(cls, "width", "I");
-	height_id = env->GetFieldID(cls, "height", "I");
+	r_id = env->GetFieldID(previewBitmap_class, "r", "J");
+	g_id = env->GetFieldID(previewBitmap_class, "g", "J");
+	b_id = env->GetFieldID(previewBitmap_class, "b", "J");
+	width_id = env->GetFieldID(previewBitmap_class, "width", "I");
+	height_id = env->GetFieldID(previewBitmap_class, "height", "I");
 
 	PreviewBitmap thumb;
 
@@ -198,19 +212,23 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	}
 	else
 	{
-		// TODO: implement plain bitmap decoding
-		printf("TODO: implement plain bitmap decoding");
-		throw 1;
+		decode_plain(thumb, image->width, image->height, image->data, image->data_size);
 	}
 
 	// Setting field values
-	env->SetIntField(obj, width_id, thumb.width);
-	env->SetIntField(obj, height_id, thumb.height);
-	env->SetLongField(obj, r_id, (jlong)(thumb.r));
-	env->SetLongField(obj, g_id, (jlong)(thumb.g));
-	env->SetLongField(obj, b_id, (jlong)(thumb.b));
+	env->SetIntField(previewBitmap, width_id, thumb.width);
+	env->SetIntField(previewBitmap, height_id, thumb.height);
+	env->SetLongField(previewBitmap, r_id, (jlong)(thumb.r));
+	env->SetLongField(previewBitmap, g_id, (jlong)(thumb.g));
+	env->SetLongField(previewBitmap, b_id, (jlong)(thumb.b));
 
-	fflush(stdout);
+	env->SetObjectField(obj, thumbnail_id, previewBitmap);
+	env->SetObjectField(obj, description_id, env->NewStringUTF(RawProcessor->imgdata.other.desc));
+	env->SetObjectField(obj, artist_id, env->NewStringUTF(RawProcessor->imgdata.other.artist));
+	env->SetObjectField(obj, cameraMaker_id, env->NewStringUTF(RawProcessor->imgdata.idata.make));
+	env->SetObjectField(obj, cameraModel_id, env->NewStringUTF(RawProcessor->imgdata.idata.model));
+	env->SetObjectField(obj, timeStamp_id, date);
+
 
 	/*res->flip = RawProcessor.imgdata.sizes.flip;	// 0 - no rotation; 3 - 180-deg rotation; 5 - 90-deg counterclockwise, 6 - 90-deg clockwise
 
@@ -234,8 +252,8 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	memcpy(res->gpsdata, RawProcessor.imgdata.other.gpsdata, 32 * sizeof(unsigned int));*/
 
 
-	RawProcessor->recycle(); // just for show this call...
-							// use it if you want to load something else
+	RawProcessor->recycle();   // just for show this call...
+	                           // use it if you want to load something else
 
 
 end:
