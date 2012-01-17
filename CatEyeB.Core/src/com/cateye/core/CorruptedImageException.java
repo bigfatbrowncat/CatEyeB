@@ -6,4 +6,8 @@ package com.cateye.core;
 public class CorruptedImageException extends ImageLoadingException
 {
 	private static final long serialVersionUID = 1L;
+	public CorruptedImageException(String message)
+	{
+		super(message);
+	}
 }

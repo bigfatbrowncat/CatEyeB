@@ -8,22 +8,21 @@ import com.cateye.core.ImageDescription;
 class RawImageDescription extends ImageDescription
 {
 	protected IPreviewBitmap thumbnail;
-	
+	protected int flip;
 	protected float isoSpeed;
 	protected float shutter;
 	protected float aperture;
 	protected float focalLength;
-	protected Date timestamp;
+	protected Date timeStamp;
 	protected int shotOrder;
 	protected String description;
 	protected String artist;
 	protected String cameraMaker;
 	protected String cameraModel;
-	protected int flip;
 	
 	protected void setDate(int value)
 	{
-		this.timestamp = new Date(value * 1000L);
+		this.timeStamp = new Date(value * 1000L);
 	}
 	
 	/**
@@ -71,7 +70,7 @@ class RawImageDescription extends ImageDescription
 	 */
 	public Date getTimestamp()
 	{
-		return timestamp;
+		return timeStamp;
 	}
 	
 	/**

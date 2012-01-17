@@ -13,8 +13,9 @@ CPPFLAGS =
 CPPDEFINES =
 
 # Universal macros
-LIBS = $(TARGET_LIB)/bitmaps.dll.a
-CUSTOM_INCLUDES = -I"../bitmaps/include"
+LIBS = $(TARGET_LIB)/bitmaps.dll.a $(TARGET_LIB)/jpeg8c.dll.a $(TARGET_LIB)/raw.a -lws2_32
+	
+CUSTOM_INCLUDES = -I"../bitmaps/include" -I"../libraw/libraw" -I"../jpeg-8c/include"
 SOURCE = src
 TARGET = ../target
 JAVA_JNI_CLASSES = com.cateye.core.native_.RawImageLoader \

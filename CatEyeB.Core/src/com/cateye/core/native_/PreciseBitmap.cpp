@@ -1,7 +1,7 @@
 #include <com/cateye/core/native_/PreciseBitmap.h>
 #include <bitmaps.h>
 
-#define NATIVE_OUT_OF_MEMORY	"Out of memory during native heap allocation"
+#define NATIVE_OUT_OF_MEMORY	"Out of memory during native image allocation"
 #define INVALID_IMAGE_DATA		"Invalid image data"
 
 JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_alloc
