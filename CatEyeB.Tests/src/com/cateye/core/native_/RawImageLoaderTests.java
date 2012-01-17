@@ -13,7 +13,7 @@ public class RawImageLoaderTests
 	public void test_load_description_from_raw_file()
 	{
 		RawImageDescription desc = new RawImageDescription();
-		desc.loadFromFile("../../data/test/IMG_5196.CR2");
+		desc.loadFromFile("../../data/test/IMG_5697.CR2");
 //		desc.loadFromFile("../../data/test/fake.CR2");
 		System.out.printf("[Java] Flip: %1$d\n", desc.getFlip());
 		System.out.printf("[Java] ISO speed: %1$f\n", desc.getIsoSpeed());

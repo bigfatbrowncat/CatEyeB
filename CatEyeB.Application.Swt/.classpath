@@ -14,6 +14,6 @@
 	<classpathentry kind="lib" path="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.workbench_3.7.0.I20110519-0100.jar" sourcepath="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.workbench_3.7.0.I20110519-0100.jar"/>
 	<classpathentry kind="lib" path="C:/Bulat/Soft/eclipse/plugins/com.ibm.icu_4.4.2.v20110208.jar" sourcepath="C:/Bulat/Soft/eclipse/plugins/com.ibm.icu_4.4.2.v20110208.jar"/>
 	<classpathentry kind="lib" path="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.forms_3.5.100.v20110425.jar" sourcepath="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.forms_3.5.100.v20110425.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.UI.SwtImageViewer"/>
+	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

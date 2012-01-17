@@ -1,13 +1,11 @@
 package com.cateye.swt;
 
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import com.cateye.ui.swt.ImageViewer;
-import org.eclipse.swt.SWT;
 
 public class MainWindow
 {
@@ -56,9 +54,13 @@ public class MainWindow
 	{
 		shell = new Shell();
 		shell.setSize(450, 300);
-		shell.setText("SWT Application");
+		shell.setText("SWT Application 2");
 		
-		final ImageViewer imageViewer = new ImageViewer(shell, SWT.NONE);
-		imageViewer.setBounds(0, 0, 424, 262);
+		FillLayout fillLayout = new FillLayout();
+		fillLayout.type = SWT.VERTICAL;
+		shell.setLayout(fillLayout);
+		
+		final ImageViewer imageViewer = new ImageViewer(shell, SWT.NO_BACKGROUND);
+		imageViewer.setSize(400, 250);
 	}
 }
