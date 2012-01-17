@@ -6,31 +6,31 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
+import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.native_.LibraryLoader;
 
 public class ImageViewer extends Canvas
 {
 	private int nativeHandle;
+	final IPreciseBitmap bmp;
 	
 	public ImageViewer(Composite parent, int style)
 	{
 		super(parent, style);
+		bmp = null;
 		
-		/*PaintListener listener = new PaintListener()
+		addPaintListener(new PaintListener()
 		{
 			@Override
 			public void paintControl(PaintEvent e)
 			{
-	            Rectangle clientArea = getClientArea();
-	            e.gc.drawLine(0,0,clientArea.width,clientArea.height); 
-	            //drawControl(handle, pe.x, pe.y, pe.width, pe.height);
+				Rectangle rect = ImageViewer.this.getClientArea();
+				drawImage(e.gc.handle, bmp, 0, 0, rect.width, rect.height);
 			}
-		};
-		
-		this.addPaintListener(listener);*/
+		});
 	}
 	
-	static final native void drawControl(int handle, int x, int y, int width, int height);
+	static final native void drawImage(int handle, IPreciseBitmap bitmap, int x, int y, int width, int height);
 	
 	static
 	{
