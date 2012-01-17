@@ -108,10 +108,15 @@ void decode_jpeg(PreviewBitmap& res, unsigned char* buffer, unsigned long size)
 JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFromFile
 	(JNIEnv * env, jobject obj, jstring filename)
 {
-	// Getting the class
+	// Getting the classes
 	jclass cls = env->GetObjectClass(obj);
+	jclass previewBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreviewBitmap;");
 
-	// Getting field ids
+	// Getting the methods
+	jmethodID previewBitmap_init = env->GetMethodID(previewBitmap_class, "<init>", "()V");
+
+
+	// Getting the field ids
 	jfieldID thumbnail_id = env->GetFieldID(cls, "thumbnail", "Lcom/cateye/core/IPreviewBitmap;"),
 	         flip_id = env->GetFieldID(cls, "flip", "I"),
 	         isoSpeed_id = env->GetFieldID(cls, "isoSpeed", "F"),
@@ -125,6 +130,7 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	         cameraMaker_id = env->GetFieldID(cls, "cameraMaker", "Ljava/lang/String;"),
 	         cameraModel_id = env->GetFieldID(cls, "cameraModel", "Ljava/lang/String;");
 
+	jobject previewBitmap;
     const char* fn;
     int ret;
 
@@ -150,27 +156,6 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 		goto end;
 	}
 
-	image = RawProcessor->dcraw_make_mem_image(&ret);
-	if (image == 0)
-	{
-		goto end;
-	}
-
-	// Extracting the picture
-
-/*	if (image->type == LIBRAW_IMAGE_JPEG)
-	{
-		decode_jpeg(res->thumbnail, image->data, image->data_size);
-	}
-	else
-	{
-		// TODO: implement plain bitmap decoding
-		printf("TODO: implement plain bitmap decoding");
-		throw 1;
-	}
-*/
-
-
 	// Setting fields
 	printf("[Native] flip = %d\n", RawProcessor->imgdata.sizes.flip);
 	env->SetIntField(obj, flip_id, RawProcessor->imgdata.sizes.flip);	// 0 - no rotation; 3 - 180-deg rotation; 5 - 90-deg counterclockwise, 6 - 90-deg clockwise
@@ -184,6 +169,46 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_RawImageDescription_loadFro
 	env->SetFloatField(obj, focalLength_id, RawProcessor->imgdata.other.focal_len);
 	printf("[Native] shot order = %d\n", RawProcessor->imgdata.other.shot_order);
 	env->SetIntField(obj, shotOrder_id, RawProcessor->imgdata.other.shot_order);
+
+	previewBitmap = env->NewObject(previewBitmap_class, previewBitmap_init);
+
+	// Getting bitmap field ids
+	jfieldID r_id, g_id, b_id, width_id, height_id;
+	r_id = env->GetFieldID(cls, "r", "J");
+	g_id = env->GetFieldID(cls, "g", "J");
+	b_id = env->GetFieldID(cls, "b", "J");
+	width_id = env->GetFieldID(cls, "width", "I");
+	height_id = env->GetFieldID(cls, "height", "I");
+
+	PreviewBitmap thumb;
+
+	// Extracting the picture
+
+	image = RawProcessor->dcraw_make_mem_image(&ret);
+	if (image == 0)
+	{
+		goto end;
+	}
+
+	printf("%d\n", image->type);
+
+	if (image->type == LIBRAW_IMAGE_JPEG)
+	{
+		decode_jpeg(thumb, image->data, image->data_size);
+	}
+	else
+	{
+		// TODO: implement plain bitmap decoding
+		printf("TODO: implement plain bitmap decoding");
+		throw 1;
+	}
+
+	// Setting field values
+	env->SetIntField(obj, width_id, thumb.width);
+	env->SetIntField(obj, height_id, thumb.height);
+	env->SetLongField(obj, r_id, (jlong)(thumb.r));
+	env->SetLongField(obj, g_id, (jlong)(thumb.g));
+	env->SetLongField(obj, b_id, (jlong)(thumb.b));
 
 	fflush(stdout);
 

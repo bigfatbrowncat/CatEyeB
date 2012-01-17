@@ -1,31 +1,38 @@
 package com.cateye.core.native_;
 
 import com.cateye.core.IPreviewBitmap;
+import com.cateye.core.InvalidDataException;
+import com.cateye.core.NativeHeapAllocationException;
 
 class PreviewBitmap implements IPreviewBitmap
 {
 	/**
-	 * Width of the image
+	 * Width of bitmap. 
+	 * Never change this form Java code.
 	 */
 	int width;
 	
 	/**
-	 * Height of the image
+	 * Height of bitmap.
+	 * Never change this form Java code.
 	 */
 	int height;
 	
 	/**
-	 * Pointer to the red channel
+	 * Pointer to the red channel in memory.
+	 * Never change this form Java code.
 	 */
 	long r;
 	
 	/**
-	 * Pointer to the green channel
+	 * Pointer to the green channel in memory.
+	 * Never change this form Java code.
 	 */
 	long g;
 	
 	/**
-	 * Pointer to the blue channel
+	 * Pointer to the blue channel in memory.
+	 * Never change this form Java code.
 	 */
 	long b;
 	
@@ -42,41 +49,19 @@ class PreviewBitmap implements IPreviewBitmap
 	}
 	
 	@Override
-	public void dispose()
-	{
-		checkResult(Free(this));
-	}
+	public native void alloc(int width, int height) throws NativeHeapAllocationException;
+
+	@Override
+	public native void free() throws InvalidDataException;
 	
 	@Override
-	public IPreviewBitmap clone()
-	{
-		PreviewBitmap result = new PreviewBitmap();
-		checkResult(Copy(this, result));
-		
-		return result;
-	}
-	
-	/**
-	 * Check result and if it is wrong throw the exception
-	 */
-	private void checkResult(int resultCode)
-	{
-		switch (resultCode)
-		{
-			case BITMAP_RESULT_OUT_OF_MEMORY:
-				throw new OutOfMemoryError();
-			case BITMAP_RESULT_INCORRECT_DATA:
-				throw new IncorrectDataException();
-		}
-	}
-	
-	static final int BITMAP_RESULT_OK = 0;
-	static final int BITMAP_RESULT_OUT_OF_MEMORY = 1;
-	static final int BITMAP_RESULT_INCORRECT_DATA = 2;
+	public native IPreviewBitmap clone() throws NativeHeapAllocationException, InvalidDataException;
 
-	static native int Init(PreviewBitmap bmp, int width, int height);
-	static native int Copy(PreviewBitmap src, PreviewBitmap res);
-	static native int Free(PreviewBitmap fb);
+	@Override
+	protected void finalize() throws Throwable {
+		free();
+		super.finalize();
+	}
 	
 	static
 	{
