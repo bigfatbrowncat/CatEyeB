@@ -15,8 +15,6 @@ public class PreciseBitmapTests {
 	{
 		final int W = 300, H = 300;
 		ArrayList<PreciseBitmap> pbmps = new ArrayList<PreciseBitmap>(); 
-		boolean outofmem = false;
-		
 		try
 		{
 			do

@@ -23,7 +23,7 @@ public class RawImageLoaderTests
 		System.out.printf("[Java] Shot order: %1$d\n", desc.getShotOrder());
 		
 		//ImageDescription description = loader.loadDescription("..\\data\\test\\IMG_5697.CR2");
-		//assertImageDescription(description);
+		assertImageDescription(desc);
 		
 		//description.dispose();
 	}
