@@ -132,9 +132,6 @@ class RawImageDescription extends ImageDescription
 		}
 	}
 	
-	@Override
-	public native void loadFromFile(String filename);
-	
 	static
 	{
 		LibraryLoader.attach("Raw.CatEyeImageLoader");		

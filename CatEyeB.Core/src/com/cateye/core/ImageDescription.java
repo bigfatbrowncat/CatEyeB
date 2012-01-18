@@ -68,10 +68,4 @@ public abstract class ImageDescription
 	 * Releases the native resources
 	 */
 	public abstract void dispose();
-	
-	/**
-	 * Loads the description from bitmap file
-	 * @param filename The file name
-	 */
-	public abstract void loadFromFile(String filename);
 }

@@ -7,6 +7,84 @@
 
 #include <com/cateye/core/native_/RawImageLoader.h>
 
+
+int ExtractedRawImage_LoadFromFile(char* filename,
+                                   bool divide_by_2,
+			PreciseBitmap* res,
+			ProgressReporter* progress_reporter)
+{
+	//res->data = 0;	// data = 0 means "error during processing"
+
+	LibRaw& RawProcessor = *(new LibRaw());
+
+	RawProcessor.set_progress_handler(internal_callback, (void*)progress_reporter);
+
+	RawProcessor.imgdata.params.gamm[0] = RawProcessor.imgdata.params.gamm[1] =
+	                                      RawProcessor.imgdata.params.no_auto_bright = 1;
+	RawProcessor.imgdata.params.output_bps = 16;
+	RawProcessor.imgdata.params.highlight  = 9;
+	RawProcessor.imgdata.params.threshold  = (float)200;
+
+	if (divide_by_2)
+	{
+		RawProcessor.imgdata.params.half_size         = 1;
+		RawProcessor.imgdata.params.four_color_rgb    = 1;
+	}
+
+	int ret = RawProcessor.open_file(filename, 1024 * 1024 * 1024);
+	if (LIBRAW_FATAL_ERROR(ret))
+	{
+		return convert_libraw_code(ret);
+	}
+	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.unpack()))
+	{
+		return convert_libraw_code(ret);
+	}
+	if (LIBRAW_FATAL_ERROR(ret = RawProcessor.dcraw_process()))
+	{
+		return convert_libraw_code(ret);
+	}
+
+    libraw_processed_image_t *image = RawProcessor.dcraw_make_mem_image(&ret);
+    if (image == 0)
+    {
+		return convert_libraw_code(ret);
+    }
+
+    PreciseBitmap_Init(res, image->width, image->height);
+
+    if (image->bits == 8)
+    {
+    	for (int i = 0; i < res->width * res->height; i++)
+    	{
+    		res->r[i] = ((float)image->data[3 * i]) / 255;
+    		res->g[i] = ((float)image->data[3 * i + 1]) / 255;
+    		res->b[i] = ((float)image->data[3 * i + 2]) / 255;
+    	}
+    }
+    else if (image->bits == 16)
+    {
+    	unsigned short* pus = (unsigned short*)image->data;
+    	for (int i = 0; i < res->width * res->height; i++)
+    	{
+    		res->r[i] = ((float)pus[3 * i]) / 65535;
+    		res->g[i] = ((float)pus[3 * i + 1]) / 65535;
+    		res->b[i] = ((float)pus[3 * i + 2]) / 65535;
+    	}
+    }
+    else
+    {
+    	PreciseBitmap_Free(res);
+    	return EXTRACTING_RESULT_UNSUPPORTED_FORMAT;
+    }
+
+	RawProcessor.recycle(); // just for show this call
+
+	delete &RawProcessor;
+	return EXTRACTING_RESULT_OK;
+}
+
+
 // ** Private functions **
 
 
