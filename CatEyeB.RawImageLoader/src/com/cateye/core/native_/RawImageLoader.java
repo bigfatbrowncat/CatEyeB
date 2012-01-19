@@ -21,7 +21,7 @@ class RawImageLoader implements IImageLoader
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
 	private final ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
 	
-	private Hashtable<WeakReference<Image>, String> imageFileNames = new Hashtable<>();
+	private Hashtable<Image, String> imageFileNames = new Hashtable<Image, String>();
 	
 	@Override
 	public void addProgressListener(IProgressListener listener)
@@ -52,14 +52,14 @@ class RawImageLoader implements IImageLoader
 	public Image loadImageFromFile(String fileName)
 	{
 		Image img = new Image(this);
-		imageFileNames.put(new WeakReference<Image>(img), fileName);
+		imageFileNames.put(img, fileName);
 		return img;
 	}
 	
 	@Override
 	public IPreciseBitmap loadPreciseBitmapForImage(Image img)
 	{
-		if (imageFileNames.contains(img))
+		if (imageFileNames.containsKey(img))
 		{
 			return loadPreciseBitmapFromFile(imageFileNames.get(img));
 		}
@@ -72,7 +72,7 @@ class RawImageLoader implements IImageLoader
 	@Override
 	public ImageDescription loadDescriptionForImage(Image img)
 	{
-		if (imageFileNames.contains(img))
+		if (imageFileNames.containsKey(img))
 		{
 			return loadImageDescriptionFromFile(imageFileNames.get(img));
 		}
@@ -82,17 +82,30 @@ class RawImageLoader implements IImageLoader
 		}		
 	}
 
+	@Override
+	public void forgetImage(Image img)
+	{
+		if (imageFileNames.containsKey(img))
+		{
+			imageFileNames.remove(img);
+		}
+		else
+		{
+			throw new IncorrectImageLoaderRelation(img, this);
+		}				
+	}
+	
 	/**
 	 * Loads the bitmap from raw file
 	 * @param filename The file name
 	 */
-	private native PreciseBitmap loadPreciseBitmapFromFile(String filename);	
+	private static native PreciseBitmap loadPreciseBitmapFromFile(String filename);	
 
 	/**
 	 * Loads the description from bitmap file
 	 * @param filename The file name
 	 */
-	private native ImageDescription loadImageDescriptionFromFile(String filename);	
+	private static native ImageDescription loadImageDescriptionFromFile(String filename);	
 	
 /*	protected void checkLoadingResult(int resultCode)
 	{

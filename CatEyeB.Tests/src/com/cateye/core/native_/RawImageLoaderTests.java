@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
 import com.cateye.tests.utils.DateAssert;
 
@@ -14,9 +15,10 @@ public class RawImageLoaderTests
 	@Test
 	public void test_load_description_from_raw_file()
 	{
-		RawImageDescription desc = new RawImageDescription();
-		desc.loadFromFile("../../data/test/IMG_5697.CR2");
-//		desc.loadFromFile("../../data/test/fake.CR2");
+		RawImageLoader ril = new RawImageLoader();
+		Image loaded = ril.loadImageFromFile("../../data/test/IMG_5697.CR2");
+		ImageDescription desc = loaded.getDescription();
+		
 		System.out.printf("[Java] Flip: %1$d\n", desc.getFlip());
 		System.out.printf("[Java] ISO speed: %1$f\n", desc.getIsoSpeed());
 		System.out.printf("[Java] Shutter: %1$f\n", desc.getShutter());
@@ -24,10 +26,9 @@ public class RawImageLoaderTests
 		System.out.printf("[Java] Focal length: %1$f\n", desc.getFocalLength());
 		System.out.printf("[Java] Shot order: %1$d\n", desc.getShotOrder());
 		
-		//ImageDescription description = loader.loadDescription("..\\data\\test\\IMG_5697.CR2");
 		assertImageDescription(desc);
 		
-		//description.dispose();
+		loaded.dispose();
 	}
 
 	protected void assertImageDescription(ImageDescription description)
