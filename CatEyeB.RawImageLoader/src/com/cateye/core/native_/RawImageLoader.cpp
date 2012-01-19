@@ -132,7 +132,7 @@ bool decode_precise(PreciseBitmap& res, libraw_processed_image_t *image)
     		res.g[i] = ((float)pus[3 * i + 1]) / 65535;
     		res.b[i] = ((float)pus[3 * i + 2]) / 65535;
     	}
-    	return false;
+    	return true;
     }
     else
     {
@@ -148,12 +148,12 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	// Getting the classes
 	jclass imageDescription_class = env->FindClass("Lcom/cateye/core/native_/RawImageDescription;");
 	jclass previewBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreviewBitmap;");
-	jclass date_class = env->FindClass("Ljava/util/Date;");
+//	jclass date_class = env->FindClass("Ljava/util/Date;");
 
 	// Getting the methods
 	jmethodID previewBitmap_init = env->GetMethodID(previewBitmap_class, "<init>", "()V");
 	jmethodID imageDescription_init = env->GetMethodID(imageDescription_class, "<init>", "()V");
-	jmethodID date_init = env->GetMethodID(date_class, "<init>", "(J)V");
+//	jmethodID date_init = env->GetMethodID(date_class, "<init>", "(J)V");
 
 	// Getting the field ids
 	jfieldID thumbnail_id = env->GetFieldID(imageDescription_class, "thumbnail", "Lcom/cateye/core/IPreviewBitmap;"),
@@ -162,7 +162,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	         shutter_id = env->GetFieldID(imageDescription_class, "shutter", "F"),
 	         aperture_id = env->GetFieldID(imageDescription_class, "aperture", "F"),
 	         focalLength_id = env->GetFieldID(imageDescription_class, "focalLength", "F"),
-	         timeStamp_id = env->GetFieldID(imageDescription_class, "timeStamp", "Ljava/util/Date;"),
+	         timeStamp_id = env->GetFieldID(imageDescription_class, "timeStamp", "J"),
 	         shotOrder_id = env->GetFieldID(imageDescription_class, "shotOrder", "I"),
 	         description_id = env->GetFieldID(imageDescription_class, "description", "Ljava/lang/String;"),
 	         artist_id = env->GetFieldID(imageDescription_class, "artist", "Ljava/lang/String;"),
@@ -215,10 +215,14 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	env->SetFloatField(imageDescription, focalLength_id, RawProcessor->imgdata.other.focal_len);
 	printf("[Native] shot order = %d\n", RawProcessor->imgdata.other.shot_order);
 	env->SetIntField(imageDescription, shotOrder_id, RawProcessor->imgdata.other.shot_order);
-	printf("[Native] timestamp = %d\n", RawProcessor->imgdata.other.timestamp);
-	time_con = 1000L * (long)RawProcessor->imgdata.other.timestamp;
-	timestamp = env->NewObject(date_class, date_init, time_con);
-	env->SetObjectField(imageDescription, timeStamp_id, timestamp);
+
+	time_con = RawProcessor->imgdata.other.timestamp;
+	printf("[Native] timestamp = %d\n", time_con);
+	//timestamp = env->NewObject(date_class, date_init, time_con);
+	//env->SetObjectField(imageDescription, timeStamp_id, timestamp);
+	env->SetLongField(imageDescription, timeStamp_id, time_con);
+
+
 	printf("[Native] description = %s\n", RawProcessor->imgdata.other.desc);
 	env->SetObjectField(imageDescription, description_id, env->NewStringUTF(RawProcessor->imgdata.other.desc));
 	printf("[Native] artist = %s\n", RawProcessor->imgdata.other.artist);
