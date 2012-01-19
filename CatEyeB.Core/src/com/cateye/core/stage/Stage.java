@@ -80,7 +80,7 @@ class Stage implements IStage
 	protected void disposeLoadedImage()
 	{
 		if (isImageLoaded())
-			this.image.dispose();
+			this.image.free();
 	}
 	
 	protected void invokeOnProgress(float progress)
@@ -105,7 +105,7 @@ class Stage implements IStage
 		
 		try
 		{
-			image = imageLoader.load(fileName);
+			image = imageLoader.loadImageFromFile(fileName);
 			originalBitmap = image.getBitmap();
 		}
 		catch (Exception e)
@@ -155,7 +155,8 @@ class Stage implements IStage
 	@Override
 	public void saveImage(String fileName)
 	{
-		this.image.setBitmap(processedBitmap == null ? originalBitmap : processedBitmap);
-		imageSaver.save(fileName, this.image);
+		throw new RuntimeException();
+		//this.image.setBitmap(processedBitmap == null ? originalBitmap : processedBitmap);
+		//imageSaver.save(fileName, this.image);
 	}
 }

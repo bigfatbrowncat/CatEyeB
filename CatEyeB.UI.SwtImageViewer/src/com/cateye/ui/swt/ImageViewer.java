@@ -7,17 +7,17 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.cateye.core.IPreciseBitmap;
+import com.cateye.core.Image;
 import com.cateye.core.native_.LibraryLoader;
 
 public class ImageViewer extends Canvas
 {
 	private int nativeHandle;
-	final IPreciseBitmap bmp;
+	private Image image;
 	
 	public ImageViewer(Composite parent, int style)
 	{
 		super(parent, style);
-		bmp = null;
 		
 		addPaintListener(new PaintListener()
 		{
@@ -25,9 +25,17 @@ public class ImageViewer extends Canvas
 			public void paintControl(PaintEvent e)
 			{
 				Rectangle rect = ImageViewer.this.getClientArea();
-				drawImage(e.gc.handle, bmp, 0, 0, rect.width, rect.height);
+				IPreciseBitmap bitmap = ImageViewer.this.image.getBitmap();
+				
+				if (bitmap != null)
+					drawImage(e.gc.handle, bitmap, 0, 0, rect.width, rect.height);
 			}
 		});
+	}
+	
+	public void setImage(Image image)
+	{
+		this.image = image;
 	}
 	
 	static final native void drawImage(int handle, IPreciseBitmap bitmap, int x, int y, int width, int height);

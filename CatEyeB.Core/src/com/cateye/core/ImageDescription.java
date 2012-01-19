@@ -67,5 +67,5 @@ public abstract class ImageDescription
 	/**
 	 * Releases the native resources
 	 */
-	public abstract void dispose();
+	public abstract void free();
 }

@@ -5,30 +5,22 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.cateye.core.IImageLoader;
+import com.cateye.core.Image;
 import com.cateye.ui.swt.ImageViewer;
+import com.google.inject.Inject;
 
 public class MainWindow
 {
-	
 	protected Shell shell;
+	private final IImageLoader imageLoader;
 	
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	public static void main(String[] args)
+	@Inject
+	public MainWindow(IImageLoader imageLoader)
 	{
-		try
-		{
-			MainWindow window = new MainWindow();
-			window.open();
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		this.imageLoader = imageLoader;
 	}
-	
+
 	/**
 	 * Open the window.
 	 */
@@ -62,5 +54,8 @@ public class MainWindow
 		
 		final ImageViewer imageViewer = new ImageViewer(shell, SWT.NO_BACKGROUND);
 		imageViewer.setSize(400, 250);
+		
+		Image image = imageLoader.loadImageFromFile("..//..//data//test//IMG_5697.CR2");
+		imageViewer.setImage(image);
 	}
 }

@@ -2,14 +2,10 @@ package com.cateye.tests.functional;
 
 import org.junit.Test;
 
-import com.cateye.core.IProgressListener;
 import com.cateye.core.native_.BrightnessStageOperationModule;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
-import com.cateye.core.stage.IStage;
-import com.cateye.core.stage.StageFactory;
 import com.cateye.core.stage.StageModule;
-import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
@@ -20,11 +16,10 @@ public class StageOperationTests
 	
 	public StageOperationTests()
 	{
-		/*
+		
 		injector = Guice.createInjector(Modules.combine(
 				new ImageLoaderModule(), new ImageSaverModule(),
 				new StageModule(), new BrightnessStageOperationModule()));
-				*/
 	}
 	
 	@Test

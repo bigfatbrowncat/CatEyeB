@@ -124,7 +124,7 @@ class RawImageDescription extends ImageDescription
 	}
 	
 	@Override
-	public void dispose()
+	public void free()
 	{
 		if (thumbnail != null)
 		{
