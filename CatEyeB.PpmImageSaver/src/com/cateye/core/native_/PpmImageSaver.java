@@ -12,13 +12,13 @@ class PpmImageSaver implements IImageSaver
 	{
 		fileName = new File(fileName).getAbsolutePath();
 		PreciseBitmap bitmap = (PreciseBitmap) image.getBitmap();
-		SaveImage(fileName, bitmap, 3);
+		SaveImage(fileName, bitmap/*, 3*/);
 	}
 	
-	static native void SaveImage(String fileName, PreciseBitmap bitmap, double limit_a);
+	static native void SaveImage(String fileName, PreciseBitmap bitmap/*, double limit_a*/);
 	
 	static
 	{
-		LibraryLoader.attach("ppm.CatEyeSaver");
+		LibraryLoader.attach("Ppm.CatEyeImageSaver");
 	}
 }
