@@ -4,30 +4,35 @@ public class Image
 {
 	protected ImageDescription description;
 	protected IPreciseBitmap bitmap;
+	protected IImageLoader loader;
 	
 	/**
 	 * @return the description of image
 	 */
 	public ImageDescription getDescription()
 	{
+		if (description == null) description = loader.loadDescriptionForImage(this);
 		return description;
 	}
 	
 	/**
-	 * @return the precious bitmap
+	 * @return the precise bitmap
 	 */
 	public IPreciseBitmap getBitmap()
 	{
+		if (bitmap == null) bitmap = loader.loadPreciseBitmapForImage(this);
 		return bitmap;
 	}
 	
-	public void setBitmap(IPreciseBitmap bitmap)
+	public Image(IImageLoader loader)
 	{
-		this.bitmap = bitmap;
+		if (loader == null) throw new IllegalArgumentException("loader shouldn't be null");
+		this.loader = loader;
 	}
-	
-	public Image(ImageDescription imageDescription, IPreciseBitmap bitmap)
+
+	public Image(IImageLoader loader, ImageDescription imageDescription, IPreciseBitmap bitmap)
 	{
+		this(loader);
 		this.description = imageDescription;
 		this.bitmap = bitmap;
 	}

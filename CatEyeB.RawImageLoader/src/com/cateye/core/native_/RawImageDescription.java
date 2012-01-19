@@ -20,11 +20,13 @@ class RawImageDescription extends ImageDescription
 	protected String cameraMaker;
 	protected String cameraModel;
 	
-	protected void setDate(int value)
+
+/*	protected void setDate(int value)
 	{
 		this.timeStamp = new Date(value * 1000L);
 	}
-	
+*/
+
 	/**
 	 * @return the thumbnail
 	 */
@@ -126,7 +128,7 @@ class RawImageDescription extends ImageDescription
 	{
 		if (thumbnail != null)
 		{
-			thumbnail.dispose();
+			thumbnail.free();
 		}
 	}
 	
@@ -134,7 +136,5 @@ class RawImageDescription extends ImageDescription
 	{
 		LibraryLoader.attach("Raw.CatEyeImageLoader");		
 	}
-	
-	@Override
-	public native void loadFromFile(String filename);
+
 }

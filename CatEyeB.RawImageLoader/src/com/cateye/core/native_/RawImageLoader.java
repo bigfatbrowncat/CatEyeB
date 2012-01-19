@@ -1,17 +1,27 @@
 package com.cateye.core.native_;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import com.cateye.core.IImageLoader;
+import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.Image;
+import com.cateye.core.ImageDescription;
+import com.cateye.core.IncorrectImageLoaderRelation;
 
 class RawImageLoader implements IImageLoader
 {
-	//# Progress listeners
+	// Progress listeners
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
 	private final ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
+	
+	private Hashtable<Image, String> imageFileNames = new Hashtable<Image, String>();
 	
 	@Override
 	public void addProgressListener(IProgressListener listener)
@@ -33,37 +43,69 @@ class RawImageLoader implements IImageLoader
 	
 	//# Methods
 	@Override
-	public Boolean canLoad(String fileName)
+	public boolean canLoadFromFile(String fileName)
 	{
-		return true; // TODO: implement a check of loading possibility
+		return true;
 	}
 	
 	@Override
-	public Image load(String fileName)
+	public Image loadImageFromFile(String fileName)
 	{
-	/*	// load description
-		RawImageDescription description = loadDescription(fileName);
-		
-		// load bitmap
-		PreciseBitmap bitmap = new PreciseBitmap();
-		checkLoadingResult(LoadFromFile(getPathToFile(fileName), true, bitmap, progressReporter));
-		
-		// raise an event
-		return new Image(description, bitmap);*/
-		return null;
+		Image img = new Image(this);
+		imageFileNames.put(img, fileName);
+		return img;
 	}
 	
 	@Override
-	public RawImageDescription loadDescription(String fileName)
+	public IPreciseBitmap loadPreciseBitmapForImage(Image img)
 	{
-		/*RawImageDescription description = new RawImageDescription();
-		LoadDescriptionFromFile(getPathToFile(fileName), description);
-		
-		return description;*/
-		return null;
+		if (imageFileNames.containsKey(img))
+		{
+			return loadPreciseBitmapFromFile(imageFileNames.get(img));
+		}
+		else
+		{
+			throw new IncorrectImageLoaderRelation(img, this);
+		}
+	}
+
+	@Override
+	public ImageDescription loadDescriptionForImage(Image img)
+	{
+		if (imageFileNames.containsKey(img))
+		{
+			return loadImageDescriptionFromFile(imageFileNames.get(img));
+		}
+		else
+		{
+			throw new IncorrectImageLoaderRelation(img, this);
+		}		
+	}
+
+	@Override
+	public void forgetImage(Image img)
+	{
+		if (imageFileNames.containsKey(img))
+		{
+			imageFileNames.remove(img);
+		}
+		else
+		{
+			throw new IncorrectImageLoaderRelation(img, this);
+		}				
 	}
 	
-	
+	/**
+	 * Loads the bitmap from raw file
+	 * @param filename The file name
+	 */
+	private static native PreciseBitmap loadPreciseBitmapFromFile(String filename);	
+
+	/**
+	 * Loads the description from bitmap file
+	 * @param filename The file name
+	 */
+	private static native ImageDescription loadImageDescriptionFromFile(String filename);	
 	
 /*	protected void checkLoadingResult(int resultCode)
 	{
@@ -125,4 +167,5 @@ class RawImageLoader implements IImageLoader
 			return true;
 		}
 	}
+
 }
