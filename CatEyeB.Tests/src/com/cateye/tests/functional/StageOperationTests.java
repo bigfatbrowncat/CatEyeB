@@ -16,10 +16,10 @@ public class StageOperationTests
 	
 	public StageOperationTests()
 	{
-		
+		/*
 		injector = Guice.createInjector(Modules.combine(
 				new ImageLoaderModule(), new ImageSaverModule(),
-				new StageModule(), new BrightnessStageOperationModule()));
+				new StageModule(), new BrightnessStageOperationModule()));*/
 	}
 	
 	@Test

@@ -5,7 +5,7 @@
 #include <libraw.h>
 #include <jpeglib.h>
 
-#define DEBUG_INFO	printf("%d\n", __LINE__);fflush(stdout);
+#define DEBUG_INFO	//printf("%d\n", __LINE__);fflush(stdout);
 
 #include <com/cateye/core/native_/RawImageLoader.h>
 
@@ -184,30 +184,30 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
     LibRaw* RawProcessor = NULL;
     libraw_processed_image_t *image = NULL;
 
-    fn = env->GetStringUTFChars(filename, NULL);
+	DEBUG_INFO    fn = env->GetStringUTFChars(filename, NULL);
     if (fn == NULL) {
         printf("Error: NULL string!\n");
 		return NULL;
     }
 
-	RawProcessor = new LibRaw();
+	DEBUG_INFO	RawProcessor = new LibRaw();
 
-	ret = RawProcessor->open_file(fn, RAWPROCESSOR_OPEN_BUFFER);
+	DEBUG_INFO ret = RawProcessor->open_file(fn, RAWPROCESSOR_OPEN_BUFFER);
 	if (ret != LIBRAW_SUCCESS)
 	{
 		goto end;
 	}
 
-	if ((ret = RawProcessor->unpack_thumb()) != LIBRAW_SUCCESS)
+	DEBUG_INFO if ((ret = RawProcessor->unpack_thumb()) != LIBRAW_SUCCESS)
 	{
 		goto end;
 	}
 
-	imageDescription = env->NewObject(imageDescription_class, imageDescription_init);
+	DEBUG_INFO imageDescription = env->NewObject(imageDescription_class, imageDescription_init);
 
 	// Setting fields
 	printf("[Native] flip = %d\n", RawProcessor->imgdata.sizes.flip);
-	env->SetIntField(imageDescription, flip_id, RawProcessor->imgdata.sizes.flip);	// 0 - no rotation; 3 - 180-deg rotation; 5 - 90-deg counterclockwise, 6 - 90-deg clockwise
+	DEBUG_INFO env->SetIntField(imageDescription, flip_id, RawProcessor->imgdata.sizes.flip);	// 0 - no rotation; 3 - 180-deg rotation; 5 - 90-deg counterclockwise, 6 - 90-deg clockwise
 	printf("[Native] iso speed = %f\n", RawProcessor->imgdata.other.iso_speed);
 	env->SetFloatField(imageDescription, isoSpeed_id, RawProcessor->imgdata.other.iso_speed);
 	printf("[Native] shutter = %f\n", RawProcessor->imgdata.other.shutter);
@@ -219,11 +219,11 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	printf("[Native] shot order = %d\n", RawProcessor->imgdata.other.shot_order);
 	env->SetIntField(imageDescription, shotOrder_id, RawProcessor->imgdata.other.shot_order);
 
-	time_con = RawProcessor->imgdata.other.timestamp;
+	DEBUG_INFO time_con = RawProcessor->imgdata.other.timestamp;
 	printf("[Native] timestamp = %d\n", time_con);
 	//timestamp = env->NewObject(date_class, date_init, time_con);
 	//env->SetObjectField(imageDescription, timeStamp_id, timestamp);
-	env->SetLongField(imageDescription, timeStamp_id, time_con);
+	DEBUG_INFO env->SetLongField(imageDescription, timeStamp_id, time_con);
 
 
 	printf("[Native] description = %s\n", RawProcessor->imgdata.other.desc);
@@ -235,10 +235,10 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	printf("[Native] camera model = %s\n", RawProcessor->imgdata.idata.model);
 	env->SetObjectField(imageDescription, cameraModel_id, env->NewStringUTF(RawProcessor->imgdata.idata.model));
 
-
+	DEBUG_INFO
 	fflush(stdout);
 
-	previewBitmap = env->NewObject(previewBitmap_class, previewBitmap_init);
+	DEBUG_INFO previewBitmap = env->NewObject(previewBitmap_class, previewBitmap_init);
 
 	// Getting bitmap field ids
 	jfieldID r_id, g_id, b_id, width_id, height_id;
@@ -252,7 +252,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 
 	// Extracting and saving the thumbnail picture
 
-	image = RawProcessor->dcraw_make_mem_image(&ret);
+	DEBUG_INFO image = RawProcessor->dcraw_make_mem_thumb(&ret);
 	if (image == 0)
 	{
 		goto end;
@@ -268,7 +268,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 	{
 		decode_plain(thumb, image->width, image->height, image->data, image->data_size);
 	}
-
+	DEBUG_INFO
 	// Setting field values
 	env->SetIntField(previewBitmap, width_id, thumb.width);
 	env->SetIntField(previewBitmap, height_id, thumb.height);
@@ -278,21 +278,21 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImage
 
 	env->SetObjectField(imageDescription, thumbnail_id, previewBitmap);
 
-
+	DEBUG_INFO
 
 	RawProcessor->recycle();   // just for show this call...
 	                           // use it if you want to load something else
 
 
 end:
-	if (image != NULL) LibRaw::dcraw_clear_mem(image);
-	if (RawProcessor != NULL) delete RawProcessor;
-	env->ReleaseStringUTFChars(filename, fn);
-	if (ret != LIBRAW_SUCCESS)
+	DEBUG_INFO if (image != NULL) LibRaw::dcraw_clear_mem(image);
+	DEBUG_INFO if (RawProcessor != NULL) delete RawProcessor;
+	DEBUG_INFO env->ReleaseStringUTFChars(filename, fn);
+	DEBUG_INFO if (ret != LIBRAW_SUCCESS)
 	{
-		throw_libraw_exception(env, ret);
+		DEBUG_INFO throw_libraw_exception(env, ret);
 	}
-	return imageDescription;
+	DEBUG_INFO return imageDescription;
 }
 
 struct JNIObjectContext

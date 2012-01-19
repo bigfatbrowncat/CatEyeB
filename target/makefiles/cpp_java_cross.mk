@@ -68,7 +68,7 @@ $(JAVA_JNI_HEADERS) : $(TARGET_GEN)/%.h : $(TARGET_BIN)/%.class
 	@echo "[$(PROJ)] Generating $@ ..."
 	$(ENSURE_GEN)
 	if [ ! -d "$(dir $@)" ]; then mkdir -p "$(dir $@)"; fi
-	"$(JAVA_HOME)/bin/javah" -classpath $(TARGET_BIN) -o $@ $(subst /,.,$(basename $(patsubst $(TARGET_GEN)/%, %, $@)))
+	"$(JAVA_HOME)/bin/javah" -classpath "$(EXTERNAL_JARS);$(CUSTOM_JARS);$(TARGET_BIN)" -o $@ $(subst /,.,$(basename $(patsubst $(TARGET_GEN)/%, %, $@)))
 
 ################### Objects ###################
 
