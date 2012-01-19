@@ -16,5 +16,6 @@
 	<classpathentry kind="lib" path="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.forms_3.5.100.v20110425.jar" sourcepath="C:/Bulat/Soft/eclipse/plugins/org.eclipse.ui.forms_3.5.100.v20110425.jar"/>
 	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/guice-3.0-no_aop.jar"/>
+	<classpathentry kind="lib" path="/ExternalLibs/lib/javax.inject.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

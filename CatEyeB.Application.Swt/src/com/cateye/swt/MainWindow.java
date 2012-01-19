@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.cateye.core.IImageLoader;
 import com.cateye.core.Image;
-import com.cateye.ui.swt.ImageViewer;
+import com.cateye.ui.swt.PreviewImageViewer;
 import com.google.inject.Inject;
 
 public class MainWindow
@@ -23,19 +23,20 @@ public class MainWindow
 
 	/**
 	 * Open the window.
+	 * @wbp.parser.entryPoint
 	 */
 	public void open()
 	{
 		Display display = Display.getDefault();
 		createContents();
+		
 		shell.open();
 		shell.layout();
+		
 		while (!shell.isDisposed())
 		{
 			if (!display.readAndDispatch())
-			{
 				display.sleep();
-			}
 		}
 	}
 	
@@ -52,10 +53,10 @@ public class MainWindow
 		fillLayout.type = SWT.VERTICAL;
 		shell.setLayout(fillLayout);
 		
-		final ImageViewer imageViewer = new ImageViewer(shell, SWT.NO_BACKGROUND);
+		final PreviewImageViewer imageViewer = new PreviewImageViewer(shell);
 		imageViewer.setSize(400, 250);
 		
 		Image image = imageLoader.loadImageFromFile("..//..//data//test//IMG_5697.CR2");
-		imageViewer.setImage(image);
+		imageViewer.setBitmap(image.getDescription().getThumbnail());
 	}
 }

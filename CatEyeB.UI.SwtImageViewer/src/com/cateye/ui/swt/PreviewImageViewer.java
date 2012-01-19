@@ -8,15 +8,15 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.cateye.core.IPreciseBitmap;
+import com.cateye.core.IPreviewBitmap;
 import com.cateye.core.Image;
 import com.cateye.core.native_.LibraryLoader;
 
-public class ImageViewer extends Canvas
+public class PreviewImageViewer extends Canvas
 {
-	private int nativeHandle;
-	private Image image;
+	private IPreviewBitmap bitmap;
 	
-	public ImageViewer(Composite parent)
+	public PreviewImageViewer(Composite parent)
 	{
 		super(parent, SWT.NO_BACKGROUND);
 		
@@ -26,21 +26,17 @@ public class ImageViewer extends Canvas
 			public void paintControl(PaintEvent e)
 			{
 				Rectangle rect = getClientArea();
-				
-				if (image != null && image.getBitmap() != null)
-					drawImage(e.gc.handle, image.getBitmap(), 0, 0, rect.width, rect.height);
-				else
-					drawImage(e.gc.handle, null, 0, 0, rect.width, rect.height);
+				drawImage(e.gc.handle, bitmap, 0, 0, rect.width, rect.height);
 			}
 		});
 	}
 	
-	public void setImage(Image image)
+	public void setBitmap(IPreviewBitmap bitmap)
 	{
-		this.image = image;
+		this.bitmap = bitmap;
 	}
 	
-	static final native void drawImage(int handle, IPreciseBitmap bitmap, int x, int y, int width, int height);
+	static final native void drawImage(int handle, IPreviewBitmap bitmap, int x, int y, int width, int height);
 	
 	static
 	{
