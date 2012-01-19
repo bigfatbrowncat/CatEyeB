@@ -1,7 +1,5 @@
 package com.cateye.core;
 
-import com.cateye.core.native_.PreciseBitmapTests;
-
 public interface IImageLoader
 {
 	void addProgressListener(IProgressListener listener);

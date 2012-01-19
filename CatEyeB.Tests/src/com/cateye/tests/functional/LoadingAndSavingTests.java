@@ -42,10 +42,11 @@ public class LoadingAndSavingTests
 		loader.addProgressListener(new IProgressListener()
 		{
 			@Override
-			public void invoke(Object sender, float progress)
+			public boolean invoke(Object sender, float progress)
 			{
 				System.out.println(progress);
 				progressInvoked = true;
+				return true;
 			}
 		});
 		

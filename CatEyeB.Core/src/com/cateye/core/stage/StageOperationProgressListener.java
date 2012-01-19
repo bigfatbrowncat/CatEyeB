@@ -17,8 +17,9 @@ class StageOperationProgressListener implements IProgressListener
 	}
 	
 	@Override
-	public void invoke(Object sender, float progress)
+	public boolean invoke(Object sender, float progress)
 	{
 		stage.invokeOnProgress(progress * effortPart);
+		return true;
 	}
 }

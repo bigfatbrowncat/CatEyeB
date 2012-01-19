@@ -5,6 +5,8 @@
 #include <libraw.h>
 #include <jpeglib.h>
 
+#define DEBUG_INFO	printf("%d\n", __LINE__);fflush(stdout);
+
 #include <com/cateye/core/native_/RawImageLoader.h>
 
 #define RAWPROCESSOR_OPEN_BUFFER			1024 * 1024 * 1024		// 1Gb
@@ -139,11 +141,12 @@ bool decode_precise(PreciseBitmap& res, libraw_processed_image_t *image)
     	PreciseBitmap_Free(res);
     	return false;
     }
+
 }
 
 
 JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImageDescriptionFromFile
-  (JNIEnv * env, jclass, jstring filename)
+  (JNIEnv * env, jobject, jstring filename)
 {
 	// Getting the classes
 	jclass imageDescription_class = env->FindClass("Lcom/cateye/core/native_/RawImageDescription;");
@@ -292,55 +295,119 @@ end:
 	return imageDescription;
 }
 
-JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreciseBitmapFromFile
-  (JNIEnv * env, jclass cls, jstring filename)
+struct JNIObjectContext
 {
-	bool divide_by_2 = false;
+	JNIObjectContext(JNIEnv * env, jobject obj): env(env), obj(obj) {}
+	JNIEnv * env;
+	jobject obj;
+};
 
-	// Getting the classes
+int my_raw_processing_callback(void *d, enum LibRaw_progress p, int iteration, int expected)
+{
+	DEBUG_INFO	JNIObjectContext* oc = (JNIObjectContext*)d;
+	DEBUG_INFO	jclass cls = oc->env->GetObjectClass(oc->obj);
+	DEBUG_INFO	jmethodID raiseProgress_id = oc->env->GetMethodID(cls, "raiseProgress", "(F)Z");
+	DEBUG_INFO	float progress = (float)((log2(p) + (float)iteration / expected) / log2(LIBRAW_PROGRESS_STRETCH));
+
+	printf("%d %d %d %d", oc, oc->env, oc->obj, raiseProgress_id);
+	DEBUG_INFO	if (oc->env->CallBooleanMethod(oc->obj, raiseProgress_id, progress))
+	{
+		DEBUG_INFO    	return 0;	// Continue
+	}
+    else
+    {
+    	DEBUG_INFO    	return 1;	// Cancel
+    }
+
+}
+
+JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreciseBitmapFromFile
+  (JNIEnv * env, jobject obj, jstring filename)
+{
+	jclass cls = env->GetObjectClass(obj);
+	jfieldID divide_by_2_id = env->GetFieldID(cls, "divideBy2", "Z");
+	bool divide_by_2 = env->GetBooleanField(obj, divide_by_2_id);
+
+	// Creating Java PreciseBitmap object
 	jclass preciseBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreciseBitmap;");
-
-	// Getting the methods
 	jmethodID preciseBitmap_init = env->GetMethodID(preciseBitmap_class, "<init>", "()V");
+	jobject preciseBitmap = env->NewObject(preciseBitmap_class, preciseBitmap_init);
 
-	jobject preciseBitmap;
-    const char* fn;
+
+	const char* fn;
     int ret;
+    bool image_is_null = false;
 
     LibRaw* RawProcessor = NULL;
     libraw_processed_image_t *image = NULL;
     PreciseBitmap pbmp;
 
-    fn = env->GetStringUTFChars(filename, NULL);
+	DEBUG_INFO
+
+	fn = env->GetStringUTFChars(filename, NULL);
     if (fn == NULL) {
         printf("Error: NULL string!\n");
 		return NULL;
     }
 
+	DEBUG_INFO
+
 	RawProcessor = new LibRaw();
+
+	DEBUG_INFO
+
+	RawProcessor->imgdata.params.gamm[0] = RawProcessor->imgdata.params.gamm[1] =
+										   RawProcessor->imgdata.params.no_auto_bright = 1;
+	DEBUG_INFO
+	RawProcessor->imgdata.params.output_bps = 16;
+	RawProcessor->imgdata.params.highlight  = 9;
+	RawProcessor->imgdata.params.threshold  = (float)200;
+	DEBUG_INFO
+
+	if (divide_by_2)
+	{
+		RawProcessor->imgdata.params.half_size         = 1;
+		RawProcessor->imgdata.params.four_color_rgb    = 1;
+	}
+
+	DEBUG_INFO
+
+	JNIObjectContext oc(env, obj);
+
+	DEBUG_INFO
+
+	RawProcessor->set_progress_handler(my_raw_processing_callback, &oc);
+
+	DEBUG_INFO
 
 	ret = RawProcessor->open_file(fn, RAWPROCESSOR_OPEN_BUFFER);
 	if (ret != LIBRAW_SUCCESS)
 	{
 		goto end;
 	}
+	DEBUG_INFO
 	ret = RawProcessor->unpack();
 	if (ret != LIBRAW_SUCCESS)
 	{
 		goto end;
 	}
-	ret = RawProcessor->dcraw_process();
+	DEBUG_INFO
+    ret = RawProcessor->dcraw_process();
 	if (ret != LIBRAW_SUCCESS)
 	{
 		goto end;
 	}
-    image = RawProcessor->dcraw_make_mem_image(&ret);
+	DEBUG_INFO
+	image = RawProcessor->dcraw_make_mem_image(&ret);
     if (image == NULL)
     {
+    	image_is_null = true;
 		goto end;
     }
 
+	DEBUG_INFO
     decode_precise(pbmp, image);
+	DEBUG_INFO
 
 	// Getting bitmap field ids
 	jfieldID r_id, g_id, b_id, width_id, height_id;
@@ -350,6 +417,8 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreci
 	width_id = env->GetFieldID(preciseBitmap_class, "width", "I");
 	height_id = env->GetFieldID(preciseBitmap_class, "height", "I");
 
+	DEBUG_INFO
+
 	// Setting field values
 	env->SetIntField(preciseBitmap, width_id, pbmp.width);
 	env->SetIntField(preciseBitmap, height_id, pbmp.height);
@@ -357,19 +426,32 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreci
 	env->SetLongField(preciseBitmap, g_id, (jlong)(pbmp.g));
 	env->SetLongField(preciseBitmap, b_id, (jlong)(pbmp.b));
 
+	DEBUG_INFO
 
 	RawProcessor->recycle();   // just for show this call...
 	                           // use it if you want to load something else
-
+	DEBUG_INFO
 
 end:
+	DEBUG_INFO
 	if (image != NULL) LibRaw::dcraw_clear_mem(image);
+	DEBUG_INFO
 	if (RawProcessor != NULL) delete RawProcessor;
+	DEBUG_INFO
 	env->ReleaseStringUTFChars(filename, fn);
-	if (ret != LIBRAW_SUCCESS)
+	DEBUG_INFO
+	if (ret != LIBRAW_SUCCESS && !image_is_null)
 	{
+		DEBUG_INFO
 		throw_libraw_exception(env, ret);
 	}
+	else if (image_is_null)
+	{
+		DEBUG_INFO
+		printf("Image is null");
+		return NULL;
+	}
+	DEBUG_INFO
 	return preciseBitmap;
 }
 
