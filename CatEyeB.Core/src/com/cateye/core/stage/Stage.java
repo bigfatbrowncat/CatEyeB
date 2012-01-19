@@ -36,9 +36,10 @@ class Stage implements IStage
 		imageLoadingProgressListener = new IProgressListener()
 		{
 			@Override
-			public void invoke(Object sender, float progress)
+			public boolean invoke(Object sender, float progress)
 			{
 				invokeOnProgress(progress);
+				return true;
 			}
 		};
 	}
