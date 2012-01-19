@@ -13,7 +13,7 @@ class RawImageDescription extends ImageDescription
 	protected float shutter;
 	protected float aperture;
 	protected float focalLength;
-	protected Date timeStamp;
+	protected long timeStamp;
 	protected int shotOrder;
 	protected String description;
 	protected String artist;
@@ -72,7 +72,7 @@ class RawImageDescription extends ImageDescription
 	 */
 	public Date getTimestamp()
 	{
-		return timeStamp;
+		return new Date(timeStamp * 1000L);
 	}
 	
 	/**

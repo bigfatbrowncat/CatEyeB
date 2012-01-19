@@ -1,11 +1,17 @@
 package com.cateye.core.native_;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
 import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
+import com.cateye.tests.utils.DateAssert;
 
 public class RawImageLoaderTests 
 {
@@ -22,6 +28,11 @@ public class RawImageLoaderTests
 		System.out.printf("[Java] Aperture: %1$f\n", desc.getAperture());
 		System.out.printf("[Java] Focal length: %1$f\n", desc.getFocalLength());
 		System.out.printf("[Java] Shot order: %1$d\n", desc.getShotOrder());
+		System.out.printf("[Java] Timestamp: %1$d ( %2$s )", desc.getTimestamp().getTime(), desc.getTimestamp().toString());
+		System.out.printf("[Java] Description: %1$s\n", desc.getDescription());
+		System.out.printf("[Java] Artist: %1$s\n", desc.getArtist());
+		System.out.printf("[Java] Camera maker: %1$s\n", desc.getCameraMaker());
+		System.out.printf("[Java] Camera model: %1$s\n", desc.getCameraModel());
 		
 		assertImageDescription(desc);
 		
@@ -40,7 +51,12 @@ public class RawImageLoaderTests
 		Assert.assertEquals(1600f, description.getIsoSpeed());
 		Assert.assertEquals(0, description.getShotOrder());
 		Assert.assertEquals(0.03125, description.getShutter(), 0.00001f);
-		System.out.printf("%1$s", description.getTimestamp());
-		//DateAssert.assertEquals(new Date("10/19/11 6:51:56 PM MSK"), description.getTimestamp());
+		
+		Calendar cld = new GregorianCalendar();//TimeZone.getTimeZone("MSK"));
+		cld.set(2011, Calendar.OCTOBER, 19, 18, 51, 56);
+		Calendar cld2 = new GregorianCalendar();
+		cld2.setTime(description.getTimestamp());
+		
+		DateAssert.assertEquals(cld, cld2);
 	}
 }
