@@ -4,7 +4,7 @@ PROJ = CatEyeB.UI.SwtImageViewer
 
 # CC macros
 COMMON_CFLAGS = -static-libgcc
-CFLAGS = -O3
+CFLAGS = -O0 -g3
 CDEFINES =
 
 # CPP macros (additional to C macros)

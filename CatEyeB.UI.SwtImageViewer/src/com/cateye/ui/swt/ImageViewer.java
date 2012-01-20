@@ -3,6 +3,7 @@ package com.cateye.ui.swt;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -30,7 +31,11 @@ public class ImageViewer extends Canvas
 				if (image != null && image.getBitmap() != null)
 					drawImage(e.gc.handle, image.getBitmap(), 0, 0, rect.width, rect.height);
 				else
-					drawImage(e.gc.handle, null, 0, 0, rect.width, rect.height);
+				{
+					// Fill self in black
+					e.gc.setBackground(new Color(e.gc.getDevice(), 0, 0, 0));
+					e.gc.fillRectangle(rect);
+				}
 			}
 		});
 	}
