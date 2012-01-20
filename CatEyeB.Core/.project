@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>bitmaps</project>
+		<project>ExternalLibs</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

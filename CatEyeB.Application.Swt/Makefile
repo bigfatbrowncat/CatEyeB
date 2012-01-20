@@ -1,6 +1,6 @@
 #################### Macros #####################
 
-PROJ = CatEyeB.Tests
+PROJ = CatEyeB.Application.Swt
 
 # Universal macros
 SOURCE = src

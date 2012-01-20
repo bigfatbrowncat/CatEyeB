@@ -5,6 +5,7 @@ import com.cateye.core.IProgressListener;
 import com.cateye.core.stage.IStageOperationProcessor;
 import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
+
 class BrightnessStageOperationProcessor implements IStageOperationProcessor<BrightnessStageOperation>
 {
 	static native void Process(PreciseBitmap bmp, BrightnessStageOperation operation);
