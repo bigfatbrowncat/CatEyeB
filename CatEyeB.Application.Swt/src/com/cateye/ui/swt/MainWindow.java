@@ -9,6 +9,7 @@ import com.cateye.core.IImageLoader;
 import com.cateye.core.Image;
 import com.cateye.ui.swt.PreviewImageViewer;
 import com.google.inject.Inject;
+import com.google.inject.Stage;
 
 public class MainWindow
 {

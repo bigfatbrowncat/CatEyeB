@@ -10,7 +10,7 @@
 #define DRAWING_EXCEPTION_CANT_CREATE_MEM_DC	"can't create memory device context"
 
 JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreviewImageViewer_drawImage
-    (JNIEnv *env, jclass, jint handle, jobject bitmap, jint crop_left, jint crop_top, jint crop_width, jint crop_height)
+    (JNIEnv *env, jclass, jint handle, jobject bitmap, jint crop_left, jint crop_top, jint crop_width, jint crop_height, jfloat scale_out)
 {
 	DEBUG_INFO jclass exception_cls = env->FindClass("com/cateye/ui/swt/exceptions/DrawingException");
 	if (bitmap != NULL)
@@ -43,7 +43,7 @@ JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreviewImageViewer_drawImage
 			{
 				BITMAPINFOHEADER bi;
 				bi.biSize = sizeof(BITMAPINFOHEADER);
-				bi.biWidth = (crop_width / 4 + 1) * 4;		// width % 4 should be 0 for BitBlt to work correctly. I don't know why...
+				bi.biWidth = (crop_width / 4 + 1) * 4;		// width % 4 should be 0 for SetDIBits to work correctly. I don't know why...
 				bi.biHeight = crop_height + 1;				// adding last string
 				bi.biPlanes = 1;
 				bi.biBitCount = 24;
@@ -60,19 +60,35 @@ JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreviewImageViewer_drawImage
 
 					int back_index = (bi.biHeight - j - 1) * bi.biWidth + i;
 
-					if (j2 >= 0 && j2 < src.height && i2 >= 0 && i2 < src.width)
+					float r = 0, g = 0, b = 0;
+					float pixels = 0;
+
+					int jpmin = (int)(j2 * scale_out), jpmax = (int)((j2 + 1) * scale_out);
+					int ipmin = (int)(i2 * scale_out), ipmax = (int)((i2 + 1) * scale_out);
+
+					if (ipmin == ipmax) ipmax = ipmin + 1;
+					if (jpmin == jpmax) jpmax = ipmin + 1;
+
+					for (int jp = jpmin; jp < jpmax; jp ++)
+					for (int ip = ipmin; ip < ipmax; ip ++)
 					{
-						bits[back_index * 3] = src.b[j2 * src.width + i2];
-						bits[back_index * 3 + 1] = src.g[j2 * src.width + i2];
-						bits[back_index * 3 + 2] = src.r[j2 * src.width + i2];
+						if (jp >= 0 && jp < src.height && ip >= 0 && ip < src.width)
+						{
+							b += src.b[jp * src.width + ip];
+							g += src.g[jp * src.width + ip];
+							r += src.r[jp * src.width + ip];
+						}
+						else
+						{
+							// painting in black
+							// don't add anything
+						}
+						pixels ++;
 					}
-					else
-					{
-						// painting in black
-						bits[back_index * 3] = 0;
-						bits[back_index * 3 + 1] = 0;
-						bits[back_index * 3 + 2] = 0;
-					}
+
+					bits[back_index * 3] = (Int8)(b / pixels);
+					bits[back_index * 3 + 1] = (Int8)(g / pixels);
+					bits[back_index * 3 + 2] = (Int8)(r / pixels);
 				}
 				fflush(stdout);
 

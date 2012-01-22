@@ -27,7 +27,7 @@ public class PreviewImageViewer extends Canvas
 				Rectangle rect = getClientArea();
 				if (bitmap != null)
 				{
-					drawImage(e.gc.handle, bitmap, -300, -100, rect.width, rect.height);
+					drawImage(e.gc.handle, bitmap, 0, 0, rect.width, rect.height, 1);
 				}
 				else
 				{
@@ -44,7 +44,7 @@ public class PreviewImageViewer extends Canvas
 		this.bitmap = bitmap;
 	}
 	
-	static final native void drawImage(int handle, IPreviewBitmap bitmap, int crop_left, int crop_top, int crop_width, int crop_height);
+	static final native void drawImage(int handle, IPreviewBitmap bitmap, int crop_left, int crop_top, int crop_width, int crop_height, float scale_out);
 	
 	static
 	{
