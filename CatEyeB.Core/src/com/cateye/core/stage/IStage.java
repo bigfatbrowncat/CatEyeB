@@ -1,5 +1,6 @@
 package com.cateye.core.stage;
 
+import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
 
 public interface IStage
@@ -17,4 +18,8 @@ public interface IStage
 	public abstract void processImage();
 	
 	public abstract void dispose();	
+	
+	public abstract IPreciseBitmap getOriginalBitmap();
+	public abstract IPreciseBitmap getBitmap();
+
 }

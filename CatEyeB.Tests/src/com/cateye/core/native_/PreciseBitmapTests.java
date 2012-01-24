@@ -1,6 +1,7 @@
 package com.cateye.core.native_;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,26 @@ public class PreciseBitmapTests {
 			pbmps.get(i).free();
 		System.out.printf("Everything's free\n");
 	}
+	
+	@Test
+	public void clone_test()
+	{
+		PreciseBitmap pbmp = new PreciseBitmap();
+		pbmp.alloc(50, 50);
+		
+		assertTrue(pbmp.b > 0);
+		assertTrue(pbmp.r > 0);
+		assertTrue(pbmp.g > 0);
+		
+		PreciseBitmap newBitmap = (PreciseBitmap)pbmp.clone();
+		assertTrue(newBitmap.b > 0);
+		assertTrue(newBitmap.r > 0);
+		assertTrue(newBitmap.g > 0);
+		
+		pbmp.free();
+		newBitmap.free();
+	}
+
 	
 	@Test
 	public void test_precisebitmap_init_and_free()

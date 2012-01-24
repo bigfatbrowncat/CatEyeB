@@ -29,7 +29,7 @@ $(TARGET_BIN)/%.class : $(SOURCE)/%.java
 	@echo "[$(PROJ)] Compiling java class $@ ..."
 	$(ENSURE_BIN)
 	#@echo "Custom jars: $(CUSTOM_JARS)"
-	"$(JAVA_HOME)/bin/javac" -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS);$(CUSTOM_JARS);$(TARGET_BIN)" -d "$(TARGET_BIN)" $<
+	"$(JAVA_HOME)/bin/javac" -g -sourcepath "$(SOURCE)" -classpath "$(EXTERNAL_JARS);$(CUSTOM_JARS);$(TARGET_BIN)" -d "$(TARGET_BIN)" $<
 
 .PHONY: all classes clean #deplibs 
 .SILENT:

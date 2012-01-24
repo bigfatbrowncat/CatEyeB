@@ -8,11 +8,9 @@ import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
 class BrightnessStageOperationProcessor implements IStageOperationProcessor<BrightnessStageOperation>
 {
-	static native void Process(PreciseBitmap bmp, BrightnessStageOperation operation);
-	
 	static
 	{
-		LibraryLoader.attach("brightness.CatEyeOperation");
+		LibraryLoader.attach("Brightness.CatEyeStageOperation");
 	}
 
 	@Override
@@ -22,7 +20,5 @@ class BrightnessStageOperationProcessor implements IStageOperationProcessor<Brig
 	}
 
 	@Override
-	public void process(BrightnessStageOperation params, IPreciseBitmap bitmap, IProgressListener progressListener) {
-		Process((PreciseBitmap)bitmap, params);
-	}
+	public native void process(BrightnessStageOperation params, IPreciseBitmap bitmap, IProgressListener progressListener);
 }

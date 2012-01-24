@@ -25,6 +25,16 @@ class Stage implements IStage
 	protected IPreciseBitmap originalBitmap;
 	protected IPreciseBitmap processedBitmap;
 	
+	public IPreciseBitmap getOriginalBitmap()
+	{
+		return this.originalBitmap;
+	}
+	
+	public IPreciseBitmap getBitmap()
+	{
+		return this.processedBitmap == null ? getOriginalBitmap() : this.processedBitmap;
+	}
+	
 	@Inject
 	public Stage(IStageOperationProcessorsProvider operationProcessorsProvider,
 			IImageLoader imageLoader, IImageSaver imageSaver)
