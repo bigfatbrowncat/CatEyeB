@@ -62,7 +62,7 @@ JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreciseImageViewer_drawImage
 
 					int back_index = (bi.biHeight - j - 1) * bi.biWidth + i;
 
-					float r = 0, g = 0, b = 0;
+					float rs = 0, gs = 0, bs = 0;
 					float pixels = 0;
 
 					int jpmin = (int)(j2 * scale_out), jpmax = (int)((j2 + 1) * scale_out);
@@ -76,9 +76,11 @@ JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreciseImageViewer_drawImage
 					{
 						if (jp >= 0 && jp < src.height && ip >= 0 && ip < src.width)
 						{
-							b += src.b[jp * src.width + ip];
-							g += src.g[jp * src.width + ip];
-							r += src.r[jp * src.width + ip];
+							float r = src.r[jp * src.width + ip];
+							float g = src.g[jp * src.width + ip];
+							float b = src.b[jp * src.width + ip];
+
+							rs += r; gs += g; bs += b;
 						}
 						else
 						{
@@ -88,9 +90,9 @@ JNIEXPORT void JNICALL Java_com_cateye_ui_swt_PreciseImageViewer_drawImage
 						pixels ++;
 					}
 
-					bits[back_index * 3] = (Int8)(b / pixels * 255);
-					bits[back_index * 3 + 1] = (Int8)(g / pixels * 255);
-					bits[back_index * 3 + 2] = (Int8)(r / pixels * 255);
+					bits[back_index * 3] = (Int8)(bs / pixels * 255);
+					bits[back_index * 3 + 1] = (Int8)(gs / pixels * 255);
+					bits[back_index * 3 + 2] = (Int8)(rs / pixels * 255);
 				}
 				fflush(stdout);
 

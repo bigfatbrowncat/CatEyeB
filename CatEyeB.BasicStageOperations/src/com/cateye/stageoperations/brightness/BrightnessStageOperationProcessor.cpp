@@ -1,11 +1,11 @@
-#include <com/cateye/core/native_/BrightnessStageOperationProcessor.h>
+#include <com/cateye/stageoperations/brightness/BrightnessStageOperationProcessor.h>
 #include <bitmaps.h>
 #include <jni.h>
 #include <math.h>
 
 #define DEBUG_INFO printf("%d\n", __LINE__);fflush(stdout);
 
-JNIEXPORT void JNICALL Java_com_cateye_core_native_1_BrightnessStageOperationProcessor_process
+JNIEXPORT void JNICALL Java_com_cateye_stageoperations_brightness_BrightnessStageOperationProcessor_process
   (JNIEnv * env, jobject obj, jobject params, jobject bitmap, jobject listener)
 {
 	// Getting the class

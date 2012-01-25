@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.stageoperations.brightness.BrightnessStageOperation;
+import com.cateye.stageoperations.limiter.LimiterStageOperation;
 import com.google.inject.Inject;
 
 public class MainWindow
@@ -47,11 +48,14 @@ public class MainWindow
 	 */
 	protected void createContents()
 	{
-		BrightnessStageOperation stageOperation = new BrightnessStageOperation();
-		stageOperation.setBrightness(3);
+		BrightnessStageOperation brightnessStageOperation = new BrightnessStageOperation();
+		brightnessStageOperation.setBrightness(100);
+		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
+		limiterStageOperation.setPower(1.9);
 		
 		IStage stage = stageFactory.create();
-		stage.addStageOperation(stageOperation);
+		stage.addStageOperation(brightnessStageOperation);
+		stage.addStageOperation(limiterStageOperation);
 		
 		shell = new Shell();
 		shell.setSize(450, 300);

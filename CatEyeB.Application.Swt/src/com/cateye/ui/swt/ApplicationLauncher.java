@@ -1,9 +1,10 @@
 package com.cateye.ui.swt;
 
-import com.cateye.core.native_.BrightnessStageOperationModule;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.core.stage.StageModule;
+import com.cateye.stageoperations.brightness.BrightnessStageOperationModule;
+import com.cateye.stageoperations.limiter.LimiterStageOperationModule;
 import com.cateye.ui.swt.MainWindow;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -39,7 +40,8 @@ public class ApplicationLauncher
 				new ImageLoaderModule(),
 				new ImageSaverModule(),
 				new StageModule(),
-				new BrightnessStageOperationModule()
+				new BrightnessStageOperationModule(),
+				new LimiterStageOperationModule()
 			)
 		);
 	}	

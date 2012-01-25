@@ -1,16 +1,16 @@
-package com.cateye.core.native_;
+package com.cateye.stageoperations.brightness;
 
 import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
+import com.cateye.core.native_.LibraryLoader;
 import com.cateye.core.stage.IStageOperationProcessor;
-import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
 
 class BrightnessStageOperationProcessor implements IStageOperationProcessor<BrightnessStageOperation>
 {
 	static
 	{
-		LibraryLoader.attach("Brightness.CatEyeStageOperation");
+		LibraryLoader.attach("Basic.CatEyeStageOperation");
 	}
 
 	@Override

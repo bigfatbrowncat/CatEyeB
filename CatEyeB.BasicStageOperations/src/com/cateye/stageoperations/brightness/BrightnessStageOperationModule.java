@@ -1,7 +1,6 @@
-package com.cateye.core.native_;
+package com.cateye.stageoperations.brightness;
 
 import com.cateye.core.stage.StageOperationModule;
-import com.cateye.stageoperations.brightness.BrightnessStageOperation;
 
 public class BrightnessStageOperationModule extends StageOperationModule
 {
