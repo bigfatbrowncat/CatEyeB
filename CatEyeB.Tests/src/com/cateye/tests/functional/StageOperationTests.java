@@ -5,7 +5,7 @@ import org.junit.Test;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.core.stage.StageModule;
-import com.cateye.stageoperations.brightness.BrightnessStageOperationModule;
+import com.cateye.stageoperations.hsb.HSBStageOperationModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;

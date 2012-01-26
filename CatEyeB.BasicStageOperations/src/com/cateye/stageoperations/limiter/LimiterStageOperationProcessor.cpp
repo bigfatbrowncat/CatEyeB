@@ -1,4 +1,5 @@
 #include <com/cateye/stageoperations/limiter/LimiterStageOperationProcessor.h>
+#include <colorlib.h>
 #include <bitmaps.h>
 #include <jni.h>
 #include <math.h>
@@ -34,19 +35,18 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_limiter_LimiterStageOpera
 
 	double power = env->GetDoubleField(params, powerId);
 
-	double alpha = 1 + power;
-
 	int pixels_per_percent = bmp.width * bmp.height / 100 + 1;		// 1 added for zero exclusion
+
+	double a = 1.0 / (power * power) + 4;
 
 	for (int i = 0; i < bmp.width * bmp.height; i++)
 	{
-		double r = bmp.r[i];
-		double g = bmp.g[i];
-		double b = bmp.b[i];
-
-		r = pow(pow(r + 1, alpha) - 1, 1.0 / alpha) - r;
-		g = pow(pow(g + 1, alpha) - 1, 1.0 / alpha) - g;
-		b = pow(pow(b + 1, alpha) - 1, 1.0 / alpha) - b;
+		double r = 2 * (bmp.r[i] - 1) / a;
+		double g = 2 * (bmp.g[i] - 1) / a;
+		double b = 2 * (bmp.b[i] - 1) / a;
+		r = r - sqrt(r * r + 1 / (power * power * a)) + 1;
+		g = g - sqrt(g * g + 1 / (power * power * a)) + 1;
+		b = b - sqrt(b * b + 1 / (power * power * a)) + 1;
 
 		bmp.r[i] = r;
 		bmp.g[i] = g;

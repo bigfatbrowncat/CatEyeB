@@ -45,7 +45,7 @@ public class PreciseImageViewer extends Canvas
 							{
 								drawImage(e.gc.handle, pbmp, frame_w * i, frame_h * j, 
 										rect.width / vernissage.getColumns() + 1, 
-										rect.height / vernissage.getRows() + 1, 200, 100, 2);
+										rect.height / vernissage.getRows() + 1, 0, 0, 2);	// TODO: Put position here
 							}
 						}
 						else

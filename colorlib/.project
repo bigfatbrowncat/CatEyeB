@@ -1,20 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>target</name>
+	<name>colorlib</name>
 	<comment></comment>
 	<projects>
-		<project>bitmaps</project>
-		<project>CatEyeB.Application.Swt</project>
-		<project>CatEyeB.BasicStageOperations</project>
-		<project>CatEyeB.Core</project>
-		<project>CatEyeB.PpmImageSaver</project>
-		<project>CatEyeB.RawImageLoader</project>
-		<project>CatEyeB.Tests</project>
-		<project>CatEyeB.UI.SwtImageViewer</project>
-		<project>colorlib</project>
-		<project>ExternalLibs</project>
-		<project>jpeg-8c</project>
-		<project>libraw</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -30,6 +18,10 @@
 					<value>true</value>
 				</dictionary>
 				<dictionary>
+					<key>org.eclipse.cdt.make.core.autoBuildTarget</key>
+					<value>all</value>
+				</dictionary>
+				<dictionary>
 					<key>org.eclipse.cdt.make.core.buildArguments</key>
 					<value></value>
 				</dictionary>
@@ -38,8 +30,8 @@
 					<value>make</value>
 				</dictionary>
 				<dictionary>
-					<key>org.eclipse.cdt.make.core.buildLocation</key>
-					<value>${workspace_loc:/target/Default}</value>
+					<key>org.eclipse.cdt.make.core.cleanBuildTarget</key>
+					<value>clean</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.contents</key>
@@ -56,6 +48,10 @@
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableFullBuild</key>
 					<value>true</value>
+				</dictionary>
+				<dictionary>
+					<key>org.eclipse.cdt.make.core.fullBuildTarget</key>
+					<value>all</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>

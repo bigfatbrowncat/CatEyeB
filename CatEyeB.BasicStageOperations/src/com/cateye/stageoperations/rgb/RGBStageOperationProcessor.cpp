@@ -1,11 +1,12 @@
-#include <com/cateye/stageoperations/brightness/BrightnessStageOperationProcessor.h>
+#include <com/cateye/stageoperations/rgb/RGBStageOperationProcessor.h>
+#include <colorlib.h>
 #include <bitmaps.h>
 #include <jni.h>
 #include <math.h>
 
 #define DEBUG_INFO printf("%d\n", __LINE__);fflush(stdout);
 
-JNIEXPORT void JNICALL Java_com_cateye_stageoperations_brightness_BrightnessStageOperationProcessor_process
+JNIEXPORT void JNICALL Java_com_cateye_stageoperations_rgb_RGBStageOperationProcessor_process
   (JNIEnv * env, jobject obj, jobject params, jobject bitmap, jobject listener)
 {
 	// Getting the class
@@ -27,28 +28,30 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_brightness_BrightnessStag
 	bmp.width = env->GetIntField(bitmap, width_id);
 	bmp.height = env->GetIntField(bitmap, height_id);
 
-	// Getting the brightness
+	// Getting the stage operation parameters
 	jclass operationClass = env->GetObjectClass(params);
-	jfieldID brightnessId;
-	brightnessId = env->GetFieldID(operationClass, "brightness", "D");
+	jfieldID rId, gId, bId;
 
-	double brightness = env->GetDoubleField(params, brightnessId);
+	rId = env->GetFieldID(operationClass, "r", "D");
+	gId = env->GetFieldID(operationClass, "g", "D");
+	bId = env->GetFieldID(operationClass, "b", "D");
+
+	double r = env->GetDoubleField(params, rId);
+	double g = env->GetDoubleField(params, gId);
+	double b = env->GetDoubleField(params, bId);
+
 
 	int pixels_per_percent = bmp.width * bmp.height / 100 + 1;		// 1 added for zero exclusion
+	double light0 = sqrt(r*r + g*g + b*b);
 
 	for (int i = 0; i < bmp.width * bmp.height; i++)
 	{
-		double r = bmp.r[i];
-		double g = bmp.g[i];
-		double b = bmp.b[i];
+		double light = sqrt(bmp.r[i] * bmp.r[i] + bmp.g[i] * bmp.g[i] + bmp.b[i] * bmp.b[i]);
 
-		r *= brightness;
-		g *= brightness;
-		b *= brightness;
+		bmp.r[i] = bmp.r[i] * r / light0 * light;
+		bmp.g[i] = bmp.g[i] * g / light0 * light;
+		bmp.b[i] = bmp.b[i] * b / light0 * light;
 
-		bmp.r[i] = r;
-		bmp.g[i] = g;
-		bmp.b[i] = b;
 
 		// Reporting progress
 		/*if (i % pixels_per_percent == 0 && progress_reporter != NULL)

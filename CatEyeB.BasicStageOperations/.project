@@ -5,6 +5,7 @@
 	<projects>
 		<project>bitmaps</project>
 		<project>CatEyeB.Core</project>
+		<project>colorlib</project>
 		<project>ExternalLibs</project>
 	</projects>
 	<buildSpec>

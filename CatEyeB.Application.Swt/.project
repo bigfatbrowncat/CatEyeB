@@ -3,7 +3,7 @@
 	<name>CatEyeB.Application.Swt</name>
 	<comment></comment>
 	<projects>
-		<project>CatEyeB.BrightnessStageOperation</project>
+		<project>CatEyeB.BasicStageOperations</project>
 		<project>CatEyeB.Core</project>
 		<project>CatEyeB.PpmImageSaver</project>
 		<project>CatEyeB.RawImageLoader</project>

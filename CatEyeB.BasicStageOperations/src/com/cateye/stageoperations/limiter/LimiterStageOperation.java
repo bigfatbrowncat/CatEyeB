@@ -5,7 +5,7 @@ import com.cateye.core.stage.StageOperation;
 
 public class LimiterStageOperation extends StageOperation
 {
-	private double power = 0.1;
+	private double power = 5;
 	
 	public double getPower()
 	{
@@ -14,12 +14,12 @@ public class LimiterStageOperation extends StageOperation
 	
 	public void setPower(double value)
 	{
-		if (power < 0.1d || power > 2d)
+		if (power < 0.1d || power > 100d)
 		{
-			throw new ArgumentOutOfRangeException("power should be in the range from 0.1 to 2");
+			throw new ArgumentOutOfRangeException("power should be in the range from 0.1 to 100");
 		}
 		
-		if ((power - this.power) >= Double.MIN_NORMAL)
+		if (Math.abs(power - this.power) >= Double.MIN_NORMAL)
 		{
 			this.power = value;
 			fireOnPropertyChanged("power", power);

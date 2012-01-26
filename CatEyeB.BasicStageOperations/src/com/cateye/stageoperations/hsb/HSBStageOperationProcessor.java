@@ -1,12 +1,13 @@
-package com.cateye.stageoperations.brightness;
+package com.cateye.stageoperations.hsb;
 
 import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.native_.LibraryLoader;
 import com.cateye.core.stage.IStageOperationProcessor;
+import com.cateye.stageoperations.hsb.HSBStageOperation;
 
 
-class BrightnessStageOperationProcessor implements IStageOperationProcessor<BrightnessStageOperation>
+class HSBStageOperationProcessor implements IStageOperationProcessor<HSBStageOperation>
 {
 	static
 	{
@@ -20,5 +21,5 @@ class BrightnessStageOperationProcessor implements IStageOperationProcessor<Brig
 	}
 
 	@Override
-	public native void process(BrightnessStageOperation params, IPreciseBitmap bitmap, IProgressListener progressListener);
+	public native void process(HSBStageOperation params, IPreciseBitmap bitmap, IProgressListener progressListener);
 }

@@ -13,11 +13,12 @@ CPPFLAGS =
 CPPDEFINES =
 
 # Universal macros
-LIBS = $(TARGET_LIB)/bitmaps.dll.a
-CUSTOM_INCLUDES = -I"../bitmaps/include"
+LIBS = $(TARGET_LIB)/bitmaps.dll.a $(TARGET_LIB)/colorlib.a 
+CUSTOM_INCLUDES = -I"../bitmaps/include" -I"../colorlib/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.stageoperations.brightness.BrightnessStageOperationProcessor	\
+JAVA_JNI_CLASSES = com.cateye.stageoperations.hsb.HSBStageOperationProcessor	\
+                   com.cateye.stageoperations.rgb.RGBStageOperationProcessor	\
                    com.cateye.stageoperations.limiter.LimiterStageOperationProcessor
 NATIVE_LIB = Basic.CatEyeStageOperation
 

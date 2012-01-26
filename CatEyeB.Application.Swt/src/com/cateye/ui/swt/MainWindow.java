@@ -8,8 +8,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
-import com.cateye.stageoperations.brightness.BrightnessStageOperation;
+import com.cateye.stageoperations.hsb.HSBStageOperation;
 import com.cateye.stageoperations.limiter.LimiterStageOperation;
+import com.cateye.stageoperations.rgb.RGBStageOperation;
 import com.google.inject.Inject;
 
 public class MainWindow
@@ -48,13 +49,21 @@ public class MainWindow
 	 */
 	protected void createContents()
 	{
-		BrightnessStageOperation brightnessStageOperation = new BrightnessStageOperation();
-		brightnessStageOperation.setBrightness(100);
+		HSBStageOperation hsbStageOperation = new HSBStageOperation();
+		hsbStageOperation.setSaturation(0.9);
+		hsbStageOperation.setHue(0);
+		hsbStageOperation.setBrightness(15);
+		
+		RGBStageOperation rgbStageOperation = new RGBStageOperation();
+		rgbStageOperation.setB(2);
+		rgbStageOperation.setG(1.5);
+		
 		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
-		limiterStageOperation.setPower(1.9);
+		limiterStageOperation.setPower(3);
 		
 		IStage stage = stageFactory.create();
-		stage.addStageOperation(brightnessStageOperation);
+		stage.addStageOperation(hsbStageOperation);
+		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
 		shell = new Shell();
@@ -71,21 +80,17 @@ public class MainWindow
 		final PreciseImageViewer imageViewer = new PreciseImageViewer(shell);
 		imageViewer.setSize(400, 250);
 		
-		//imageViewer.setBitmap(image.getDescription().getThumbnail());
-		PreciseBitmapsVernissage vern = new PreciseBitmapsVernissage(2, 2);
-		for (int j = 0; j < 2; j++)
-		for (int i = 0; i < 2; i++)
-		{
-			vern.setUpdated(i, j, true);
-			vern.setBitmap(i, j, stage.getOriginalBitmap());
-		}
+		PreciseBitmapsVernissage vern = new PreciseBitmapsVernissage(2, 1);
+
+		vern.setUpdated(0, 0, true);
+		vern.setBitmap(0, 0, stage.getOriginalBitmap());
 		
-		vern.setBitmap(0, 1, stage.getBitmap());
+		vern.setUpdated(1, 0, true);
+		vern.setBitmap(1, 0, stage.getBitmap());
 		
-		vern.setUpdated(0, 0, false);
 		vern.setCaption(1, 0, "This is the caption for (1, 0) picture"); 
 		
 		imageViewer.setVernissage(vern);
-		//imageViewer.setBitmap(image.getBitmap());
+
 	}
 }
