@@ -48,9 +48,9 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_rgb_RGBStageOperationProc
 	{
 		double light = sqrt(bmp.r[i] * bmp.r[i] + bmp.g[i] * bmp.g[i] + bmp.b[i] * bmp.b[i]);
 
-		bmp.r[i] = bmp.r[i] * r / light0 * light;
-		bmp.g[i] = bmp.g[i] * g / light0 * light;
-		bmp.b[i] = bmp.b[i] * b / light0 * light;
+		bmp.r[i] = bmp.r[i] * r;// / light0 * light;
+		bmp.g[i] = bmp.g[i] * g;// / light0 * light;
+		bmp.b[i] = bmp.b[i] * b;// / light0 * light;
 
 
 		// Reporting progress

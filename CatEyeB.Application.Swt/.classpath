@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.BasicStageOperations/src"/>
+	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/guice-3.0-no_aop.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/swt-debug.jar"/>
@@ -11,5 +11,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.PpmImageSaver"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.RawImageLoader"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.UI.SwtImageViewer"/>
+	<classpathentry kind="lib" path="/ExternalLibs/lib/swing2swt.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding_1.4.0.I20110111-0800.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding_1.4.0.I20110111-0800.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.beans_1.2.100.I20100824-0800.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.beans_1.2.100.I20100824-0800.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.observable_1.4.0.I20110222-0800.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.observable_1.4.0.I20110222-0800.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.property_1.4.0.I20110222-0800.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.core.databinding.property_1.4.0.I20110222-0800.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.jface.databinding_1.5.0.I20100907-0800.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.jface.databinding_1.5.0.I20100907-0800.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.equinox.common_3.6.0.v20110523.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/org.eclipse.equinox.common_3.6.0.v20110523.jar"/>
+	<classpathentry kind="lib" path="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/com.ibm.icu_4.4.2.v20110208.jar" sourcepath="C:/eclipse-java-indigo-SR1-win32/eclipse/plugins/com.ibm.icu_4.4.2.v20110208.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
