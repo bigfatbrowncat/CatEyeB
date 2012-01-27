@@ -1,5 +1,8 @@
 package com.cateye.ui.swt;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -11,28 +14,61 @@ import com.cateye.core.IPropertyChangedListener;
 import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.stageoperations.hsb.HSBStageOperation;
+import com.cateye.stageoperations.hsb.ui.swt.HSBStageOperationWidget;
 import com.cateye.stageoperations.limiter.LimiterStageOperation;
 import com.cateye.stageoperations.rgb.RGBStageOperation;
 import com.cateye.stageoperations.rgb.ui.swt.RGBStageOperationWidget;
 import com.google.inject.Inject;
-import swing2swt.layout.BorderLayout;
-import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.GridData;
 
 public class MainWindow
 {
 	protected Shell shell;
 	protected Button button;
 	private final StageFactory stageFactory;
+	private Timer updateTimer;
 	
 	private PreciseBitmapsVernissage vern = new PreciseBitmapsVernissage(2, 1);
 	private PreciseImageViewer imageViewer;
 	private IStage stage;
 	
 	private RGBStageOperation rgbStageOperation;
-	private RGBStageOperationWidget rgbStageOperationWidget;
-	private Composite centerComposite;
+	private HSBStageOperation hsbStageOperation;
 
+	private RGBStageOperationWidget rgbStageOperationWidget;
+	private HSBStageOperationWidget hsbStageOperationWidget;
+	
+	IPropertyChangedListener stageOperationPropertyChanged = new IPropertyChangedListener() 
+	{
+		
+		@Override
+		public void invoke(Object sender, String propertyName, Object newValue) 
+		{
+			if (updateTimer != null)
+			{
+				updateTimer.cancel();
+			}
+			updateTimer = new Timer(); 
+			updateTimer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					shell.getDisplay().asyncExec(new Runnable() {
+						
+						@Override
+						public void run() {
+							stage.processImage();
+							vern.setBitmap(1, 0, stage.getBitmap());
+							imageViewer.redraw();
+						}
+					});
+				}
+			}, 50);
+			
+			//imageViewer.redraw();
+		}
+	};
 	
 	@Inject
 	public MainWindow(StageFactory stageFactory)
@@ -63,7 +99,7 @@ public class MainWindow
 	
 	private IStage createStage()
 	{
-		HSBStageOperation hsbStageOperation = new HSBStageOperation();
+		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
 		hsbStageOperation.setHue(0);
 		hsbStageOperation.setBrightness(7);
@@ -76,7 +112,7 @@ public class MainWindow
 		limiterStageOperation.setPower(10);
 		
 		IStage stage = stageFactory.create();
-//		stage.addStageOperation(hsbStageOperation);
+		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
@@ -89,7 +125,6 @@ public class MainWindow
 	
 	private void createImageViewer(IStage stage, Composite parent)
 	{
-		centerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		imageViewer = new PreciseImageViewer(parent);
 
 		vern.setUpdated(0, 0, true);
@@ -111,27 +146,29 @@ public class MainWindow
 		shell = new Shell();
 		shell.setSize(450, 300);
 		shell.setText("CatEyeB");
-		shell.setLayout(new BorderLayout(0, 0));
+		
+		GridLayout mainLayout = new GridLayout(2, false);
+		shell.setLayout(mainLayout);
+		mainLayout.horizontalSpacing = 5;
+		
+		Composite centerComposite = new Composite(shell, SWT.NONE);
+		centerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
+		centerComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
 		Composite rightComposite = new Composite(shell, SWT.NONE);
-		rightComposite.setLayoutData(BorderLayout.EAST);
 		rightComposite.setLayout(new GridLayout(1, false));
-		
-		centerComposite = new Composite(shell, SWT.NONE);
-		centerComposite.setLayoutData(BorderLayout.CENTER);
+		rightComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
 		
 		createImageViewer(stage, centerComposite);
+
+		// Stage operation widgets
+		
 		rgbStageOperationWidget = new RGBStageOperationWidget(rightComposite, SWT.NONE);
 		rgbStageOperationWidget.setRgbStageOperation(rgbStageOperation);
-		rgbStageOperation.addOnPropertyChangedListener(new IPropertyChangedListener() {
-			
-			@Override
-			public void invoke(Object sender, String propertyName, Object newValue) 
-			{
-				stage.processImage();
-				vern.setBitmap(1, 0, stage.getBitmap());
-				imageViewer.redraw();
-			}
-		});
+		rgbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
+		
+		hsbStageOperationWidget = new HSBStageOperationWidget(rightComposite, SWT.NONE);
+		hsbStageOperationWidget.setHsbStageOperation(hsbStageOperation);
+		hsbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 	}
 }
