@@ -171,4 +171,6 @@ public class MainWindow
 		hsbStageOperationWidget.setHsbStageOperation(hsbStageOperation);
 		hsbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 	}
+	
+	
 }

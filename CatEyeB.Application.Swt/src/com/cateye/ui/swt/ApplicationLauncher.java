@@ -31,8 +31,6 @@ public class ApplicationLauncher
 		{
 			e.printStackTrace();
 		}
-		
-		initIoC();
 	}
 	
 	private static void initIoC()
