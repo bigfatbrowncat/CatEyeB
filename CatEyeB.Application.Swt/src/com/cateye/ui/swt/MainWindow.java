@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Shell;
 import com.cateye.core.IPropertyChangedListener;
 import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
+import com.cateye.stageoperations.compressor.CompressorStageOperation;
+import com.cateye.stageoperations.compressor.ui.swt.CompressorStageOperationWidget;
 import com.cateye.stageoperations.hsb.HSBStageOperation;
 import com.cateye.stageoperations.hsb.ui.swt.HSBStageOperationWidget;
 import com.cateye.stageoperations.limiter.LimiterStageOperation;
@@ -35,9 +37,11 @@ public class MainWindow
 	
 	private RGBStageOperation rgbStageOperation;
 	private HSBStageOperation hsbStageOperation;
+	private CompressorStageOperation compressorStageOperation;
 
 	private RGBStageOperationWidget rgbStageOperationWidget;
 	private HSBStageOperationWidget hsbStageOperationWidget;
+	private CompressorStageOperationWidget compressorStageOperationWidget;
 	
 	IPropertyChangedListener stageOperationPropertyChanged = new IPropertyChangedListener() 
 	{
@@ -108,10 +112,13 @@ public class MainWindow
 		rgbStageOperation.setB(2);
 		rgbStageOperation.setG(1.5);
 		
+		compressorStageOperation = new CompressorStageOperation();
+		
 		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
 		limiterStageOperation.setPower(10);
 		
 		IStage stage = stageFactory.create();
+		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(limiterStageOperation);

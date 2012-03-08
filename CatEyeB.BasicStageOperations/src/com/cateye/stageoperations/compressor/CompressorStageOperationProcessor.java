@@ -1,13 +1,12 @@
-package com.cateye.stageoperations.hsb;
+package com.cateye.stageoperations.compressor;
 
 import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
 import com.cateye.core.native_.LibraryLoader;
 import com.cateye.core.stage.IStageOperationProcessor;
-import com.cateye.stageoperations.hsb.HSBStageOperation;
 
-class HSBStageOperationProcessor implements 
-		IStageOperationProcessor<HSBStageOperation>
+public class CompressorStageOperationProcessor implements
+		IStageOperationProcessor<CompressorStageOperation> 
 {
 	static
 	{
@@ -21,6 +20,7 @@ class HSBStageOperationProcessor implements
 	}
 
 	@Override
-	public native void process(HSBStageOperation params, IPreciseBitmap bitmap, 
+	public native void process(CompressorStageOperation params, IPreciseBitmap bitmap,
 			IProgressListener progressListener);
+
 }

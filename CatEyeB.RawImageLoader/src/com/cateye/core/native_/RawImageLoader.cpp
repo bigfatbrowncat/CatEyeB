@@ -309,7 +309,6 @@ int my_raw_processing_callback(void *d, enum LibRaw_progress p, int iteration, i
 	DEBUG_INFO	jmethodID raiseProgress_id = oc->env->GetMethodID(cls, "raiseProgress", "(F)Z");
 	DEBUG_INFO	float progress = (float)((log2(p) + (float)iteration / expected) / log2(LIBRAW_PROGRESS_STRETCH));
 
-	printf("%d %d %d %d", oc, oc->env, oc->obj, raiseProgress_id);
 	DEBUG_INFO	if (oc->env->CallBooleanMethod(oc->obj, raiseProgress_id, progress))
 	{
 		DEBUG_INFO    	return 0;	// Continue
