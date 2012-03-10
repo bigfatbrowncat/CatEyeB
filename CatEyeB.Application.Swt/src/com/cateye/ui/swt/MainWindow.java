@@ -106,7 +106,7 @@ public class MainWindow
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
 		hsbStageOperation.setHue(0);
-		hsbStageOperation.setBrightness(7);
+		hsbStageOperation.setBrightness(8);
 		
 		rgbStageOperation = new RGBStageOperation();
 		rgbStageOperation.setB(2);
@@ -115,12 +115,12 @@ public class MainWindow
 		compressorStageOperation = new CompressorStageOperation();
 		
 		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
-		limiterStageOperation.setPower(10);
+		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
+		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
 		stage.loadImage("..//..//data//test//IMG_5697.CR2");
