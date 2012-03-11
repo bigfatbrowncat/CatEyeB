@@ -17,8 +17,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a -lgdi32
 CUSTOM_INCLUDES = -I"../bitmaps/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.ui.swt.ImageViewer \
-                   com.cateye.ui.swt.PreviewImageViewer \
+JAVA_JNI_CLASSES = com.cateye.ui.swt.PreviewImageViewer \
                    com.cateye.ui.swt.PreciseImageViewer
 NATIVE_LIB = ImageViewer.SwtWidgets
 

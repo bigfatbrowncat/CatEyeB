@@ -29,10 +29,55 @@ public:
 
 	inline const T& operator () (int i, int j) const
 	{
+/*		if (i >= width)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+		if (j >= height)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+
+		if (i < 0)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+		if (j < 0)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+*/
 		return data->link[j * width + i];
 	}
 	inline T& operator () (int i, int j)
 	{
+/*		if (i >= width)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+		if (j >= height)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+
+		if (i < 0)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
+		if (j < 0)
+		{
+			DEBUG_INFO
+			throw 1;
+		}*/
+
+
 		return data->link[j * width + i];
 	}
 
@@ -73,7 +118,9 @@ public:
 	arr2(int width, int height) : width(width), height(height)
 	{
 		this->data = new counted_link<T>;
+		DEBUG_INFO
 		this->data->link = new T[width * height];
+		DEBUG_INFO
 	}
 	virtual ~arr2()
 	{
@@ -199,26 +246,56 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 
 	DEBUG_INFO
 
+	printf("divides = %d, (%d, %d)\n", divides, Hw, Hh);
+
 	// Building phi_k
 	vector<arr2<float> > phi;
 	for (int k = 0; k <= divides; k++)		// k is the index of H_cur
 	{
 		DEBUG_INFO
+
+		printf("%d\n", k); fflush(stdout);
+
 		float avg_grad = 0;
 
 		int w = (int)(Hw / pow(2, k));
 		int h = (int)(Hh / pow(2, k));
 
+		printf("%d, %d\n", w, h); fflush(stdout);
+
 		if (k > 0)
 		{
+			DEBUG_INFO
 			// Calculating the new H_cur
 			arr2<float> H_cur_new(w, h);
+			DEBUG_INFO
 			for (int i = 0; i < w; i++)
 			for (int j = 0; j < h; j++)
 			{
-				H_cur_new(i, j) = (float)(0.25 * (H_cur(2 * i, 2 * j)     + H_cur(2 * i + 1, 2 * j) +
-				                                  H_cur(2 * i, 2 * j + 1) + H_cur(2 * i + 1, 2 * j + 1)));
+				double Hcn_tmp = H_cur(2 * i, 2 * j);
+				int q = 1;
+
+				if (2 * i + 1 < Hw)
+				{
+					Hcn_tmp += H_cur(2 * i + 1, 2 * j);
+					q++;
+				}
+
+				if (2 * j + 1 < Hh)
+				{
+					Hcn_tmp += H_cur(2 * i, 2 * j + 1);
+					q++;
+				}
+
+				if (2 * i + 1 < Hw && 2 * j + 1 < Hh)
+				{
+					Hcn_tmp += H_cur(2 * i + 1, 2 * j + 1);
+					q++;
+				}
+
+				H_cur_new(i, j) = (float)(Hcn_tmp / q);
 			}
+			DEBUG_INFO
 			H_cur = H_cur_new;
 		}
 		DEBUG_INFO
@@ -402,10 +479,12 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 
 bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float stop_dpd)
 {
+	DEBUG_INFO
 	int w = rho.getWidth(), h = rho.getHeight();
 	arr2<float> I(w + 2, h + 2);
 	arr2<float> Inew(w + 2, h + 2);
 
+	DEBUG_INFO
 	// Setting initial values
 	for (int i = 0; i < w + 2; i++)
 	for (int j = 0; j < h + 2; j++)
@@ -420,6 +499,7 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 		I(i, j) = I0(i1 - 1, j1 - 1);
 		Inew(i, j) = I0(i1 - 1, j1 - 1);
 	}
+	DEBUG_INFO
 
 	float delta = 0; float delta_prev = 10000;
 	// object delta_lock = new object();
@@ -429,7 +509,7 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 
 		float my_delta = 0;
 
-		for (int i = 0; i < w + 1; i++)
+		for (int i = 1; i < w + 1; i++)
 		{
 			// Run, Thomas, run!
 			float alpha[h + 3];
@@ -472,6 +552,7 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 			Inew(w + 1, j) = Inew(w, j);
 		}
 
+
 		// Controlling the constant after horizontal iterations
 		float m = 0;
 		for (int i = 0; i < w + 2; i++)
@@ -499,8 +580,8 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 		// This formula is found experimentally
 		float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
 
-		//printf("%f, ", dpd);
-		//fflush(stdout);
+		printf("layer progress: %f\n", progress);
+		fflush(stdout);
 
 
 		if (dpd < stop_dpd)
@@ -519,8 +600,6 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 
 void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressure, double contrast, float epsilon, int steps_max)
 {
-
-
 	arr2<float> r_chan(bmp.r, bmp.width, bmp.height);
 	arr2<float> g_chan(bmp.g, bmp.width, bmp.height);
 	arr2<float> b_chan(bmp.b, bmp.width, bmp.height);
@@ -656,7 +735,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	gId = env->GetFieldID(operationClass, "g", "D");
 	bId = env->GetFieldID(operationClass, "b", "D");*/
 
-//	Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
-	Compress(bmp, 0.5, 0.01, 0.05, 0.65, 0.01f, 20000);
+	Compress(bmp, 0.7, 0.1, 2, 0.85, 0.01f, 20000);
+	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
 }

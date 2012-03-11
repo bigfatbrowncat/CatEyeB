@@ -124,6 +124,7 @@ public class MainWindow
 		stage.addStageOperation(limiterStageOperation);
 		
 		stage.loadImage("..//..//data//test//IMG_1520.CR2");
+//		stage.loadImage("..//..//data//test//IMG_5196.CR2");
 		stage.processImage();
 		
 		return stage;
