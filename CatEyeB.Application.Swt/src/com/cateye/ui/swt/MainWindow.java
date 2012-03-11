@@ -123,7 +123,7 @@ public class MainWindow
 		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
-		stage.loadImage("..//..//data//test//IMG_5697.CR2");
+		stage.loadImage("..//..//data//test//IMG_1520.CR2");
 		stage.processImage();
 		
 		return stage;

@@ -517,8 +517,10 @@ bool SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 	return false;
 }
 
-void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressure, double contrast, int steps_max)
+void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressure, double contrast, float epsilon, int steps_max)
 {
+
+
 	arr2<float> r_chan(bmp.r, bmp.width, bmp.height);
 	arr2<float> g_chan(bmp.g, bmp.width, bmp.height);
 	arr2<float> b_chan(bmp.b, bmp.width, bmp.height);
@@ -591,8 +593,6 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	}
 	double p = pow(100, curve * 1.5);
 
-	float epsilon = 0.01f;	// TODO: Should be configured somehow...
-
 	DEBUG_INFO
 
 	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
@@ -656,6 +656,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	gId = env->GetFieldID(operationClass, "g", "D");
 	bId = env->GetFieldID(operationClass, "b", "D");*/
 
-	Compress(bmp, 0.2, 0.01, 0.05, 0.85, 5000);
+//	Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
+	Compress(bmp, 0.5, 0.01, 0.05, 0.65, 0.01f, 20000);
 
 }
