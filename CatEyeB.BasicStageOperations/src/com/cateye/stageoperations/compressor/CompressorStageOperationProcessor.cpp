@@ -29,7 +29,7 @@ public:
 
 	inline const T& operator () (int i, int j) const
 	{
-/*		if (i >= width)
+		if (i >= width)
 		{
 			DEBUG_INFO
 			throw 1;
@@ -50,12 +50,12 @@ public:
 			DEBUG_INFO
 			throw 1;
 		}
-*/
+
 		return data->link[j * width + i];
 	}
 	inline T& operator () (int i, int j)
 	{
-/*		if (i >= width)
+		if (i >= width)
 		{
 			DEBUG_INFO
 			throw 1;
@@ -75,7 +75,7 @@ public:
 		{
 			DEBUG_INFO
 			throw 1;
-		}*/
+		}
 
 
 		return data->link[j * width + i];
@@ -111,15 +111,35 @@ public:
 	arr2(T* src_data, int width, int height) : width(width), height(height)
 	{
 		this->data = new counted_link<T>;
+		if (this->data == NULL)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
 		this->data->link = new T[width * height];
+		if (this->data->link == NULL)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
 		memcpy(this->data->link, src_data, width * height * sizeof(T));
 	}
 
 	arr2(int width, int height) : width(width), height(height)
 	{
 		this->data = new counted_link<T>;
+		if (this->data == NULL)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
 		DEBUG_INFO
 		this->data->link = new T[width * height];
+		if (this->data->link == NULL)
+		{
+			DEBUG_INFO
+			throw 1;
+		}
 		DEBUG_INFO
 	}
 	virtual ~arr2()
@@ -133,7 +153,7 @@ public:
 	}
 };
 
-arr2<float> Upsample2(const arr2<float>& Q, int new_w, int new_h)
+arr2<float> Upsample2(const arr2<float> Q, int new_w, int new_h)
 {
 	int w = Q.getWidth(), h = Q.getHeight();
 
@@ -371,9 +391,11 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 		int h = phi[k].getHeight();
 		// Multiplying
 		DEBUG_INFO
+		printf("Phi: %d, %d\n", Phi.getWidth(), Phi.getHeight());
 		for (int i = 0; i < w; i++)
 		for (int j = 0; j < h; j++)
 		{
+			//printf("i = %d, j = %d, w = %d, h = %d\n", i, j, w, h);fflush(stdout);
 			Phi(i, j) *= phi[k](i, j);
 		}
 

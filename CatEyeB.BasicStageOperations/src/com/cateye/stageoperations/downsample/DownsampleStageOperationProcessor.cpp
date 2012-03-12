@@ -34,11 +34,33 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_downsample_DownsampleStag
 	bmp.height = env->GetIntField(bitmap, height_id);
 
 	// Getting the stage operation parameters
-/*	jclass operationClass = env->GetObjectClass(params);
-	jfieldID rId, gId, bId;
+	jclass operationClass = env->GetObjectClass(params);
+	jfieldID rateId;
 
-	rId = env->GetFieldID(operationClass, "r", "D");
-	gId = env->GetFieldID(operationClass, "g", "D");
-	bId = env->GetFieldID(operationClass, "b", "D");*/
+	rateId = env->GetFieldID(operationClass, "rate", "I");
+	int rate = (int)env->GetIntField(params, rateId);
 
+	PreciseBitmap newBmp;
+	PreciseBitmap_Init(newBmp, bmp.width / rate, bmp.height / rate);
+
+	for (int i = 0; i < bmp.width; i++)
+	for (int j = 0; j < bmp.height; j++)
+	{
+		int inx = (j / rate) * newBmp.width + i / rate;
+		if (i / rate < newBmp.width && j / rate < newBmp.height)
+		{
+			newBmp.r[inx] += 1.0 / rate / rate * bmp.r[j * bmp.width + i];
+			newBmp.g[inx] += 1.0 / rate / rate * bmp.g[j * bmp.width + i];
+			newBmp.b[inx] += 1.0 / rate / rate * bmp.b[j * bmp.width + i];
+		}
+	}
+
+	// Setting the new bitmap data
+	env->SetIntField(bitmap, width_id, (jint)(newBmp.width));
+	env->SetIntField(bitmap, height_id, (jint)(newBmp.height));
+	env->SetLongField(bitmap, r_id, (jlong)(newBmp.r));
+	env->SetLongField(bitmap, g_id, (jlong)(newBmp.g));
+	env->SetLongField(bitmap, b_id, (jlong)(newBmp.b));
+
+	PreciseBitmap_Free(bmp);
 }

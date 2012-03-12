@@ -1,13 +1,14 @@
+#include <com/cateye/core/native_/RawImageLoader.h>
 #include <math.h>
 #include <stdio.h>
 
 #include <bitmaps.h>
 #include <libraw.h>
 #include <jpeglib.h>
+#include <jni.h>
 
 #define DEBUG_INFO	//printf("%d\n", __LINE__);fflush(stdout);
 
-#include <com/cateye/core/native_/RawImageLoader.h>
 
 #define RAWPROCESSOR_OPEN_BUFFER			1024 * 1024 * 1024		// 1Gb
 #define	MESSAGE_LIBRAW_OUT_OF_MEMORY		"Out of memory occured during libraw processing"

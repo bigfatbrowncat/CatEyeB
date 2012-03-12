@@ -106,6 +106,7 @@ public class MainWindow
 	private IStage createStage()
 	{
 		downsampleStageOperation = new DownsampleStageOperation();
+		downsampleStageOperation.setRate(3);
 		
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
