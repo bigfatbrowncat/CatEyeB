@@ -735,7 +735,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	gId = env->GetFieldID(operationClass, "g", "D");
 	bId = env->GetFieldID(operationClass, "b", "D");*/
 
-	Compress(bmp, 0.7, 0.1, 2, 0.85, 0.01f, 20000);
+	Compress(bmp, 0.7, 0.05, 1, 0.75, 0.003f, 20000);
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
 }

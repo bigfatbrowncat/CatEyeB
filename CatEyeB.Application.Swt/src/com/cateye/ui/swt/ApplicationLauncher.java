@@ -3,12 +3,11 @@ package com.cateye.ui.swt;
 import com.cateye.core.native_.ImageLoaderModule;
 import com.cateye.core.native_.ImageSaverModule;
 import com.cateye.core.stage.StageModule;
-import com.cateye.stageoperations.compressor.CompressorStageOperation;
 import com.cateye.stageoperations.compressor.CompressorStageOperationModule;
+import com.cateye.stageoperations.downsample.DownsampleStageOperationModule;
 import com.cateye.stageoperations.hsb.HSBStageOperationModule;
 import com.cateye.stageoperations.limiter.LimiterStageOperationModule;
 import com.cateye.stageoperations.rgb.RGBStageOperationModule;
-import com.cateye.ui.swt.MainWindow;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.util.Modules;
@@ -44,7 +43,8 @@ public class ApplicationLauncher
 				new RGBStageOperationModule(),
 				new HSBStageOperationModule(),
 				new LimiterStageOperationModule(),
-				new CompressorStageOperationModule()
+				new CompressorStageOperationModule(),
+				new DownsampleStageOperationModule()
 			)
 		);
 	}	

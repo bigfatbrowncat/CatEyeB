@@ -15,6 +15,7 @@ import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
 import com.cateye.stageoperations.compressor.CompressorStageOperation;
 import com.cateye.stageoperations.compressor.ui.swt.CompressorStageOperationWidget;
+import com.cateye.stageoperations.downsample.DownsampleStageOperation;
 import com.cateye.stageoperations.hsb.HSBStageOperation;
 import com.cateye.stageoperations.hsb.ui.swt.HSBStageOperationWidget;
 import com.cateye.stageoperations.limiter.LimiterStageOperation;
@@ -38,6 +39,7 @@ public class MainWindow
 	private RGBStageOperation rgbStageOperation;
 	private HSBStageOperation hsbStageOperation;
 	private CompressorStageOperation compressorStageOperation;
+	private DownsampleStageOperation downsampleStageOperation;
 
 	private RGBStageOperationWidget rgbStageOperationWidget;
 	private HSBStageOperationWidget hsbStageOperationWidget;
@@ -103,6 +105,8 @@ public class MainWindow
 	
 	private IStage createStage()
 	{
+		downsampleStageOperation = new DownsampleStageOperation();
+		
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
 		hsbStageOperation.setHue(0);
@@ -114,10 +118,12 @@ public class MainWindow
 		
 		compressorStageOperation = new CompressorStageOperation();
 		
+		
 		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
+		stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
