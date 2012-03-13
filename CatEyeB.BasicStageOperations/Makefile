@@ -4,7 +4,7 @@ PROJ = CatEyeB.BasicStageOperations
 
 # CC macros
 COMMON_CFLAGS = -static-libgcc
-CFLAGS = -O0
+CFLAGS = -O0 -g2
 CDEFINES =
 
 # CPP macros (additional to C macros)

@@ -106,7 +106,7 @@ public class MainWindow
 	private IStage createStage()
 	{
 		downsampleStageOperation = new DownsampleStageOperation();
-		downsampleStageOperation.setRate(3);
+		downsampleStageOperation.setRate(2);
 		
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
@@ -124,7 +124,7 @@ public class MainWindow
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		stage.addStageOperation(downsampleStageOperation);
+		//stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
@@ -132,7 +132,7 @@ public class MainWindow
 		
 		stage.loadImage("..//..//data//test//IMG_1520.CR2");
 //		stage.loadImage("..//..//data//test//IMG_5196.CR2");
-		stage.processImage();
+		//stage.processImage();
 		
 		return stage;
 	}
