@@ -539,12 +539,6 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> Iprev, bool prev_exists, arr
 
 		if (prev_exists /*&& (step % 10 == 0)*/)
 		{
-			delta /= (float)sqrt(w * h);
-			float dpd = fabs((delta - delta_prev) / delta);
-
-			// This formula is found experimentally
-			float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
-
 
 			int pW = Iprev.getWidth(), pH = Iprev.getHeight(), nW = I.getWidth() - 2, nH = I.getHeight() - 2;
 			// Controlling the pinned variety 2x2
@@ -572,24 +566,32 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> Iprev, bool prev_exists, arr
 					if (2 * i + ii + 1 < nW &&
 						2 * j + jj + 1 < nH)
 					{
-						I(2 * i + ii + 1, 2 * j + jj + 1) -= mm /** progress */* 0.01;
+						I(2 * i + ii + 1, 2 * j + jj + 1) -= mm /** progress */* 0.001;
 					}
 				}
 
 			}
 
-
-			printf("step #%d, progress: %f\n", step, progress);
-			fflush(stdout);
-
-
-			if (dpd < stop_dpd && step > 1)
-			{
-				printf("!");
-				fflush(stdout);
-				break;
-			}
 		}
+
+		delta /= (float)sqrt(w * h);
+		float dpd = fabs((delta - delta_prev) / delta);
+
+		// This formula is found experimentally
+		float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
+
+
+		printf("step #%d, progress: %f\n", step, progress);
+		fflush(stdout);
+
+
+		if (dpd < stop_dpd && step > 1)
+		{
+			printf("!");
+			fflush(stdout);
+			break;
+		}
+
 
 		delta_prev = delta;
 		delta = 0;
@@ -614,7 +616,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 
 	int divides = 0, wt = W, ht = H;
 	ww.push_back(wt); hh.push_back(ht);
-	while (wt > 1 && ht > 1 && divides < 10)
+	while (wt > 1 && ht > 1 && divides < 3)
 	{
 		wt /= 2; ht /= 2;
 		ww.push_back(wt); hh.push_back(ht);
@@ -760,6 +762,9 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
+//	arr2<float> I(div_G.getWidth(), div_G.getHeight());
+//	SolvePoissonNeiman(I, arr2<float>(1,1), false, div_G, steps_max, epsilon);
+
 
 	DEBUG_INFO
 
@@ -820,7 +825,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	gId = env->GetFieldID(operationClass, "g", "D");
 	bId = env->GetFieldID(operationClass, "b", "D");*/
 
-	Compress(bmp, 0.7, 0.05, 1, 0.75, 0.001f, 10000);
+	Compress(bmp, 0.8, 0.05, 0.3, 0.75, 0.0003f, 10000);
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
 }

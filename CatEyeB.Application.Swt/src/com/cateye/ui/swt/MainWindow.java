@@ -124,7 +124,7 @@ public class MainWindow
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		//stage.addStageOperation(downsampleStageOperation);
+		stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
