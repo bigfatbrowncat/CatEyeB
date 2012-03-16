@@ -26,6 +26,8 @@ public:
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
 
+	counted_link<T>* getData() { return data; }
+
 	arr2<T> clone()
 	{
 		return arr2<T>(this->data->link, this->width, this->height);
@@ -259,6 +261,7 @@ arr2<float> Upsample2(const arr2<float> Q, int new_w, int new_h)
 		Q22(i, j) /= diver;
 	}
 
+	printf("Q22: %x\n", Q22.getData());
 	return Q22;
 }
 
@@ -313,32 +316,14 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 			DEBUG_INFO
 			// Calculating the new H_cur
 			arr2<float> H_cur_new(w, h);
+			printf("H_cur_new: %p\n", H_cur_new.getData());
 			DEBUG_INFO
 			for (int i = 0; i < w; i++)
 			for (int j = 0; j < h; j++)
 			{
-				double Hcn_tmp = H_cur(2 * i, 2 * j);
-				int q = 1;
+				H_cur_new(i, j) = (float)(0.25 * (H_cur(2 * i, 2 * j)     + H_cur(2 * i + 1, 2 * j) +
+				                                  H_cur(2 * i, 2 * j + 1) + H_cur(2 * i + 1, 2 * j + 1)));
 
-				if (2 * i + 1 < Hw)
-				{
-					Hcn_tmp += H_cur(2 * i + 1, 2 * j);
-					q++;
-				}
-
-				if (2 * j + 1 < Hh)
-				{
-					Hcn_tmp += H_cur(2 * i, 2 * j + 1);
-					q++;
-				}
-
-				if (2 * i + 1 < Hw && 2 * j + 1 < Hh)
-				{
-					Hcn_tmp += H_cur(2 * i + 1, 2 * j + 1);
-					q++;
-				}
-
-				H_cur_new(i, j) = (float)(Hcn_tmp / q);
 			}
 			DEBUG_INFO
 			H_cur = H_cur_new;
@@ -427,6 +412,7 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 		if (k > 0)
 		{
 			Phi = Upsample2(Phi, ww[k - 1], hh[k - 1]);
+			printf("Phi: %x\n", Phi.getData());
 		}
 	}
 	DEBUG_INFO
@@ -445,7 +431,85 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 
 //typedef void (*SolutionReporter) (float progress, arr2<float> solution);
 
-void SolvePoissonNeiman(arr2<float> I0, arr2<float> Iprev, bool prev_exists, arr2<float> rho, int steps_max, float stop_dpd)
+void SolveAverage(arr2<float> I0, arr2<float> rho, int steps, double II, double Irho)
+{
+	int w = rho.getWidth(), h = rho.getHeight();
+	for (int step = 0; step < steps; step++)
+	{
+		for (int i = 0; i < w; i++)
+		for (int j = 0; j < h; j++)
+		{
+			double q = 1;
+			double res = rho(i, j) * Irho;
+
+			if (i > 0)
+			{
+				res += I0(i - 1, j) * II;
+				q++;
+			}
+			if (j > 0)
+			{
+				res += I0(i, j - 1) * II;
+				q++;
+			}
+			if (i < w - 1)
+			{
+				res += I0(i + 1, j) * II;
+				q++;
+			}
+			if (j < h - 1)
+			{
+				res += I0(i, j + 1) * II;
+				q++;
+			}
+			if (i > 0 && j > 0)
+			{
+				res += I0(i - 1, j - 1) * II / 2;
+				q++;
+			}
+			if (i < w - 1 && j > 0)
+			{
+				res += I0(i + 1, j - 1) * II / 2;
+				q++;
+			}
+			if (i < w - 1 && j < h - 1)
+			{
+				res += I0(i + 1, j + 1) * II / 2;
+				q++;
+			}
+			if (i > 0 && j < h - 1)
+			{
+				res += I0(i - 1, j + 1) * II / 2;
+				q++;
+			}
+
+			res /= q;
+			I0(i, j) += res;
+		}
+
+		// Controlling the constant
+
+		float m = 0;
+		for (int i = 0; i < w; i++)
+		for (int j = 0; j < h; j++)
+		{
+			m += I0(i, j);
+		}
+		m /= (w+2) * (h+2);
+
+		for (int i = 0; i < w; i++)
+		for (int j = 0; j < h; j++)
+		{
+			I0(i, j) = I0(i, j) - m;
+		}
+
+		printf("step: %d\n", step);
+		fflush(stdout);
+	}
+
+}
+
+void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float stop_dpd)
 {
 	DEBUG_INFO
 	int w = rho.getWidth(), h = rho.getHeight();
@@ -470,7 +534,6 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> Iprev, bool prev_exists, arr
 	DEBUG_INFO
 
 	float delta = 0; float delta_prev = 0;
-	// object delta_lock = new object();
 	for (int step = 0; step < steps_max; step ++)
 	{
 		// *** Horizontal iterations ***
@@ -537,60 +600,19 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> Iprev, bool prev_exists, arr
 			I(i, j) = Inew(i, j) - m;
 		}
 
-		if (prev_exists /*&& (step % 10 == 0)*/)
+
+		delta /= (float)sqrt(w * h);
+		float dpd = fabs((delta - delta_prev) / delta);
+
+		// This formula is found experimentally
+		float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
+		printf("step: %d, progress: %.1f\n", step, progress * 100);
+		fflush(stdout);
+
+		if (dpd < stop_dpd && step > 0)
 		{
-			delta /= (float)sqrt(w * h);
-			float dpd = fabs((delta - delta_prev) / delta);
-
-			// This formula is found experimentally
-			float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
-
-
-			int pW = Iprev.getWidth(), pH = Iprev.getHeight(), nW = I.getWidth() - 2, nH = I.getHeight() - 2;
-			// Controlling the pinned variety 2x2
-			for (int i = 0; i < pW; i++)
-			for (int j = 0; j < pH; j++)
-			{
-				float mm = 0;
-				int q = 0;
-				for (int ii = 0; ii < 1; ii++)
-				for (int jj = 0; jj < 1; jj++)
-				{
-					if (2 * i + ii + 1 < nW &&
-						2 * j + jj + 1 < nH)
-					{
-						mm += I(2 * i + ii + 1, 2 * j + jj + 1);
-						q++;
-					}
-				}
-				mm /= q;
-				mm -= Iprev(i, j);
-
-				for (int ii = 0; ii < 1; ii++)
-				for (int jj = 0; jj < 1; jj++)
-				{
-					if (2 * i + ii + 1 < nW &&
-						2 * j + jj + 1 < nH)
-					{
-						I(2 * i + ii + 1, 2 * j + jj + 1) -= mm /** progress */* 0.01;
-					}
-				}
-
-			}
-
-
-			printf("step #%d, progress: %f\n", step, progress);
-			fflush(stdout);
-
-
-			if (dpd < stop_dpd && step > 1)
-			{
-				printf("!");
-				fflush(stdout);
-				break;
-			}
+			break;
 		}
-
 		delta_prev = delta;
 		delta = 0;
 	}
@@ -614,7 +636,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 
 	int divides = 0, wt = W, ht = H;
 	ww.push_back(wt); hh.push_back(ht);
-	while (wt > 1 && ht > 1 && divides < 10)
+	while (wt > 1 && ht > 1 && divides < 5)
 	{
 		wt /= 2; ht /= 2;
 		ww.push_back(wt); hh.push_back(ht);
@@ -634,7 +656,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 		for (int i = 0; i < w; i++)
 		for (int j = 0; j < h; j++)
 		{
-			if (i / 2 < ww[p] && j / 2 < hh[p])
+			if ((i / 2 < ww[p]) && (j / 2 < hh[p]))
 				rho_new(i / 2, j / 2) += 0.25f * Rho[p - 1](i, j);
 		}
 
@@ -643,13 +665,11 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 	DEBUG_INFO
 
 	arr2<float> I(Rho[divides].getWidth(), Rho[divides].getHeight());
-	arr2<float> Iprev(Rho[divides].getWidth(), Rho[divides].getHeight());
-	bool prev_exists = false;
 
 	for (int p = divides; p >= 0; p--)
 	{
 		DEBUG_INFO
-		SolvePoissonNeiman(I, Iprev, prev_exists, Rho[p], steps_max, stop_dpd);
+		if (p == divides) SolvePoissonNeiman(I, Rho[p], steps_max, stop_dpd);
 		/* Delegate was here:
 		 *
 		 * delegate (float progress, float[,] solution)
@@ -673,8 +693,6 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 
 		if (p > 0)
 		{
-			Iprev = I.clone();
-			prev_exists = true;
 			I = Upsample2(I, ww[p - 1], hh[p - 1]);
 		}
 	}
@@ -724,7 +742,7 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	// Calculating Phi
-	arr2<float> Phi = BuildPhi(H, 0.01 * pressure, contrast, noise_gate);
+	arr2<float> Phi = BuildPhi(H, 0.1 * pressure, contrast, noise_gate);
 
 	DEBUG_INFO
 
@@ -759,7 +777,9 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 
 	DEBUG_INFO
 
+	// Solving Poisson equation Delta I = div G
 	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
+	//SolveAverage(I, Phi, 100, 0.1, 0.1);
 
 	DEBUG_INFO
 
@@ -813,14 +833,25 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	bmp.height = env->GetIntField(bitmap, height_id);
 
 	// Getting the stage operation parameters
-/*	jclass operationClass = env->GetObjectClass(params);
-	jfieldID rId, gId, bId;
+	jclass operationClass = env->GetObjectClass(params);
+	jfieldID curveId, noiseGateId, pressureId, contrastId;
 
-	rId = env->GetFieldID(operationClass, "r", "D");
-	gId = env->GetFieldID(operationClass, "g", "D");
-	bId = env->GetFieldID(operationClass, "b", "D");*/
+	curveId = env->GetFieldID(operationClass, "curve", "D");
+	noiseGateId = env->GetFieldID(operationClass, "noiseGate", "D");
+	pressureId = env->GetFieldID(operationClass, "pressure", "D");
+	contrastId = env->GetFieldID(operationClass, "contrast", "D");
 
-	Compress(bmp, 0.7, 0.05, 1, 0.75, 0.001f, 10000);
+	double curve, noiseGate, pressure, contrast;
+	curve = (double)env->GetDoubleField(params, curveId);
+	noiseGate = (double)env->GetDoubleField(params, noiseGateId);
+	pressure = (double)env->GetDoubleField(params, pressureId);
+	contrast = (double)env->GetDoubleField(params, contrastId);
+
+	curve = 0.7;
+	noiseGate = 0.1;
+	pressure = 3;
+	contrast = 0.85;
+	Compress(bmp, curve, noiseGate, pressure, contrast, 0.001f, 10000);
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
 }

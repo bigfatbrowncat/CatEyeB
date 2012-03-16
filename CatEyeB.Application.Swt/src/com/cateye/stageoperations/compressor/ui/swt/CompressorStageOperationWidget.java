@@ -17,10 +17,10 @@ public class CompressorStageOperationWidget extends Composite
 	private final double ln2 = Math.log(2);
 	
 	private CompressorStageOperation compressorStageOperation;
-	private Scale rScale, gScale, bScale;
+	private Scale curveScale, noiseGateScale, pressureScale, contrastScale;
 	private boolean changingProperty = false;
 	
-	private final SelectionListener rgbScaleSelectionListener = new SelectionListener()
+	private final SelectionListener scaleSelectionListener = new SelectionListener()
 	{
 		
 		@Override
@@ -31,12 +31,13 @@ public class CompressorStageOperationWidget extends Composite
 				try
 				{
 					changingProperty = true;
-					double value = Math.pow(2, ((double)((Scale)arg0.widget).getSelection()) / 100 - 2);
+					double value = (double)(((Scale)arg0.widget).getSelection()) / 100;
 
-					/*if (compressorStageOperation != null)
-					if (arg0.widget == rScale) compressorStageOperation.setR(value);
-					if (arg0.widget == gScale) compressorStageOperation.setG(value);
-					if (arg0.widget == bScale) compressorStageOperation.setB(value);*/
+					if (compressorStageOperation != null)
+					if (arg0.widget == curveScale) compressorStageOperation.setCurve(value);
+					if (arg0.widget == noiseGateScale) compressorStageOperation.setNoiseGate(value);
+					if (arg0.widget == pressureScale) compressorStageOperation.setPressure(value * 4);
+					if (arg0.widget == contrastScale) compressorStageOperation.setContrast(value * 0.95);
 				}
 				finally
 				{
@@ -62,12 +63,14 @@ public class CompressorStageOperationWidget extends Composite
 				try
 				{
 					changingProperty = true;
-					/*if (propertyName.equals("r"))
-						rScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getR()) / ln2 + 2)));
-					if (propertyName.equals("g"))
-						gScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getG()) / ln2 + 2)));
-					if (propertyName.equals("b"))
-						bScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getB()) / ln2 + 2)));*/
+					if (propertyName.equals("curve"))
+						curveScale.setSelection((int)(100 * (compressorStageOperation.getCurve())));
+					if (propertyName.equals("noiseGate"))
+						noiseGateScale.setSelection((int)(100 * (compressorStageOperation.getNoiseGate())));
+					if (propertyName.equals("pressure"))
+						pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure() / 4)));
+					if (propertyName.equals("contrast"))
+						contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast() / 0.95)));
 				}
 				finally
 				{
@@ -83,36 +86,50 @@ public class CompressorStageOperationWidget extends Composite
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
-		Label lblRed = new Label(this, SWT.NONE);
-		lblRed.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblRed.setText("Red:");
+		Label lblCurve = new Label(this, SWT.NONE);
+		lblCurve.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblCurve.setText("Curve:");
 		
-		rScale = new Scale(this, SWT.NONE);
-		rScale.setMaximum(400);
-		rScale.setSelection(200);
-		rScale.setTouchEnabled(true);
-		rScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		rScale.addSelectionListener(rgbScaleSelectionListener);
+		curveScale = new Scale(this, SWT.NONE);
+		curveScale.setMaximum(100);
+		curveScale.setSelection(50);
+		curveScale.setTouchEnabled(true);
+		curveScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		curveScale.addSelectionListener(scaleSelectionListener);
 		
-		Label lblGreen = new Label(this, SWT.NONE);
-		lblGreen.setText("Green:");
+		Label lblNoiseGate = new Label(this, SWT.NONE);
+		lblNoiseGate.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblNoiseGate.setText("Noise gate:");
 		
-		gScale = new Scale(this, SWT.NONE);
-		gScale.setMaximum(400);
-		gScale.setSelection(200);
-		gScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		gScale.addSelectionListener(rgbScaleSelectionListener);
-		
-		Label lblBlue = new Label(this, SWT.NONE);
-		lblBlue.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-		lblBlue.setText("Blue:");
-		
-		bScale = new Scale(this, SWT.NONE);
-		bScale.setMaximum(400);
-		bScale.setSelection(200);
-		bScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		bScale.addSelectionListener(rgbScaleSelectionListener);
+		noiseGateScale = new Scale(this, SWT.NONE);
+		noiseGateScale.setMaximum(100);
+		noiseGateScale.setSelection(50);
+		noiseGateScale.setTouchEnabled(true);
+		noiseGateScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		noiseGateScale.addSelectionListener(scaleSelectionListener);
 
+		Label lblPressure = new Label(this, SWT.NONE);
+		lblPressure.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblPressure.setText("Pressure:");
+		
+		pressureScale = new Scale(this, SWT.NONE);
+		pressureScale.setMaximum(100);
+		pressureScale.setSelection(50);
+		pressureScale.setTouchEnabled(true);
+		pressureScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		pressureScale.addSelectionListener(scaleSelectionListener);
+
+		Label lblContrast = new Label(this, SWT.NONE);
+		lblContrast.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblContrast.setText("Contrast:");
+		
+		contrastScale = new Scale(this, SWT.NONE);
+		contrastScale.setMaximum(100);
+		contrastScale.setSelection(50);
+		contrastScale.setTouchEnabled(true);
+		contrastScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		contrastScale.addSelectionListener(scaleSelectionListener);
+		
 		// TODO Auto-generated constructor stub
 	}
 
@@ -120,9 +137,10 @@ public class CompressorStageOperationWidget extends Composite
 	{
 		if (compressorStageOperation != null)
 		{		
-			/*rScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getR()) / ln2 + 2)));
-			gScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getG()) / ln2 + 2)));
-			bScale.setSelection((int)(100 * (Math.log(compressorStageOperation.getB()) / ln2 + 2)));*/
+			curveScale.setSelection((int)(100 * (compressorStageOperation.getCurve())));
+			noiseGateScale.setSelection((int)(100 * (compressorStageOperation.getNoiseGate())));
+			pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure() / 4)));
+			contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast() / 0.95)));
 		}
 	}
 

@@ -4,6 +4,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -51,28 +53,6 @@ public class MainWindow
 		@Override
 		public void invoke(Object sender, String propertyName, Object newValue) 
 		{
-			if (updateTimer != null)
-			{
-				updateTimer.cancel();
-			}
-			updateTimer = new Timer(); 
-			updateTimer.schedule(new TimerTask() {
-				
-				@Override
-				public void run() {
-					shell.getDisplay().asyncExec(new Runnable() {
-						
-						@Override
-						public void run() {
-							stage.processImage();
-							vern.setBitmap(1, 0, stage.getBitmap());
-							imageViewer.redraw();
-						}
-					});
-				}
-			}, 50);
-			
-			//imageViewer.redraw();
 		}
 	};
 	
@@ -111,10 +91,10 @@ public class MainWindow
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
 		hsbStageOperation.setHue(0);
-		hsbStageOperation.setBrightness(8);
+		hsbStageOperation.setBrightness(7);
 		
 		rgbStageOperation = new RGBStageOperation();
-		rgbStageOperation.setB(2);
+		rgbStageOperation.setR(2);
 		rgbStageOperation.setG(1.5);
 		
 		compressorStageOperation = new CompressorStageOperation();
@@ -124,7 +104,7 @@ public class MainWindow
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		//stage.addStageOperation(downsampleStageOperation);
+		stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
@@ -178,6 +158,7 @@ public class MainWindow
 
 		// Stage operation widgets
 		
+		
 		rgbStageOperationWidget = new RGBStageOperationWidget(rightComposite, SWT.NONE);
 		rgbStageOperationWidget.setRgbStageOperation(rgbStageOperation);
 		rgbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
@@ -185,6 +166,28 @@ public class MainWindow
 		hsbStageOperationWidget = new HSBStageOperationWidget(rightComposite, SWT.NONE);
 		hsbStageOperationWidget.setHsbStageOperation(hsbStageOperation);
 		hsbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
+
+		compressorStageOperationWidget = new CompressorStageOperationWidget(rightComposite, SWT.NONE);
+		compressorStageOperationWidget.setCompressorStageOperation(compressorStageOperation);
+		compressorStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
+		
+		Button processBtn = new Button(rightComposite, SWT.NONE);
+		processBtn.setText("Process");
+		processBtn.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				stage.processImage();
+				vern.setBitmap(0, 0, stage.getBitmap());
+				imageViewer.redraw();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	
