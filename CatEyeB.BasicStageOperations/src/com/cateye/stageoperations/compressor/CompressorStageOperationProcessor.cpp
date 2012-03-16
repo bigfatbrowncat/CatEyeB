@@ -600,19 +600,24 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 			I(i, j) = Inew(i, j) - m;
 		}
 
-
 		delta /= (float)sqrt(w * h);
 		float dpd = fabs((delta - delta_prev) / delta);
 
 		// This formula is found experimentally
 		float progress = (float)fmin(pow(stop_dpd / (dpd + 0.000001), 0.78), 0.999);
-		printf("step: %d, progress: %.1f\n", step, progress * 100);
+
+		printf("step #%d, progress: %f\n", step, progress);
 		fflush(stdout);
 
-		if (dpd < stop_dpd && step > 0)
+
+		if (dpd < stop_dpd && step > 1)
 		{
+			printf("!");
+			fflush(stdout);
 			break;
 		}
+
+
 		delta_prev = delta;
 		delta = 0;
 	}
@@ -636,7 +641,8 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 
 	int divides = 0, wt = W, ht = H;
 	ww.push_back(wt); hh.push_back(ht);
-	while (wt > 1 && ht > 1 && divides < 5)
+
+	while (wt > 1 && ht > 1 && divides < 3)
 	{
 		wt /= 2; ht /= 2;
 		ww.push_back(wt); hh.push_back(ht);
@@ -779,7 +785,6 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 
 	// Solving Poisson equation Delta I = div G
 	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
-	//SolveAverage(I, Phi, 100, 0.1, 0.1);
 
 	DEBUG_INFO
 
@@ -852,6 +857,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	pressure = 3;
 	contrast = 0.85;
 	Compress(bmp, curve, noiseGate, pressure, contrast, 0.001f, 10000);
+
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
 }
