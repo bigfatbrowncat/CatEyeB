@@ -13,7 +13,7 @@ CPPFLAGS =
 CPPDEFINES =
 
 # Universal macros
-LIBS = $(TARGET_LIB)/bitmaps.dll.a $(TARGET_LIB)/colorlib.a 
+LIBS = $(TARGET_LIB)/bitmaps.dll.a $(TARGET_LIB)/colorlib.a -lpthread
 CUSTOM_INCLUDES = -I"../bitmaps/include" -I"../colorlib/include"
 SOURCE = src
 TARGET = ../target

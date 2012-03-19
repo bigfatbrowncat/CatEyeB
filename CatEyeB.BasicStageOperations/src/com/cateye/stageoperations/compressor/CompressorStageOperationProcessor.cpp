@@ -5,6 +5,7 @@
 #include <math.h>
 #include <mem.h>
 #include <time.h>
+#include <pthread.h>
 
 #include <vector>
 
@@ -431,7 +432,92 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 	return Phi_cut;
 }
 
-//typedef void (*SolutionReporter) (float progress, arr2<float> solution);
+void* PoissonNeimanThread_start(void* data);
+
+class PoissonNeimanThread
+{
+	friend void* PoissonNeimanThread_start(void* data);
+private:
+	int i1, i2, w, h;
+	arr2<float>& I, Inew, rho;
+
+	pthread_t thread;
+
+public:
+	double my_delta;
+
+	PoissonNeimanThread(int i1, int i2, int w, int h,
+	                    arr2<float>& I, arr2<float>& Inew, arr2<float>& rho) :
+	                    i1(i1), i2(i2), w(w), h(h), I(I), Inew(Inew), rho(rho)
+	{
+		pthread_create(&thread, NULL, PoissonNeimanThread_start, this);
+	}
+
+	void join()
+	{
+		void* res;
+		pthread_join(thread, &res);
+	}
+};
+
+void* PoissonNeimanThread_start(void* data)
+{
+	PoissonNeimanThread* thr = (PoissonNeimanThread*)data;
+	int w = thr->w;
+	int h = thr->h;
+	int i1 = thr->i1;
+	int i2 = thr->i2;
+	arr2<float>& I = thr->I;
+	arr2<float>& Inew = thr->Inew;
+	arr2<float>& rho = thr->rho;
+	double my_delta = 0;
+
+	for (int i = i1; i <= i2; i++) //	for (int i = 1; i < w + 1; i++)
+
+	{
+		// Run, Thomas, run!
+		float alpha[h + 3];
+		float beta[h + 3];
+
+		alpha[1] = 0.25f; beta[1] = 0.25f * (I(i + 1, 0) + Inew(i - 1, 0));
+
+		float* cur_alpha = &alpha[1];
+		float* cur_beta = &beta[1];
+
+		for (int j = 1; j < h + 1; j++)
+		{
+			float Fj = I(i + 1, j) + Inew(i - 1, j) - 2 * rho(i - 1, j - 1);
+
+			float alpha_new = 1.0f / (4 - *cur_alpha);
+			float beta_new = (Fj + *cur_beta) / (4.0f - *cur_alpha);
+
+			cur_alpha++; cur_beta++;
+
+			*cur_alpha = alpha_new;
+			*cur_beta = beta_new;
+		}
+
+		// ...and the last one
+		float Fj = I(i + 1, h + 1) + Inew(i - 1, h + 1);
+
+		alpha[h + 2] = 1.0f / (4 - *cur_alpha);
+		beta[h + 2] = (Fj + *cur_beta) / (4.0f - *cur_alpha);
+
+
+		Inew(i, h + 1) = beta[h + 2];
+
+		for (int j = h; j >= 0; j--)
+		{
+			double Iold_ij = I(i, j);
+			float Inew_ij = alpha[j + 1] * Inew(i, j + 1) + beta[j + 1];
+			Inew(i, j) = Inew_ij;
+			my_delta += (float)fabs(Inew_ij - Iold_ij);
+		}
+	}
+
+	thr->my_delta = my_delta;
+}
+
 
 void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float stop_dpd)
 {
@@ -457,56 +543,37 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 	}
 	DEBUG_INFO
 
+
+
 	float delta = 0; float delta_prev = 0;
 	for (int step = 0; step < steps_max; step ++)
 	{
 		// *** Horizontal iterations ***
 
-		float my_delta = 0;
-
-		for (int i = 1; i < w + 1; i++)
+		int threads_num = 6;
+		PoissonNeimanThread** pnthrs = new PoissonNeimanThread*[threads_num];
+		for (int q = 0; q < threads_num; q++)
 		{
-			// Run, Thomas, run!
-			float alpha[h + 3];
-			float beta[h + 3];
-
-			alpha[1] = 0.25f; beta[1] = 0.25f * (I(i + 1, 0) + Inew(i - 1, 0));
-
-			float* cur_alpha = &alpha[1];
-			float* cur_beta = &beta[1];
-
-			for (int j = 1; j < h + 1; j++)
+			int i1 = (w / threads_num) * q + 1, i2;
+			if (q < threads_num - 1)
 			{
-				float Fj = I(i + 1, j) + Inew(i - 1, j) - 2 * rho(i - 1, j - 1);
-
-				float alpha_new = 1.0f / (4 - *cur_alpha);
-				float beta_new = (Fj + *cur_beta) / (4.0f - *cur_alpha);
-
-				cur_alpha++; cur_beta++;
-
-				*cur_alpha = alpha_new;
-				*cur_beta = beta_new;
+				i2 = (w / threads_num) * (q + 1) + 1;
+			}
+			else
+			{
+				i2 = w + 1;
 			}
 
-			// ...and the last one
-			float Fj = I(i + 1, h + 1) + Inew(i - 1, h + 1);
-
-			alpha[h + 2] = 1.0f / (4 - *cur_alpha);
-			beta[h + 2] = (Fj + *cur_beta) / (4.0f - *cur_alpha);
-
-
-			Inew(i, h + 1) = beta[h + 2];
-
-			for (int j = h; j >= 0; j--)
-			{
-				double Iold_ij = I(i, j);
-				float Inew_ij = alpha[j + 1] * Inew(i, j + 1) + beta[j + 1];
-				Inew(i, j) = Inew_ij;
-				my_delta += (float)fabs(Inew_ij - Iold_ij);
-			}
+			pnthrs[q] = new PoissonNeimanThread(i1, i2, w, h, I, Inew, rho);
 		}
 
-		delta += my_delta;
+		for (int q = 0; q < threads_num; q++)
+		{
+			pnthrs[q]->join();
+			delta += pnthrs[q]->my_delta;
+			delete pnthrs[q];
+		}
+		delete [] pnthrs;
 
 		// Restoring Neiman boundary conditions after horizontal iterations
 		for (int i = 0; i < w + 2; i++)
