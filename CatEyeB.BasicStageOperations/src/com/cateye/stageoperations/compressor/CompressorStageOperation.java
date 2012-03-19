@@ -5,9 +5,9 @@ import com.cateye.core.stage.StageOperation;
 
 public class CompressorStageOperation extends StageOperation 
 {
-	private double curve = 0.5;
+	private double curve = 0.7;
 	private double noiseGate = 0.1;
-	private double pressure = 1;
+	private double pressure = 0.4;
 	private double contrast = 0.85;
 	
 	public double getCurve()
@@ -55,7 +55,7 @@ public class CompressorStageOperation extends StageOperation
 	
 	public void setPressure(double value)
 	{
-		if (value < 0.0d || value > 10d)
+		if (value < 0.0d || value > 1d)
 		{
 			throw new ArgumentOutOfRangeException("pressure");
 		}
@@ -74,7 +74,7 @@ public class CompressorStageOperation extends StageOperation
 	
 	public void setContrast(double value)
 	{
-		if (value < 0.00d || value > 0.95d)
+		if (value < 0.00d || value > 1d)
 		{
 			throw new ArgumentOutOfRangeException("contrast");
 		}

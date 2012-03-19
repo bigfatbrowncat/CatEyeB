@@ -91,7 +91,7 @@ public class MainWindow
 		hsbStageOperation = new HSBStageOperation();
 		hsbStageOperation.setSaturation(0.9);
 		hsbStageOperation.setHue(0);
-		hsbStageOperation.setBrightness(7);
+		hsbStageOperation.setBrightness(3);
 		
 		rgbStageOperation = new RGBStageOperation();
 		rgbStageOperation.setR(2);

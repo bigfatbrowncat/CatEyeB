@@ -36,8 +36,8 @@ public class CompressorStageOperationWidget extends Composite
 					if (compressorStageOperation != null)
 					if (arg0.widget == curveScale) compressorStageOperation.setCurve(value);
 					if (arg0.widget == noiseGateScale) compressorStageOperation.setNoiseGate(value);
-					if (arg0.widget == pressureScale) compressorStageOperation.setPressure(value * 4);
-					if (arg0.widget == contrastScale) compressorStageOperation.setContrast(value * 0.95);
+					if (arg0.widget == pressureScale) compressorStageOperation.setPressure(value);
+					if (arg0.widget == contrastScale) compressorStageOperation.setContrast(value);
 				}
 				finally
 				{
@@ -68,9 +68,9 @@ public class CompressorStageOperationWidget extends Composite
 					if (propertyName.equals("noiseGate"))
 						noiseGateScale.setSelection((int)(100 * (compressorStageOperation.getNoiseGate())));
 					if (propertyName.equals("pressure"))
-						pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure() / 4)));
+						pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure())));
 					if (propertyName.equals("contrast"))
-						contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast() / 0.95)));
+						contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast())));
 				}
 				finally
 				{
@@ -139,8 +139,8 @@ public class CompressorStageOperationWidget extends Composite
 		{		
 			curveScale.setSelection((int)(100 * (compressorStageOperation.getCurve())));
 			noiseGateScale.setSelection((int)(100 * (compressorStageOperation.getNoiseGate())));
-			pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure() / 4)));
-			contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast() / 0.95)));
+			pressureScale.setSelection((int)(100 * (compressorStageOperation.getPressure())));
+			contrastScale.setSelection((int)(100 * (compressorStageOperation.getContrast())));
 		}
 	}
 

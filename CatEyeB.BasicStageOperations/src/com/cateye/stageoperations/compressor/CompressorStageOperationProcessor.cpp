@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <math.h>
 #include <mem.h>
+#include <time.h>
 
 #include <vector>
 
@@ -35,6 +36,7 @@ public:
 
 	inline const T& operator () (int i, int j) const
 	{
+#ifdef DEBUG_ARRAYS
 		if (i >= width)
 		{
 			DEBUG_INFO
@@ -56,11 +58,12 @@ public:
 			DEBUG_INFO
 			throw 1;
 		}
-
+#endif
 		return data->link[j * width + i];
 	}
 	inline T& operator () (int i, int j)
 	{
+#ifdef DEBUG_ARRAYS
 		if (i >= width)
 		{
 			DEBUG_INFO
@@ -82,8 +85,7 @@ public:
 			DEBUG_INFO
 			throw 1;
 		}
-
-
+#endif
 		return data->link[j * width + i];
 	}
 
@@ -372,12 +374,12 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 		{
 			double abs_grad_H_cur = sqrt(grad_H_cur_x(i, j) * grad_H_cur_x(i, j) +
 			                             grad_H_cur_y(i, j) * grad_H_cur_y(i, j));
-			abs_grad_H_cur = 0.001;		// Avoiding zero
+			abs_grad_H_cur += 0.001;		// Avoiding zero
 
 			phi_k(i, j) = (float)(pow(abs_grad_H_cur / alpha, beta - 1));
 
 			// nOISE GATE
-			float nf_edge = (float)noise_gate * avg_grad;
+			float nf_edge = (float)noise_gate * avg_grad + 0.00001;
 			phi_k(i, j) *= (float)(1.0 - exp(-pow(abs_grad_H_cur / nf_edge, 0.8)));
 		}
 		phi.push_back(phi_k);
@@ -431,84 +433,6 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 
 //typedef void (*SolutionReporter) (float progress, arr2<float> solution);
 
-void SolveAverage(arr2<float> I0, arr2<float> rho, int steps, double II, double Irho)
-{
-	int w = rho.getWidth(), h = rho.getHeight();
-	for (int step = 0; step < steps; step++)
-	{
-		for (int i = 0; i < w; i++)
-		for (int j = 0; j < h; j++)
-		{
-			double q = 1;
-			double res = rho(i, j) * Irho;
-
-			if (i > 0)
-			{
-				res += I0(i - 1, j) * II;
-				q++;
-			}
-			if (j > 0)
-			{
-				res += I0(i, j - 1) * II;
-				q++;
-			}
-			if (i < w - 1)
-			{
-				res += I0(i + 1, j) * II;
-				q++;
-			}
-			if (j < h - 1)
-			{
-				res += I0(i, j + 1) * II;
-				q++;
-			}
-			if (i > 0 && j > 0)
-			{
-				res += I0(i - 1, j - 1) * II / 2;
-				q++;
-			}
-			if (i < w - 1 && j > 0)
-			{
-				res += I0(i + 1, j - 1) * II / 2;
-				q++;
-			}
-			if (i < w - 1 && j < h - 1)
-			{
-				res += I0(i + 1, j + 1) * II / 2;
-				q++;
-			}
-			if (i > 0 && j < h - 1)
-			{
-				res += I0(i - 1, j + 1) * II / 2;
-				q++;
-			}
-
-			res /= q;
-			I0(i, j) += res;
-		}
-
-		// Controlling the constant
-
-		float m = 0;
-		for (int i = 0; i < w; i++)
-		for (int j = 0; j < h; j++)
-		{
-			m += I0(i, j);
-		}
-		m /= (w+2) * (h+2);
-
-		for (int i = 0; i < w; i++)
-		for (int j = 0; j < h; j++)
-		{
-			I0(i, j) = I0(i, j) - m;
-		}
-
-		printf("step: %d\n", step);
-		fflush(stdout);
-	}
-
-}
-
 void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float stop_dpd)
 {
 	DEBUG_INFO
@@ -547,25 +471,38 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 			float beta[h + 3];
 
 			alpha[1] = 0.25f; beta[1] = 0.25f * (I(i + 1, 0) + Inew(i - 1, 0));
-			for (int j = 1; j < h + 2; j++)
-			{
-				alpha[j + 1] = 1.0f / (4 - alpha[j]);
-				float Fj;
-				if (j < h + 1)
-					Fj = I(i + 1, j) + Inew(i - 1, j) - 2 * rho(i - 1, j - 1);
-				else
-					Fj = I(i + 1, j) + Inew(i - 1, j);
 
-				beta[j + 1] = (Fj + beta[j]) / (4.0f - alpha[j]);
+			float* cur_alpha = &alpha[1];
+			float* cur_beta = &beta[1];
+
+			for (int j = 1; j < h + 1; j++)
+			{
+				float Fj = I(i + 1, j) + Inew(i - 1, j) - 2 * rho(i - 1, j - 1);
+
+				float alpha_new = 1.0f / (4 - *cur_alpha);
+				float beta_new = (Fj + *cur_beta) / (4.0f - *cur_alpha);
+
+				cur_alpha++; cur_beta++;
+
+				*cur_alpha = alpha_new;
+				*cur_beta = beta_new;
 			}
+
+			// ...and the last one
+			float Fj = I(i + 1, h + 1) + Inew(i - 1, h + 1);
+
+			alpha[h + 2] = 1.0f / (4 - *cur_alpha);
+			beta[h + 2] = (Fj + *cur_beta) / (4.0f - *cur_alpha);
+
 
 			Inew(i, h + 1) = beta[h + 2];
 
 			for (int j = h; j >= 0; j--)
 			{
-				double iold = I(i, j);
-				Inew(i, j) = alpha[j + 1] * Inew(i, j + 1) + beta[j + 1];
-				my_delta += (float)fabs(Inew(i, j) - iold);
+				double Iold_ij = I(i, j);
+				float Inew_ij = alpha[j + 1] * Inew(i, j + 1) + beta[j + 1];
+				Inew(i, j) = Inew_ij;
+				my_delta += (float)fabs(Inew_ij - Iold_ij);
 			}
 		}
 
@@ -642,7 +579,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 	int divides = 0, wt = W, ht = H;
 	ww.push_back(wt); hh.push_back(ht);
 
-	while (wt > 1 && ht > 1 && divides < 3)
+	while (wt > 1 && ht > 1 && divides < 5)
 	{
 		wt /= 2; ht /= 2;
 		ww.push_back(wt); hh.push_back(ht);
@@ -675,7 +612,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 	for (int p = divides; p >= 0; p--)
 	{
 		DEBUG_INFO
-		if (p == divides) SolvePoissonNeiman(I, Rho[p], steps_max, stop_dpd);
+		SolvePoissonNeiman(I, Rho[p], steps_max, stop_dpd);
 		/* Delegate was here:
 		 *
 		 * delegate (float progress, float[,] solution)
@@ -748,7 +685,7 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	// Calculating Phi
-	arr2<float> Phi = BuildPhi(H, 0.1 * pressure, contrast, noise_gate);
+	arr2<float> Phi = BuildPhi(H, 0.01 * pressure, contrast, 0.2 * noise_gate);
 
 	DEBUG_INFO
 
@@ -784,7 +721,9 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	// Solving Poisson equation Delta I = div G
-	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
+	//arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
+	arr2<float> I(Phi.getWidth(), Phi.getHeight());
+	SolvePoissonNeiman(I, div_G, steps_max, epsilon);
 
 	DEBUG_INFO
 
@@ -852,11 +791,19 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	pressure = (double)env->GetDoubleField(params, pressureId);
 	contrast = (double)env->GetDoubleField(params, contrastId);
 
-	curve = 0.7;
+/*	curve = 0.7;
 	noiseGate = 0.1;
-	pressure = 3;
-	contrast = 0.85;
-	Compress(bmp, curve, noiseGate, pressure, contrast, 0.001f, 10000);
+	pressure = 1;
+	contrast = 0.8;*/
+
+	time_t start;
+	time(&start);
+	Compress(bmp, curve, noiseGate, pressure, contrast, 0.0025f, 10000);
+	time_t end;
+	time(&end);
+
+	printf("time spent on compressing: %d seconds", end - start);
+	fflush(stdout);
 
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
 
