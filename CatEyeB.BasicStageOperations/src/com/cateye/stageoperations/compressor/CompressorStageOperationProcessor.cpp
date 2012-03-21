@@ -165,6 +165,7 @@ public:
 			throw 1;
 		}
 		DEBUG_INFO
+		data->counter ++;
 	}
 	virtual ~arr2()
 	{
@@ -472,7 +473,7 @@ void* PoissonNeimanThread_start(void* data)
 	arr2<float>& rho = thr->rho;
 	double my_delta = 0;
 
-	for (int i = i1; i <= i2; i++) //	for (int i = 1; i < w + 1; i++)
+	for (int i = i1; i < i2; i++) //	for (int i = 1; i < w + 1; i++)
 
 	{
 		// Run, Thomas, run!
@@ -869,7 +870,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 	time_t end;
 	time(&end);
 
-	printf("time spent on compressing: %d seconds", end - start);
+	printf("time spent on compressing: %d seconds\n", end - start);
 	fflush(stdout);
 
 	//Compress(bmp, 0.2, 0.01, 0.05, 0.85, 0.001f, 20000);
