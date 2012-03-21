@@ -1,5 +1,5 @@
-#include <com/cateye/core/native_/PpmImageSaver.h>
-
+#include <com/cateye/core/jni/PpmImageSaver.h>
+#include <jni.h>
 #include <stdio.h>
 #include <math.h>
 #include <bitmaps.h>
@@ -44,7 +44,7 @@ void SaveImage(const char* filename, PreciseBitmap* bitmap/*, double limit_a*/)
 }
 
 
-JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PpmImageSaver_SaveImage
+JNIEXPORT void JNICALL Java_com_cateye_core_jni_PpmImageSaver_SaveImage
   (JNIEnv * env, jclass obj, jstring fileName, jobject bitmap/*, jdouble limit_a*/)
 {
 	const char *nativeFileName = env->GetStringUTFChars(fileName, 0);

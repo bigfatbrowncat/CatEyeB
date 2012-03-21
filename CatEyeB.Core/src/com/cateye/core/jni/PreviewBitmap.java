@@ -1,8 +1,9 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import com.cateye.core.IPreviewBitmap;
 import com.cateye.core.InvalidDataException;
 import com.cateye.core.NativeHeapAllocationException;
+import com.cateye.core.jni.LibraryLoader;
 
 class PreviewBitmap implements IPreviewBitmap
 {

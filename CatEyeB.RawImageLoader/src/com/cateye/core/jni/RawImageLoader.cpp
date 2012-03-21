@@ -1,4 +1,4 @@
-#include <com/cateye/core/native_/RawImageLoader.h>
+#include <com/cateye/core/jni/RawImageLoader.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -146,12 +146,12 @@ bool decode_precise(PreciseBitmap& res, libraw_processed_image_t *image)
 }
 
 
-JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadImageDescriptionFromFile
+JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadImageDescriptionFromFile
   (JNIEnv * env, jobject, jstring filename)
 {
 	// Getting the classes
-	jclass imageDescription_class = env->FindClass("Lcom/cateye/core/native_/RawImageDescription;");
-	jclass previewBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreviewBitmap;");
+	jclass imageDescription_class = env->FindClass("Lcom/cateye/core/jni/RawImageDescription;");
+	jclass previewBitmap_class = env->FindClass("Lcom/cateye/core/jni/PreviewBitmap;");
 //	jclass date_class = env->FindClass("Ljava/util/Date;");
 
 	// Getting the methods
@@ -321,7 +321,7 @@ int my_raw_processing_callback(void *d, enum LibRaw_progress p, int iteration, i
 
 }
 
-JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreciseBitmapFromFile
+JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBitmapFromFile
   (JNIEnv * env, jobject obj, jstring filename)
 {
 	jclass cls = env->GetObjectClass(obj);
@@ -329,7 +329,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_RawImageLoader_loadPreci
 	bool divide_by_2 = env->GetBooleanField(obj, divide_by_2_id);
 
 	// Creating Java PreciseBitmap object
-	jclass preciseBitmap_class = env->FindClass("Lcom/cateye/core/native_/PreciseBitmap;");
+	jclass preciseBitmap_class = env->FindClass("Lcom/cateye/core/jni/PreciseBitmap;");
 	jmethodID preciseBitmap_init = env->GetMethodID(preciseBitmap_class, "<init>", "()V");
 	jobject preciseBitmap = env->NewObject(preciseBitmap_class, preciseBitmap_init);
 

@@ -1,9 +1,10 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import java.util.Date;
 
 import com.cateye.core.IPreviewBitmap;
 import com.cateye.core.ImageDescription;
+import com.cateye.core.jni.LibraryLoader;
 
 class RawImageDescription extends ImageDescription
 {

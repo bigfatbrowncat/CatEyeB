@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.cateye.core.Image;
 import com.cateye.core.ImageDescription;
+import com.cateye.core.jni.RawImageLoader;
 import com.cateye.tests.utils.DateAssert;
 
 public class RawImageLoaderTests 

@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 /**
  * Native function returns unknown result

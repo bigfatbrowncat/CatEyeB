@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IPreviewBitmap;
-import com.cateye.core.native_.LibraryLoader;
+import com.cateye.core.jni.LibraryLoader;
 
 public class PreciseImageViewer extends Canvas
 {

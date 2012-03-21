@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.cateye.core.IPreviewBitmap;
-import com.cateye.core.native_.LibraryLoader;
+import com.cateye.core.jni.LibraryLoader;
 
 public class PreviewImageViewer extends Canvas
 {

@@ -1,10 +1,11 @@
-#include <com/cateye/core/native_/PreciseBitmap.h>
+#include <com/cateye/core/jni/PreviewBitmap.h>
+#include <jni.h>
 #include <bitmaps.h>
 
 #define NATIVE_OUT_OF_MEMORY	"Out of memory during native image allocation"
 #define INVALID_IMAGE_DATA		"Invalid image data"
 
-JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_alloc
+JNIEXPORT void JNICALL Java_com_cateye_core_jni_PreviewBitmap_alloc
 	(JNIEnv * env, jobject obj, jint width, jint height)
 {
 	// Getting the class
@@ -21,8 +22,8 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_alloc
 	height_id = env->GetFieldID(cls, "height", "I");
 
 	// Creating the bitmap
-	PreciseBitmap pbmp;
-	int res = PreciseBitmap_Init(pbmp, width, height);
+	PreviewBitmap pbmp;
+	int res = PreviewBitmap_Init(pbmp, width, height);
 
 	switch (res)
 	{
@@ -45,7 +46,7 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_alloc
 
 }
 
-JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_free
+JNIEXPORT void JNICALL Java_com_cateye_core_jni_PreviewBitmap_free
 	(JNIEnv * env, jobject obj)
 {
 	// Getting the class
@@ -62,14 +63,14 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_free
 	height_id = env->GetFieldID(cls, "height", "I");
 
 	// Getting the bitmap from JVM
-	PreciseBitmap pbmp;
-	pbmp.r = (float*)env->GetLongField(obj, r_id);
-	pbmp.g = (float*)env->GetLongField(obj, g_id);
-	pbmp.b = (float*)env->GetLongField(obj, b_id);
+	PreviewBitmap pbmp;
+	pbmp.r = (Int8*)env->GetLongField(obj, r_id);
+	pbmp.g = (Int8*)env->GetLongField(obj, g_id);
+	pbmp.b = (Int8*)env->GetLongField(obj, b_id);
 	pbmp.width = env->GetIntField(obj, width_id);
 	pbmp.height = env->GetIntField(obj, height_id);
 
-	int res = PreciseBitmap_Free(pbmp);
+	int res = PreviewBitmap_Free(pbmp);
 
 	switch (res)
 	{
@@ -91,7 +92,7 @@ JNIEXPORT void JNICALL Java_com_cateye_core_native_1_PreciseBitmap_free
 
 }
 
-JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_PreciseBitmap_clone
+JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_PreviewBitmap_clone
 	(JNIEnv * env, jobject obj)
 {
 	// Getting the class
@@ -108,16 +109,16 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_native_1_PreciseBitmap_clone
 	height_id = env->GetFieldID(cls, "height", "I");
 
 	// Getting the bitmap from JVM
-	PreciseBitmap src;
-	src.r = (float*)env->GetLongField(obj, r_id);
-	src.g = (float*)env->GetLongField(obj, g_id);
-	src.b = (float*)env->GetLongField(obj, b_id);
+	PreviewBitmap src;
+	src.r = (Int8*)env->GetLongField(obj, r_id);
+	src.g = (Int8*)env->GetLongField(obj, g_id);
+	src.b = (Int8*)env->GetLongField(obj, b_id);
 	src.width = env->GetIntField(obj, width_id);
 	src.height = env->GetIntField(obj, height_id);
 
-	PreciseBitmap dest;
+	PreviewBitmap dest;
 
-	int res = PreciseBitmap_Copy(src, dest);
+	int res = PreviewBitmap_Copy(src, dest);
 
 	switch (res)
 	{

@@ -104,7 +104,7 @@ public class MainWindow
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		//stage.addStageOperation(downsampleStageOperation);
+		stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
@@ -112,7 +112,8 @@ public class MainWindow
 		
 		stage.loadImage("..//..//data//test//IMG_1520.CR2");
 //		stage.loadImage("..//..//data//test//IMG_5196.CR2");
-		//stage.processImage();
+//		stage.processImage();
+//		stage.saveImage("/test.ppm");
 		
 		return stage;
 	}

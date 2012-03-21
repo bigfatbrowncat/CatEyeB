@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 /**
  * Helper for library loading. It loads libraries from a directory specified in configuration.

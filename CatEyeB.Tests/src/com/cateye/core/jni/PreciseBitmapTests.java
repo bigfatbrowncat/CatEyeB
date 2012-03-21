@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import com.cateye.core.NativeHeapAllocationException;
-import com.cateye.core.native_.PreciseBitmap;
+import com.cateye.core.jni.PreciseBitmap;
 
 public class PreciseBitmapTests {
 	@Test(timeout=5000)

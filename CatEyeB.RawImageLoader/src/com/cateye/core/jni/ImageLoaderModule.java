@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import com.cateye.core.IImageLoader;
 import com.google.inject.AbstractModule;

@@ -1,4 +1,4 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 /**
  * Exception will thrown if bitmap cannot be created with the passed arguments

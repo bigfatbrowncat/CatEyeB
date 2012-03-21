@@ -1,7 +1,7 @@
 package com.cateye.ui.swt;
 
-import com.cateye.core.native_.ImageLoaderModule;
-import com.cateye.core.native_.ImageSaverModule;
+import com.cateye.core.jni.ImageLoaderModule;
+import com.cateye.core.jni.ImageSaverModule;
 import com.cateye.core.stage.StageModule;
 import com.cateye.stageoperations.compressor.CompressorStageOperationModule;
 import com.cateye.stageoperations.downsample.DownsampleStageOperationModule;

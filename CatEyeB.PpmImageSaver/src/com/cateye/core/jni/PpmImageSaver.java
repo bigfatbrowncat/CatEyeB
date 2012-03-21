@@ -1,9 +1,11 @@
-package com.cateye.core.native_;
+package com.cateye.core.jni;
 
 import java.io.File;
 
 import com.cateye.core.IImageSaver;
 import com.cateye.core.Image;
+import com.cateye.core.jni.LibraryLoader;
+import com.cateye.core.jni.PreciseBitmap;
 
 class PpmImageSaver implements IImageSaver
 {

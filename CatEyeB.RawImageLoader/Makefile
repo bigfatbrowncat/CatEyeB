@@ -18,7 +18,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a $(TARGET_LIB)/jpeg8c.dll.a $(TARGET_LIB)/raw.
 CUSTOM_INCLUDES = -I"../bitmaps/include" -I"../libraw/libraw" -I"../jpeg-8c/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.core.native_.RawImageLoader
+JAVA_JNI_CLASSES = com.cateye.core.jni.RawImageLoader
 NATIVE_LIB = Raw.CatEyeImageLoader
 
 include ../target/makefiles/cpp_java_cross.mk

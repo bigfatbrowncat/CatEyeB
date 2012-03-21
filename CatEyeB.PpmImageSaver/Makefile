@@ -17,7 +17,7 @@ LIBS = $(TARGET_LIB)/bitmaps.dll.a
 CUSTOM_INCLUDES = -I"../bitmaps/include"
 SOURCE = src
 TARGET = ../target
-JAVA_JNI_CLASSES = com.cateye.core.native_.PpmImageSaver
+JAVA_JNI_CLASSES = com.cateye.core.jni.PpmImageSaver
 NATIVE_LIB = Ppm.CatEyeImageSaver
 
 include ../target/makefiles/cpp_java_cross.mk

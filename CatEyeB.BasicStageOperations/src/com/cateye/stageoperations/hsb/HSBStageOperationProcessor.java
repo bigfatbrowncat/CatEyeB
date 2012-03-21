@@ -2,7 +2,7 @@ package com.cateye.stageoperations.hsb;
 
 import com.cateye.core.IPreciseBitmap;
 import com.cateye.core.IProgressListener;
-import com.cateye.core.native_.LibraryLoader;
+import com.cateye.core.jni.LibraryLoader;
 import com.cateye.core.stage.IStageOperationProcessor;
 import com.cateye.stageoperations.hsb.HSBStageOperation;
 
