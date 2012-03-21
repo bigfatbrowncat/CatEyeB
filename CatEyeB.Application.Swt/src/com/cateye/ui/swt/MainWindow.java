@@ -110,7 +110,7 @@ public class MainWindow
 		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
-		stage.loadImage("..//..//data//test//IMG_1520.CR2");
+//		stage.loadImage("..//..//data//test//IMG_1520.CR2");
 //		stage.loadImage("..//..//data//test//IMG_5196.CR2");
 //		stage.processImage();
 //		stage.saveImage("/test.ppm");
@@ -146,6 +146,10 @@ public class MainWindow
 		GridLayout mainLayout = new GridLayout(2, false);
 		shell.setLayout(mainLayout);
 		mainLayout.horizontalSpacing = 5;
+		mainLayout.marginLeft = 0;
+		mainLayout.marginTop = 0;
+		mainLayout.marginRight = 0;
+		mainLayout.marginBottom = 0;
 		
 		Composite centerComposite = new Composite(shell, SWT.NONE);
 		centerComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -155,21 +159,24 @@ public class MainWindow
 		rightComposite.setLayout(new GridLayout(1, false));
 		rightComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
 		
-		createImageViewer(stage, centerComposite);
+		//createImageViewer(stage, centerComposite);
 
 		// Stage operation widgets
 		
 		
 		rgbStageOperationWidget = new RGBStageOperationWidget(rightComposite, SWT.NONE);
 		rgbStageOperationWidget.setRgbStageOperation(rgbStageOperation);
+		rgbStageOperationWidget.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		rgbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 		
 		hsbStageOperationWidget = new HSBStageOperationWidget(rightComposite, SWT.NONE);
 		hsbStageOperationWidget.setHsbStageOperation(hsbStageOperation);
+		hsbStageOperationWidget.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		hsbStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 
 		compressorStageOperationWidget = new CompressorStageOperationWidget(rightComposite, SWT.NONE);
 		compressorStageOperationWidget.setCompressorStageOperation(compressorStageOperation);
+		compressorStageOperationWidget.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		compressorStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 		
 		Button processBtn = new Button(rightComposite, SWT.NONE);

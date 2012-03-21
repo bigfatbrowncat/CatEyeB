@@ -19,6 +19,7 @@ public class RGBStageOperationWidget extends Composite
 	private RGBStageOperation rgbStageOperation;
 	private Scale rScale, gScale, bScale;
 	private boolean changingProperty = false;
+	private com.cateye.ui.swt.Scale testScale;
 	
 	private final SelectionListener rgbScaleSelectionListener = new SelectionListener()
 	{
@@ -83,6 +84,14 @@ public class RGBStageOperationWidget extends Composite
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
 		
+		Label lblTest = new Label(this, SWT.NONE);
+		lblTest.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+		lblTest.setText("Test:");
+		
+		testScale = new com.cateye.ui.swt.Scale(this);
+		testScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		testScale.setSize(300, 200);
+		
 		Label lblRed = new Label(this, SWT.NONE);
 		lblRed.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
 		lblRed.setText("Red:");
@@ -91,7 +100,7 @@ public class RGBStageOperationWidget extends Composite
 		rScale.setMaximum(400);
 		rScale.setSelection(200);
 		rScale.setTouchEnabled(true);
-		rScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		rScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		rScale.addSelectionListener(rgbScaleSelectionListener);
 		
 		Label lblGreen = new Label(this, SWT.NONE);
@@ -100,7 +109,7 @@ public class RGBStageOperationWidget extends Composite
 		gScale = new Scale(this, SWT.NONE);
 		gScale.setMaximum(400);
 		gScale.setSelection(200);
-		gScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		gScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		gScale.addSelectionListener(rgbScaleSelectionListener);
 		
 		Label lblBlue = new Label(this, SWT.NONE);
@@ -110,7 +119,7 @@ public class RGBStageOperationWidget extends Composite
 		bScale = new Scale(this, SWT.NONE);
 		bScale.setMaximum(400);
 		bScale.setSelection(200);
-		bScale.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		bScale.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		bScale.addSelectionListener(rgbScaleSelectionListener);
 
 		// TODO Auto-generated constructor stub
