@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Composite;
 public class Scale extends Canvas
 {
 	private Image skin;
+	private Image base_leftSide;
 	
 	private void makeSkin(Device device, String filename, int foreR, int foreG, int foreB, int backR, int backG, int backB)
 	{
@@ -42,6 +43,18 @@ public class Scale extends Canvas
 	
 		skin = new Image(device, resData);
 				
+	}
+	
+	private Image cutSkinPart(Image src, int x, int y, int w, int h)
+	{
+		ImageData srcImageData = src.getImageData();
+		ImageData resImageData = new ImageData(w, h, srcImageData.depth, srcImageData.palette);
+		
+		for (int i = 0; i < w; i++)
+		for (int j = 0; j < h; j++)
+		{
+			
+		}
 	}
 	
 	public Scale(Composite parent)

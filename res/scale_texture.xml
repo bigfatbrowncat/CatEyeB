@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<scale>
+	<mask name="../../res/scale_texturemask.png" />
+	<base height="18">
+		<leftside left="7" top="8" width="6" />
+		<rangezone left="60" top="8" width="100" />
+		<rightside left="216" top="8" width="6" />
+	</base>
+	<marker height="22">
+		<leftside left="246" top="4" width="8" />
+		<rightside left="256" top="4" width="9" />
+		<rangezone left="254" top="4" width="1" />
+	</marker>
+</scale>
