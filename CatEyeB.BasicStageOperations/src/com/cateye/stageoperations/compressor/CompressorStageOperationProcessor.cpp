@@ -288,12 +288,12 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 	DEBUG_INFO
 
 	// Building H0
-	arr2<float> H_cur(Hw, Hh);
+	arr2<float> H_cur = H.clone();/* (Hw, Hh);
 	for (int i = 0; i < Hw; i++)
 	for (int j = 0; j < Hh; j++)
 	{
 		H_cur(i, j) = H(i, j);
-	}
+	}*/
 
 	DEBUG_INFO
 
@@ -421,15 +421,16 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 	DEBUG_INFO
 
 	// Extracting the correct size
-	arr2<float> Phi_cut(Hw, Hh);
+	//arr2<float> Phi_cut = Phi.clone();
+	/*(Hw, Hh);
 	for (int i = 0; i < Hw; i++)
 	for (int j = 0; j < Hh; j++)
 	{
 		Phi_cut(i, j) = Phi(i, j);
-	}
+	}*/
 	DEBUG_INFO
 
-	return Phi_cut;
+	return Phi;
 }
 
 void* PoissonNeimanThread_start(void* data);
@@ -550,7 +551,7 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 	{
 		// *** Horizontal iterations ***
 
-		int threads_num = 6;
+		int threads_num = 8;
 		PoissonNeimanThread** pnthrs = new PoissonNeimanThread*[threads_num];
 		for (int q = 0; q < threads_num; q++)
 		{
