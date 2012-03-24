@@ -1,7 +1,10 @@
 package com.cateye.ui.swt;
 
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -26,6 +29,7 @@ import com.cateye.stageoperations.rgb.ui.swt.RGBStageOperationWidget;
 import com.google.inject.Inject;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.xml.sax.SAXException;
 
 public class MainWindow
 {
@@ -64,9 +68,12 @@ public class MainWindow
 
 	/**
 	 * Open the window.
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 * @wbp.parser.entryPoint
 	 */
-	public void open()
+	public void open() throws ParserConfigurationException, SAXException, IOException
 	{
 		stage = createStage();
 
@@ -136,8 +143,11 @@ public class MainWindow
 	}
 	
 	/**	 * Create contents of the window.
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
 	 */
-	protected void createContents()
+	protected void createContents() throws ParserConfigurationException, SAXException, IOException
 	{
 		shell = new Shell();
 		shell.setSize(450, 300);

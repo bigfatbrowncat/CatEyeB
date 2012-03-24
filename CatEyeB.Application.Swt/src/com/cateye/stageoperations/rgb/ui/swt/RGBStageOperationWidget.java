@@ -1,5 +1,9 @@
 package com.cateye.stageoperations.rgb.ui.swt;
 
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.SWT;
@@ -8,6 +12,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.layout.GridData;
+import org.xml.sax.SAXException;
 
 import com.cateye.core.IPropertyChangedListener;
 import com.cateye.stageoperations.rgb.RGBStageOperation;
@@ -79,7 +84,7 @@ public class RGBStageOperationWidget extends Composite
 		}
 	};
 			
-	public RGBStageOperationWidget(Composite parent, int style) 
+	public RGBStageOperationWidget(Composite parent, int style) throws ParserConfigurationException, SAXException, IOException 
 	{
 		super(parent, style);
 		setLayout(new GridLayout(2, false));
