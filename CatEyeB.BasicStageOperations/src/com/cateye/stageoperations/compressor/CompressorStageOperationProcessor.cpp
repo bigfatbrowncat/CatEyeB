@@ -17,6 +17,7 @@ template <typename T> struct counted_link
 {
 	T* link;
 	int counter;
+	counted_link<T>() : counter(0) {}
 };
 
 template <typename T> class arr2
@@ -147,6 +148,7 @@ public:
 			throw 1;
 		}
 		memcpy(this->data->link, src_data, width * height * sizeof(T));
+		data->counter ++;
 	}
 
 	arr2(int width, int height) : width(width), height(height)

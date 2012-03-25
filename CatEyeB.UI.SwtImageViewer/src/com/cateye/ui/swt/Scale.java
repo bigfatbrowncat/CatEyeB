@@ -10,8 +10,10 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.w3c.dom.Document;
@@ -21,14 +23,104 @@ import org.xml.sax.SAXException;
 
 public class Scale extends Canvas
 {
-	String textureFileName = null;
-	Integer baseHeight = null;
-	Integer leftSideLeft = null, leftSideTop = null, leftSideWidth = null;
-	Integer rangeZoneLeft = null, rangeZoneTop = null, rangeZoneWidth = null;
-	Integer rightSideLeft = null, rightSideTop = null, rightSideWidth = null;
+	static class SkinElement
+	{
+		private Image skin;
+		private Integer left, top, width, height, baseline;
+		public static SkinElement loadFromNode(Node node, int height, int baseline)
+		{
+			SkinElement res = new SkinElement();
+			res.left = Integer.parseInt(node.getAttributes().getNamedItem("left").getNodeValue());
+			res.top = Integer.parseInt(node.getAttributes().getNamedItem("top").getNodeValue());
+			res.width = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
+			res.height = height;
+			res.baseline = baseline - res.top;
+			return res;
+		}
+		public void loadSkin(Image texture)
+		{
+			skin = Scale.cutSkinPart(texture, left, top, width, height);
+		}
+		public void draw(GC gc, int x, int y)
+		{
+			gc.drawImage(skin, x, y - baseline);
+		}
+		public void draw(GC gc, int x, int y, int targetWidth, int targetHeight)
+		{
+			gc.drawImage(skin, 0, 0, width, height, x, y - baseline, targetWidth, targetHeight);
+		}
+		public Integer getLeft() 
+		{
+			return left;
+		}
+		public Integer getTop() 
+		{
+			return top;
+		}
+		public Integer getWidth() 
+		{
+			return width;
+		}
+		public Integer getHeight() 
+		{
+			return height;
+		}
+
+	}
 	
+	static class ScaleSkinElement
+	{
+		public Integer height, baseline;
+		public SkinElement leftSide, rangeZone, rightSide;
+		public static ScaleSkinElement loadFromNode(Node node)
+		{
+			ScaleSkinElement res = new ScaleSkinElement();
+			
+			res.height = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());
+			res.baseline = Integer.parseInt(node.getAttributes().getNamedItem("baseline").getNodeValue());
+			
+			for (int i2 = 0; i2 < node.getChildNodes().getLength(); i2++)
+			{
+				Node baseItem = node.getChildNodes().item(i2);
+				if (baseItem.getNodeName().equals("leftside"))
+				{
+					res.leftSide = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+				}
+				else if (baseItem.getNodeName().equals("rangezone"))
+				{
+					res.rangeZone = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+				}
+				else if (baseItem.getNodeName().equals("rightside"))
+				{
+					res.rightSide = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+				}
+			}
+			
+			return res;
+		}
+		
+		public void loadSkin(Image texture)
+		{
+			leftSide.loadSkin(texture);
+			rangeZone.loadSkin(texture);
+			rightSide.loadSkin(texture);
+		}
+
+		public void draw(GC gc, int x, int y, int width)
+		{
+			//System.out.println(gc.getAdvanced());
+			leftSide.draw(gc, 0, y);
+			rangeZone.draw(gc, leftSide.getWidth(), y, width - leftSide.getWidth() - rightSide.getWidth(), height);
+			rightSide.draw(gc, width - rightSide.getWidth(), y);
+		}
+		
+	}
+
+	private String textureFileName = null;
+	private Integer height = null;
 	private Image skin;
-	private Image leftSide, rightSide, rangeZone;
+	
+	private ScaleSkinElement baseSkinElement, markerSkinElement;
 	
 	private void makeSkin(Device device, int foreR, int foreG, int foreB, int backR, int backG, int backB)
 	{
@@ -38,8 +130,7 @@ public class Scale extends Canvas
 		ImageData resData = new ImageData(textureMaskData.width, textureMaskData.height, textureMaskData.depth, textureMaskData.palette);
 		
 		resData.alphaData = new byte[resData.width * resData.height];
-		
-		System.out.println((byte)132);
+
 		for (int i = 0; i < textureMaskData.width * textureMaskData.height; i++)
 		{
 			int red_mask = (textureMaskData.data[i * textureMaskData.depth / 8 + 2] + 256) % 256;				// frame bump
@@ -60,7 +151,7 @@ public class Scale extends Canvas
 				
 	}
 	
-	private Image cutSkinPart(Image src, int x, int y, int w, int h)
+	private static Image cutSkinPart(Image src, int x, int y, int w, int h)
 	{
 		ImageData srcImageData = src.getImageData();
 		ImageData resImageData = new ImageData(w, h, srcImageData.depth, srcImageData.palette);
@@ -79,7 +170,27 @@ public class Scale extends Canvas
 		return new Image(src.getDevice(), resImageData);
 	}
 	
-	private Image scaleSkinPart(Image src, int newWidth, int newHeight)
+	private static void pasteSkinPart(Image part, Image dest, int x, int y)
+	{
+		ImageData partImageData = part.getImageData();
+		int partb = partImageData.depth / 8;
+		ImageData destImageData = dest.getImageData();
+		int destb = destImageData.depth / 8;
+		int w = destImageData.width, h = destImageData.height;
+		
+		for (int i = 0; i < partImageData.width; i++)
+		for (int j = 0; j < partImageData.height; j++)
+		{
+			int partpos = (j * w + i);
+			int destpos = ((j + y) * destImageData.width + (i + x)) * destb;
+			destImageData.data[destpos * destb] = destImageData.data[partpos * partb];
+			destImageData.data[destpos * destb + 1] = destImageData.data[partpos * partb + 1];
+			destImageData.data[destpos * destb + 2] = destImageData.data[partpos * partb + 2];
+			destImageData.alphaData[destpos] = destImageData.alphaData[partpos];
+		}
+	}
+	/*
+	private static Image scaleSkinPart(Image src, int newWidth, int newHeight)
 	{
 		ImageData srcImageData = src.getImageData();
 		ImageData resImageData = new ImageData(newWidth, newWidth, srcImageData.depth, srcImageData.palette);
@@ -100,7 +211,7 @@ public class Scale extends Canvas
 		
 		return new Image(src.getDevice(), resImageData);
 	}
-	
+	*/
 	public Scale(Composite parent) throws ParserConfigurationException, SAXException, IOException
 	{
 		super(parent, /*SWT.NO_BACKGROUND*/ SWT.NONE);
@@ -124,6 +235,8 @@ public class Scale extends Canvas
 		Element scaleElement = d.getDocumentElement();
 		if (scaleElement.getNodeName().equals("scale"))
 		{
+			height = Integer.parseInt(scaleElement.getAttributes().getNamedItem("height").getNodeValue());
+			
 			for (int i = 0; i < scaleElement.getChildNodes().getLength(); i++)
 			{
 				Node scaleItem = scaleElement.getChildNodes().item(i);
@@ -133,40 +246,19 @@ public class Scale extends Canvas
 				}
 				else if (scaleItem.getNodeName().equals("base"))
 				{
-					baseHeight = Integer.parseInt(scaleItem.getAttributes().getNamedItem("height").getNodeValue());
-					
-					for (int i2 = 0; i2 < scaleItem.getChildNodes().getLength(); i2++)
-					{
-						Node baseItem = scaleItem.getChildNodes().item(i2);
-						if (baseItem.getNodeName().equals("leftside"))
-						{
-							leftSideLeft = Integer.parseInt(baseItem.getAttributes().getNamedItem("left").getNodeValue());
-							leftSideTop = Integer.parseInt(baseItem.getAttributes().getNamedItem("top").getNodeValue());
-							leftSideWidth = Integer.parseInt(baseItem.getAttributes().getNamedItem("width").getNodeValue());
-						}
-						else if (baseItem.getNodeName().equals("rangezone"))
-						{
-							rangeZoneLeft = Integer.parseInt(baseItem.getAttributes().getNamedItem("left").getNodeValue());
-							rangeZoneTop = Integer.parseInt(baseItem.getAttributes().getNamedItem("top").getNodeValue());
-							rangeZoneWidth = Integer.parseInt(baseItem.getAttributes().getNamedItem("width").getNodeValue());
-						}
-						else if (baseItem.getNodeName().equals("rightside"))
-						{
-							rightSideLeft = Integer.parseInt(baseItem.getAttributes().getNamedItem("left").getNodeValue());
-							rightSideTop = Integer.parseInt(baseItem.getAttributes().getNamedItem("top").getNodeValue());
-							rightSideWidth = Integer.parseInt(baseItem.getAttributes().getNamedItem("width").getNodeValue());
-						}
-					}
+					baseSkinElement = ScaleSkinElement.loadFromNode(scaleItem);
 				}
-					
+				else if (scaleItem.getNodeName().equals("marker"))
+				{
+					markerSkinElement = ScaleSkinElement.loadFromNode(scaleItem);
+				}
 			}
 		}
 		
 		makeSkin(getDisplay(), fore_red, fore_green, fore_blue, back_red, back_green, back_blue);
-		leftSide = cutSkinPart(skin, leftSideLeft, leftSideTop, leftSideWidth, baseHeight);
-		rightSide = cutSkinPart(skin, rightSideLeft, rightSideTop, rightSideWidth, baseHeight);
-		rangeZone = cutSkinPart(skin, rangeZoneLeft, rangeZoneTop, rangeZoneWidth, baseHeight);
-
+		baseSkinElement.loadSkin(skin);
+		markerSkinElement.loadSkin(skin);
+		
 		addPaintListener(new PaintListener()
 		{
 			@Override
@@ -174,14 +266,9 @@ public class Scale extends Canvas
 			{
 				int scaleWidth = Scale.this.getSize().x;
 				
-				int rangeZoneCurrentWidth = scaleWidth - leftSideWidth - rightSideWidth;
-				Image rangeZoneCurrent = scaleSkinPart(rangeZone, rangeZoneCurrentWidth, baseHeight);
+				baseSkinElement.draw(e.gc, 0, height / 2, scaleWidth);
+				markerSkinElement.draw(e.gc, 0, height / 2, 20);
 				
-				e.gc.drawImage(leftSide, 0, 0);
-				e.gc.drawImage(rangeZoneCurrent, leftSideWidth, 0);
-				e.gc.drawImage(rightSide, leftSideWidth + rangeZoneCurrentWidth, 0);
-				
-				//draw(e.gc.handle);
 			}
 		});
 	}
