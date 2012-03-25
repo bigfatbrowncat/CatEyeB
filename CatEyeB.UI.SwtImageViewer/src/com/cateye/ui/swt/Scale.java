@@ -6,6 +6,9 @@ import org.eclipse.swt.SWT;
 
 import javax.xml.parsers.*;
 
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -13,7 +16,6 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.w3c.dom.Document;
@@ -109,16 +111,19 @@ public class Scale extends Canvas
 		public void draw(GC gc, int x, int y, int width)
 		{
 			//System.out.println(gc.getAdvanced());
-			leftSide.draw(gc, 0, y);
-			rangeZone.draw(gc, leftSide.getWidth(), y, width - leftSide.getWidth() - rightSide.getWidth(), height);
-			rightSide.draw(gc, width - rightSide.getWidth(), y);
+			leftSide.draw(gc, x, y);
+			rangeZone.draw(gc, x + leftSide.getWidth(), y, width - leftSide.getWidth() - rightSide.getWidth(), height);
+			rightSide.draw(gc, x + width - rightSide.getWidth(), y);
 		}
 		
 	}
 
 	private String textureFileName = null;
-	private Integer height = null;
+	private Integer height = null, markerWidth = 20;
+	public double value = 0.5;
 	private Image skin;
+	private int markerDragX;
+	private boolean markerDragging; 
 	
 	private ScaleSkinElement baseSkinElement, markerSkinElement;
 	
@@ -214,7 +219,7 @@ public class Scale extends Canvas
 	*/
 	public Scale(Composite parent) throws ParserConfigurationException, SAXException, IOException
 	{
-		super(parent, /*SWT.NO_BACKGROUND*/ SWT.NONE);
+		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
 		Color foreColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND); 
 		
@@ -266,8 +271,69 @@ public class Scale extends Canvas
 			{
 				int scaleWidth = Scale.this.getSize().x;
 				
+				Color foreColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND); 
+				e.gc.setForeground(foreColor);
+				e.gc.fillRectangle(0, 0, Scale.this.getSize().x, Scale.this.getSize().y);
+				
 				baseSkinElement.draw(e.gc, 0, height / 2, scaleWidth);
-				markerSkinElement.draw(e.gc, 0, height / 2, 20);
+				int markerX = (int) (value * (scaleWidth - markerWidth));
+				markerSkinElement.draw(e.gc, markerX, height / 2, markerWidth);
+				
+			}
+		});
+
+		addMouseMoveListener(new MouseMoveListener() {
+			
+			@Override
+			public void mouseMove(MouseEvent arg0) 
+			{
+				if (markerDragging)
+				{
+					int scaleWidth = Scale.this.getSize().x;
+
+					int markerX = arg0.x - markerDragX;
+					double newValue = (double)markerX / (scaleWidth - markerWidth);
+					if (newValue < 0) newValue = 0;
+					if (newValue > 1) newValue = 1;
+					
+					if (Math.abs(value - newValue) >= Double.MIN_NORMAL)
+					{
+						value = newValue;
+						Scale.this.redraw();
+					}
+				}
+			}
+		});
+		
+		addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseUp(MouseEvent arg0) {
+				if (markerDragging)
+				{
+					markerDragging = false;
+				}
+			}
+			
+			@Override
+			public void mouseDown(MouseEvent arg0) 
+			{
+				int scaleWidth = Scale.this.getSize().x;
+				int markerX = (int) (value * (scaleWidth - markerWidth));
+				
+				if (arg0.x > markerX && arg0.x < markerX + markerWidth &&
+				    arg0.y > height / 2 - markerSkinElement.height / 2 &&
+				    arg0.y < height / 2 + markerSkinElement.height / 2)
+				{
+					markerDragX = arg0.x - markerX;
+					markerDragging = true;
+				}
+				
+			}
+			
+			@Override
+			public void mouseDoubleClick(MouseEvent arg0) {
+				// TODO Auto-generated method stub
 				
 			}
 		});
