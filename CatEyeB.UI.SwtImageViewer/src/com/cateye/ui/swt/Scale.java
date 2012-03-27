@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.w3c.dom.Document;
@@ -29,6 +30,7 @@ public class Scale extends Canvas
 	{
 		private Image skin;
 		private Integer left, top, width, height, baseline;
+		
 		public static SkinElement loadFromNode(Node node, int height, int baseline)
 		{
 			SkinElement res = new SkinElement();
@@ -123,7 +125,9 @@ public class Scale extends Canvas
 	public double value = 0.5;
 	private Image skin;
 	private int markerDragX;
-	private boolean markerDragging; 
+	private boolean markerDragging;
+	
+	private Color foreColor, backColor;
 	
 	private ScaleSkinElement baseSkinElement, markerSkinElement;
 	
@@ -217,19 +221,72 @@ public class Scale extends Canvas
 		return new Image(src.getDevice(), resImageData);
 	}
 	*/
+	
+	public int getNaturalHeight()
+	{
+		return height;
+	}
+	
+	public Color getBackColor()
+	{
+		return backColor;
+	}
+	
+	public void setBackColor(Color value)
+	{
+		backColor = value;
+		makeSkin(getDisplay(), 
+		         foreColor.getRed(), 
+		         foreColor.getGreen(), 
+		         foreColor.getBlue(),
+		         backColor.getRed(),
+		         backColor.getGreen(),
+		         backColor.getBlue());
+		baseSkinElement.loadSkin(skin);
+		markerSkinElement.loadSkin(skin);
+	}
+
+	public Color getForeColor()
+	{
+		return foreColor;
+	}
+	
+	public void setForeColor(Color value)
+	{
+		foreColor = value;
+		makeSkin(getDisplay(), 
+		         foreColor.getRed(), 
+		         foreColor.getGreen(), 
+		         foreColor.getBlue(),
+		         backColor.getRed(),
+		         backColor.getGreen(),
+		         backColor.getBlue());
+		baseSkinElement.loadSkin(skin);
+		markerSkinElement.loadSkin(skin);
+	}
+	
+	public double getValue()
+	{
+		return value;
+	}
+	
+	public void setValue(double value)
+	{
+		this.value = value;
+		redraw();
+	}
+	
 	public Scale(Composite parent) throws ParserConfigurationException, SAXException, IOException
 	{
 		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 
-		Color foreColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND); 
+		foreColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND); 
 		
-		int fore_red = foreColor.getRed();
-		int fore_green = foreColor.getGreen();
-		int fore_blue = foreColor.getBlue();
-
-		int back_red = (foreColor.getRed() + 255) / 2;
-		int back_green = (foreColor.getGreen() + 255) / 2;
-		int back_blue = (foreColor.getBlue() + 255) / 2;
+		//int back_red = 255;//(foreColor.getRed() + 255) / 2;
+		//int back_green = 225;//(foreColor.getGreen() + 255) / 2;
+		//int back_blue = 225;//(foreColor.getBlue() + 255) / 2;
+		
+		backColor = new Color(this.getDisplay(), new RGB(255, 255, 255));
 		
 		// Reading XML skin description
 		
@@ -259,8 +316,15 @@ public class Scale extends Canvas
 				}
 			}
 		}
+
+		makeSkin(getDisplay(), 
+		         foreColor.getRed(), 
+		         foreColor.getGreen(), 
+		         foreColor.getBlue(),
+		         backColor.getRed(),
+		         backColor.getGreen(),
+		         backColor.getBlue());
 		
-		makeSkin(getDisplay(), fore_red, fore_green, fore_blue, back_red, back_green, back_blue);
 		baseSkinElement.loadSkin(skin);
 		markerSkinElement.loadSkin(skin);
 		

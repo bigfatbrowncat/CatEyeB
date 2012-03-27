@@ -29,16 +29,16 @@ import com.cateye.stageoperations.rgb.ui.swt.RGBStageOperationWidget;
 import com.google.inject.Inject;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.xml.sax.SAXException;
 
 public class MainWindow
 {
 	protected Shell shell;
-	protected Button button;
+	protected Button loadBtn, processBtn;
 	private final StageFactory stageFactory;
-	private Timer updateTimer;
 	
-	private PreciseBitmapsVernissage vern = new PreciseBitmapsVernissage(2, 1);
+	private PreciseBitmapsVernissage vern = new PreciseBitmapsVernissage(1, 1);
 	private PreciseImageViewer imageViewer;
 	private IStage stage;
 	
@@ -106,21 +106,17 @@ public class MainWindow
 		
 		compressorStageOperation = new CompressorStageOperation();
 		
-		
 		LimiterStageOperation limiterStageOperation = new LimiterStageOperation();
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		stage.addStageOperation(downsampleStageOperation);
+		//stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
 		stage.addStageOperation(limiterStageOperation);
 		
-//		stage.loadImage("..//..//data//test//IMG_1520.CR2");
 //		stage.loadImage("..//..//data//test//IMG_5196.CR2");
-//		stage.processImage();
-//		stage.saveImage("/test.ppm");
 		
 		return stage;
 	}
@@ -132,11 +128,6 @@ public class MainWindow
 
 		vern.setUpdated(0, 0, true);
 		vern.setBitmap(0, 0, stage.getOriginalBitmap());
-		
-		vern.setUpdated(1, 0, true);
-		vern.setBitmap(1, 0, stage.getBitmap());
-		
-		vern.setCaption(1, 0, "This is the caption for (1, 0) picture"); 
 		
 		imageViewer.setVernissage(vern);
 		imageViewer.setLayout(new FillLayout(SWT.HORIZONTAL));
@@ -150,7 +141,7 @@ public class MainWindow
 	protected void createContents() throws ParserConfigurationException, SAXException, IOException
 	{
 		shell = new Shell();
-		shell.setSize(450, 300);
+		shell.setSize(1100, 700);
 		shell.setText("CatEyeB");
 		
 		GridLayout mainLayout = new GridLayout(2, false);
@@ -169,7 +160,7 @@ public class MainWindow
 		rightComposite.setLayout(new GridLayout(1, false));
 		rightComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1));
 		
-		//createImageViewer(stage, centerComposite);
+		createImageViewer(stage, centerComposite);
 
 		// Stage operation widgets
 		
@@ -189,7 +180,29 @@ public class MainWindow
 		compressorStageOperationWidget.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 		compressorStageOperation.addOnPropertyChangedListener(stageOperationPropertyChanged);
 		
-		Button processBtn = new Button(rightComposite, SWT.NONE);
+		Composite buttonsContainer = new Composite(rightComposite, SWT.NONE);
+		RowLayout buttonsLayout = new RowLayout(SWT.HORIZONTAL);
+		buttonsContainer.setLayout(buttonsLayout);
+
+		loadBtn = new Button(buttonsContainer, SWT.NONE);
+		loadBtn.setText("Load");
+		loadBtn.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				stage.loadImage("..//..//data//test//IMG_1520.CR2");
+				processBtn.setEnabled(true);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		processBtn = new Button(buttonsContainer, SWT.NONE);
+		processBtn.setEnabled(false);
 		processBtn.setText("Process");
 		processBtn.addSelectionListener(new SelectionListener() {
 			
@@ -206,6 +219,7 @@ public class MainWindow
 				
 			}
 		});
+		
 	}
 	
 	

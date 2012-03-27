@@ -6,6 +6,7 @@
 #include <mem.h>
 #include <time.h>
 #include <pthread.h>
+#include <stdio.h>
 
 #include <vector>
 
@@ -28,8 +29,6 @@ private:
 public:
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
-
-	counted_link<T>* getData() { return data; }
 
 	arr2<T> clone()
 	{
@@ -96,11 +95,13 @@ public:
 		width = other.width;
 		height = other.height;
 		data = other.data;
+#ifdef DEBUG_ARRAYS
 		if (this->data == NULL)
 		{
 			DEBUG_INFO
 			throw 1;
 		}
+#endif
 		data->counter ++;
 	}
 
@@ -109,11 +110,13 @@ public:
 		if (this != &other)
 		{
 			data->counter --;
+#ifdef DEBUG_ARRAYS
 			if (data == NULL || data->link == NULL)
 			{
 				DEBUG_INFO
 				throw 1;
 			}
+#endif
 			if (data != NULL && data->counter == 0)
 			{
 				if (data->link != NULL) delete [] data->link;
@@ -123,11 +126,13 @@ public:
 			width = other.width;
 			height = other.height;
 			data = other.data;
+#ifdef DEBUG_ARRAYS
 			if (this->data == NULL)
 			{
 				DEBUG_INFO
 				throw 1;
 			}
+#endif
 			data->counter ++;
 		}
 		return *this;
@@ -136,11 +141,13 @@ public:
 	arr2(T* src_data, int width, int height) : width(width), height(height)
 	{
 		this->data = new counted_link<T>;
+#ifdef DEBUG_ARRAYS
 		if (this->data == NULL)
 		{
 			DEBUG_INFO
 			throw 1;
 		}
+#endif
 		this->data->link = new T[width * height];
 		if (this->data->link == NULL)
 		{
@@ -154,11 +161,13 @@ public:
 	arr2(int width, int height) : width(width), height(height)
 	{
 		this->data = new counted_link<T>;
+#ifdef DEBUG_ARRAYS
 		if (this->data == NULL)
 		{
 			DEBUG_INFO
 			throw 1;
 		}
+#endif
 		DEBUG_INFO
 		this->data->link = new T[width * height];
 		if (this->data->link == NULL)
@@ -172,11 +181,13 @@ public:
 	virtual ~arr2()
 	{
 		data->counter --;
+#ifdef DEBUG_ARRAYS
 		if (data == NULL || data->link == NULL)
 		{
 			DEBUG_INFO
 			throw 1;
 		}
+#endif
 
 		if (data != NULL && data->counter == 0)
 		{
@@ -267,7 +278,6 @@ arr2<float> Upsample2(const arr2<float> Q, int new_w, int new_h)
 		Q22(i, j) /= diver;
 	}
 
-	printf("Q22: %x\n", Q22.getData());
 	return Q22;
 }
 
@@ -300,29 +310,22 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 
 	DEBUG_INFO
 
-	printf("divides = %d, (%d, %d)\n", divides, Hw, Hh);
-
 	// Building phi_k
 	vector<arr2<float> > phi;
 	for (int k = 0; k <= divides; k++)		// k is the index of H_cur
 	{
 		DEBUG_INFO
 
-		printf("%d\n", k); fflush(stdout);
-
 		float avg_grad = 0;
 
 		int w = (int)(Hw / pow(2, k));
 		int h = (int)(Hh / pow(2, k));
-
-		printf("%d, %d\n", w, h); fflush(stdout);
 
 		if (k > 0)
 		{
 			DEBUG_INFO
 			// Calculating the new H_cur
 			arr2<float> H_cur_new(w, h);
-			printf("H_cur_new: %p\n", H_cur_new.getData());
 			DEBUG_INFO
 			for (int i = 0; i < w; i++)
 			for (int j = 0; j < h; j++)
@@ -407,7 +410,6 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 		int h = phi[k].getHeight();
 		// Multiplying
 		DEBUG_INFO
-		printf("Phi: %d, %d\n", Phi.getWidth(), Phi.getHeight());
 		for (int i = 0; i < w; i++)
 		for (int j = 0; j < h; j++)
 		{
@@ -418,7 +420,6 @@ arr2<float> BuildPhi(arr2<float> H, double alpha, double beta, double noise_gate
 		if (k > 0)
 		{
 			Phi = Upsample2(Phi, ww[k - 1], hh[k - 1]);
-			printf("Phi: %x\n", Phi.getData());
 		}
 	}
 	DEBUG_INFO
@@ -477,7 +478,6 @@ void* PoissonNeimanThread_start(void* data)
 	double my_delta = 0;
 
 	for (int i = i1; i < i2; i++) //	for (int i = 1; i < w + 1; i++)
-
 	{
 		// Run, Thomas, run!
 		float alpha[h + 3];
@@ -547,14 +547,12 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 	}
 	DEBUG_INFO
 
-
-
 	float delta = 0; float delta_prev = 0;
 	for (int step = 0; step < steps_max; step ++)
 	{
 		// *** Horizontal iterations ***
 
-		int threads_num = 8;
+		int threads_num = 36;
 		PoissonNeimanThread** pnthrs = new PoissonNeimanThread*[threads_num];
 		for (int q = 0; q < threads_num; q++)
 		{
@@ -620,8 +618,6 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 
 		if (dpd < stop_dpd && step > 1)
 		{
-			printf("!");
-			fflush(stdout);
 			break;
 		}
 
@@ -792,9 +788,9 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	// Solving Poisson equation Delta I = div G
-	//arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
 	arr2<float> I(Phi.getWidth(), Phi.getHeight());
 	SolvePoissonNeiman(I, div_G, steps_max, epsilon);
+	//arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
 
 	DEBUG_INFO
 
@@ -869,7 +865,7 @@ JNIEXPORT void JNICALL Java_com_cateye_stageoperations_compressor_CompressorStag
 
 	time_t start;
 	time(&start);
-	Compress(bmp, curve, noiseGate, pressure, contrast, 0.0025f, 10000);
+	Compress(bmp, curve, noiseGate, pressure, contrast, 0.003f, 10000);
 	time_t end;
 	time(&end);
 
