@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import com.cateye.core.IProgressListener;
 import com.cateye.core.IPropertyChangedListener;
 import com.cateye.core.stage.IStage;
 import com.cateye.core.stage.StageFactory;
@@ -117,6 +118,15 @@ public class MainWindow
 		stage.addStageOperation(limiterStageOperation);
 		
 //		stage.loadImage("..//..//data//test//IMG_5196.CR2");
+		
+		stage.addOnProgressListener(new IProgressListener() {
+			
+			@Override
+			public boolean invoke(Object arg0, float arg1) {
+				System.out.println(arg1);
+				return true;
+			}
+		});
 		
 		return stage;
 	}

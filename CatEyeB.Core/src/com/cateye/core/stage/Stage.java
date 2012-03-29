@@ -19,7 +19,18 @@ class Stage implements IStage
 	private final List<StageOperation> stageOperations = new ArrayList<StageOperation>();
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
 	
-	private final IProgressListener imageLoadingProgressListener;
+	private final IProgressListener stageInternalProgressListener = new IProgressListener()
+	{
+		@Override
+		public boolean invoke(Object sender, float progress)
+		{
+			boolean cancel = false;
+			for (IProgressListener listener : progressListeners)
+				if (!listener.invoke(this, progress)) cancel = true;
+			return !cancel;
+		}
+	};
+	
 	protected Image image;
 	
 	protected IPreciseBitmap originalBitmap;
@@ -43,15 +54,6 @@ class Stage implements IStage
 		this.imageLoader = imageLoader;
 		this.imageSaver = imageSaver;
 		
-		imageLoadingProgressListener = new IProgressListener()
-		{
-			@Override
-			public boolean invoke(Object sender, float progress)
-			{
-				invokeOnProgress(progress);
-				return true;
-			}
-		};
 	}
 	
 	@Override
@@ -94,12 +96,6 @@ class Stage implements IStage
 			this.image.free();
 	}
 	
-	protected void invokeOnProgress(float progress)
-	{
-		for (IProgressListener listener : progressListeners)
-			listener.invoke(this, progress);
-	}
-	
 	/**
 	 * Returns true if image is loaded
 	 */
@@ -112,7 +108,7 @@ class Stage implements IStage
 	public void loadImage(String fileName)
 	{
 		disposeLoadedImage();
-		imageLoader.addProgressListener(imageLoadingProgressListener);
+		imageLoader.addProgressListener(stageInternalProgressListener);
 		
 		try
 		{
@@ -125,7 +121,7 @@ class Stage implements IStage
 		}
 		finally
 		{
-			imageLoader.removeProgressListener(imageLoadingProgressListener);
+			imageLoader.removeProgressListener(stageInternalProgressListener);
 		}
 	}
 	

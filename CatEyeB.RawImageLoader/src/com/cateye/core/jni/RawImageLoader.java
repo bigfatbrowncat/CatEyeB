@@ -17,7 +17,6 @@ class RawImageLoader implements IImageLoader
 {
 	// Progress listeners
 	private final List<IProgressListener> progressListeners = new ArrayList<IProgressListener>();
-	private final ExtractingProgressReporter progressReporter = new ExtractingProgressReporter(this);
 	private boolean divideBy2 = true;
 	
 	private Hashtable<Image, String> imageFileNames = new Hashtable<Image, String>();
@@ -44,6 +43,7 @@ class RawImageLoader implements IImageLoader
 		progressListeners.remove(listener);
 	}
 	
+	// Don't change the signature! It's called from native code.
 	protected boolean raiseProgress(float progress)
 	{
 		boolean res = true;
@@ -120,26 +120,6 @@ class RawImageLoader implements IImageLoader
 	 */
 	private native ImageDescription loadImageDescriptionFromFile(String filename);	
 	
-
-	/**
-	 * Implementation of native extracting progress reporter
-	 */
-	static class ExtractingProgressReporter
-	{
-		private final RawImageLoader loader;
-		
-		public ExtractingProgressReporter(RawImageLoader loader)
-		{
-			this.loader = loader;
-		}
-		
-		public boolean invoke(float progress)
-		{
-			loader.raiseProgress(progress);
-			return true;
-		}
-	}
-
 	static
 	{
 		LibraryLoader.attach("Raw.CatEyeImageLoader");

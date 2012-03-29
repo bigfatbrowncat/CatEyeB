@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#define DEBUG_INFO printf("%d\n", __LINE__);fflush(stdout);
+#define DEBUG_INFO //printf("%d\n", __LINE__);fflush(stdout);
 
 template <typename T> struct counted_link
 {
@@ -29,6 +29,11 @@ private:
 public:
 	int getWidth() const { return width; }
 	int getHeight() const { return height; }
+
+	T* getData()
+	{
+		return data->link;
+	}
 
 	arr2<T> clone()
 	{
@@ -488,9 +493,17 @@ void* PoissonNeimanThread_start(void* data)
 		float* cur_alpha = &alpha[1];
 		float* cur_beta = &beta[1];
 
+		/*float *I_p1 = &(I(i + 1, 1));
+		float *Inew_m1 = &(Inew(i - 1, 1));
+		float *rho_m1m1 = &(rho(i - 1, 0));*/
+
 		for (int j = 1; j < h + 1; j++)
 		{
 			float Fj = I(i + 1, j) + Inew(i - 1, j) - 2 * rho(i - 1, j - 1);
+			/*float Fj = (*I_p1) + (*Inew_m1) - 2 * (*rho_m1m1);
+			I_p1 += w + 2;
+			Inew_m1 += w + 2;
+			rho_m1m1 += w;*/
 
 			float alpha_new = 1.0f / (4 - *cur_alpha);
 			float beta_new = (Fj + *cur_beta) / (4.0f - *cur_alpha);
@@ -547,13 +560,14 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 	}
 	DEBUG_INFO
 
+	int threads_num = 16;
+	PoissonNeimanThread** pnthrs = new PoissonNeimanThread*[threads_num];
+
 	float delta = 0; float delta_prev = 0;
 	for (int step = 0; step < steps_max; step ++)
 	{
 		// *** Horizontal iterations ***
 
-		int threads_num = 36;
-		PoissonNeimanThread** pnthrs = new PoissonNeimanThread*[threads_num];
 		for (int q = 0; q < threads_num; q++)
 		{
 			int i1 = (w / threads_num) * q + 1, i2;
@@ -575,7 +589,6 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 			delta += pnthrs[q]->my_delta;
 			delete pnthrs[q];
 		}
-		delete [] pnthrs;
 
 		// Restoring Neiman boundary conditions after horizontal iterations
 		for (int i = 0; i < w + 2; i++)
@@ -626,6 +639,8 @@ void SolvePoissonNeiman(arr2<float> I0, arr2<float> rho, int steps_max, float st
 		delta = 0;
 	}
 
+	delete [] pnthrs;
+
 	for (int i = 1; i < w + 1; i++)
 	for (int j = 1; j < h + 1; j++)
 	{
@@ -646,7 +661,7 @@ arr2<float> SolvePoissonNeimanMultiLattice(arr2<float> rho, int steps_max, float
 	int divides = 0, wt = W, ht = H;
 	ww.push_back(wt); hh.push_back(ht);
 
-	while (wt > 1 && ht > 1 && divides < 5)
+	while (wt > 1 && ht > 1 && divides < 2)
 	{
 		wt /= 2; ht /= 2;
 		ww.push_back(wt); hh.push_back(ht);

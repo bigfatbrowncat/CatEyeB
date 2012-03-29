@@ -333,10 +333,10 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBit
 	jmethodID preciseBitmap_init = env->GetMethodID(preciseBitmap_class, "<init>", "()V");
 	jobject preciseBitmap = env->NewObject(preciseBitmap_class, preciseBitmap_init);
 
+	JNIObjectContext* oc = new JNIObjectContext(env, obj);
 
 	const char* fn;
     int ret;
-    bool image_is_null = false;
 
     LibRaw* RawProcessor = NULL;
     libraw_processed_image_t *image = NULL;
@@ -372,36 +372,41 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBit
 
 	DEBUG_INFO
 
-	JNIObjectContext oc(env, obj);
 
-	DEBUG_INFO
-
-	RawProcessor->set_progress_handler(my_raw_processing_callback, &oc);
-
-	DEBUG_INFO
-
-	ret = RawProcessor->open_file(fn, RAWPROCESSOR_OPEN_BUFFER);
-	if (ret != LIBRAW_SUCCESS)
+	try
 	{
-		goto end;
+		RawProcessor->set_progress_handler(my_raw_processing_callback, oc);
+
+		DEBUG_INFO
+		ret = RawProcessor->open_file(fn, RAWPROCESSOR_OPEN_BUFFER);
+		if (ret != LIBRAW_SUCCESS)
+		{
+			goto end;
+		}
+
+		DEBUG_INFO
+		ret = RawProcessor->unpack();
+		if (ret != LIBRAW_SUCCESS)
+		{
+			goto end;
+		}
+		DEBUG_INFO
+		ret = RawProcessor->dcraw_process();
+		if (ret != LIBRAW_SUCCESS)
+		{
+			goto end;
+		}
+		DEBUG_INFO
+
+		image = RawProcessor->dcraw_make_mem_image(&ret);
 	}
-	DEBUG_INFO
-	ret = RawProcessor->unpack();
-	if (ret != LIBRAW_SUCCESS)
+	catch (...)
 	{
-		goto end;
+		// Do nothing, just leave image as null
 	}
-	DEBUG_INFO
-    ret = RawProcessor->dcraw_process();
-	if (ret != LIBRAW_SUCCESS)
-	{
-		goto end;
-	}
-	DEBUG_INFO
-	image = RawProcessor->dcraw_make_mem_image(&ret);
-    if (image == NULL)
+
+	if (image == NULL)
     {
-    	image_is_null = true;
 		goto end;
     }
 
@@ -433,6 +438,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBit
 	DEBUG_INFO
 
 end:
+	delete oc;
 	DEBUG_INFO
 	if (image != NULL) LibRaw::dcraw_clear_mem(image);
 	DEBUG_INFO
@@ -440,12 +446,12 @@ end:
 	DEBUG_INFO
 	env->ReleaseStringUTFChars(filename, fn);
 	DEBUG_INFO
-	if (ret != LIBRAW_SUCCESS && !image_is_null)
+	if (ret != LIBRAW_SUCCESS && image != NULL)
 	{
 		DEBUG_INFO
 		throw_libraw_exception(env, ret);
 	}
-	else if (image_is_null)
+	else if (image == NULL)
 	{
 		DEBUG_INFO
 		printf("Image is null");
