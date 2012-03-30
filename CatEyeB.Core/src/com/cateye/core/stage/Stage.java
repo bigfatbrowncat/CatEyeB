@@ -31,6 +31,11 @@ class Stage implements IStage
 		}
 	};
 	
+	protected void invokeOnProgress(float progress)
+	{
+		// TODO incomplete
+	}
+	
 	protected Image image;
 	
 	protected IPreciseBitmap originalBitmap;

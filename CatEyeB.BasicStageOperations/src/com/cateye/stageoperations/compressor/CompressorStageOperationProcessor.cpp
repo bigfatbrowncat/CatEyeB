@@ -803,9 +803,9 @@ void Compress(PreciseBitmap bmp, double curve, double noise_gate, double pressur
 	DEBUG_INFO
 
 	// Solving Poisson equation Delta I = div G
-	arr2<float> I(Phi.getWidth(), Phi.getHeight());
-	SolvePoissonNeiman(I, div_G, steps_max, epsilon);
-	//arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
+	//arr2<float> I(Phi.getWidth(), Phi.getHeight());
+	//SolvePoissonNeiman(I, div_G, steps_max, epsilon);
+	arr2<float> I = SolvePoissonNeimanMultiLattice(div_G, steps_max, epsilon);
 
 	DEBUG_INFO
 

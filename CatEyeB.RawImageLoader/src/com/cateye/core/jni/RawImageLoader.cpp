@@ -373,7 +373,7 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBit
 	DEBUG_INFO
 
 
-	try
+//	try
 	{
 		RawProcessor->set_progress_handler(my_raw_processing_callback, oc);
 
@@ -400,10 +400,10 @@ JNIEXPORT jobject JNICALL Java_com_cateye_core_jni_RawImageLoader_loadPreciseBit
 
 		image = RawProcessor->dcraw_make_mem_image(&ret);
 	}
-	catch (...)
+/*	catch (...)
 	{
 		// Do nothing, just leave image as null
-	}
+	}*/
 
 	if (image == NULL)
     {
@@ -446,17 +446,17 @@ end:
 	DEBUG_INFO
 	env->ReleaseStringUTFChars(filename, fn);
 	DEBUG_INFO
-	if (ret != LIBRAW_SUCCESS && image != NULL)
+	if (ret != LIBRAW_SUCCESS)
 	{
 		DEBUG_INFO
 		throw_libraw_exception(env, ret);
 	}
-	else if (image == NULL)
+/*	else if (image == NULL)
 	{
 		DEBUG_INFO
 		printf("Image is null");
 		return NULL;
-	}
+	}*/
 	DEBUG_INFO
 	return preciseBitmap;
 }

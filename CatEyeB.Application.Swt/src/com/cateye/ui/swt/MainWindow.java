@@ -111,7 +111,7 @@ public class MainWindow
 		limiterStageOperation.setPower(5);
 		
 		IStage stage = stageFactory.create();
-		//stage.addStageOperation(downsampleStageOperation);
+		stage.addStageOperation(downsampleStageOperation);
 		stage.addStageOperation(hsbStageOperation);
 		stage.addStageOperation(rgbStageOperation);
 		stage.addStageOperation(compressorStageOperation);
@@ -124,7 +124,7 @@ public class MainWindow
 			@Override
 			public boolean invoke(Object arg0, float arg1) {
 				System.out.println(arg1);
-				return true;
+				return true;	// false means 'cancel'
 			}
 		});
 		
