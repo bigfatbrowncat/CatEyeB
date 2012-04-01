@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="src" path="/CatEyeB.RawImageLoader"/>
+	<classpathentry exported="true" kind="src" path="/CatEyeB.PpmImageSaver"/>
+	<classpathentry exported="true" kind="src" path="/CatEyeB.BasicStageOperations"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CatEyeB.Core"/>
+	<classpathentry kind="lib" path="/ExternalLibs/lib/swt-debug.jar"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/CatEyeB.UI.SwtImageViewer"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
@@ -7,12 +13,6 @@
 	<classpathentry kind="lib" path="/ExternalLibs/lib/guice-multibindings-3.0.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/javax.inject.jar"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/mockito-all-1.9.0.jar"/>
-	<classpathentry kind="src" path="/CatEyeB.RawImageLoader"/>
-	<classpathentry kind="src" path="/CatEyeB.PpmImageSaver"/>
-	<classpathentry kind="src" path="/CatEyeB.BasicStageOperations"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.Core"/>
-	<classpathentry kind="lib" path="/ExternalLibs/lib/swt-debug.jar"/>
-	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.UI.SwtImageViewer"/>
+	<classpathentry kind="lib" path="/target/bin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
