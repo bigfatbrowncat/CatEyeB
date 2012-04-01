@@ -26,14 +26,14 @@ import org.xml.sax.SAXException;
 
 public class Scale extends Canvas
 {
-	static class SkinElement
+	static class SkinTexturePart
 	{
 		private Image skin;
 		private Integer left, top, width, height, baseline;
 		
-		public static SkinElement loadFromNode(Node node, int height, int baseline)
+		public static SkinTexturePart loadFromNode(Node node, int height, int baseline)
 		{
-			SkinElement res = new SkinElement();
+			SkinTexturePart res = new SkinTexturePart();
 			res.left = Integer.parseInt(node.getAttributes().getNamedItem("left").getNodeValue());
 			res.top = Integer.parseInt(node.getAttributes().getNamedItem("top").getNodeValue());
 			res.width = Integer.parseInt(node.getAttributes().getNamedItem("width").getNodeValue());
@@ -72,13 +72,13 @@ public class Scale extends Canvas
 
 	}
 	
-	static class ScaleSkinElement
+	static class ResizingSkinElement
 	{
 		public Integer height, baseline;
-		public SkinElement leftSide, rangeZone, rightSide;
-		public static ScaleSkinElement loadFromNode(Node node)
+		public SkinTexturePart leftSide, rangeZone, rightSide;
+		public static ResizingSkinElement loadFromNode(Node node)
 		{
-			ScaleSkinElement res = new ScaleSkinElement();
+			ResizingSkinElement res = new ResizingSkinElement();
 			
 			res.height = Integer.parseInt(node.getAttributes().getNamedItem("height").getNodeValue());
 			res.baseline = Integer.parseInt(node.getAttributes().getNamedItem("baseline").getNodeValue());
@@ -88,15 +88,15 @@ public class Scale extends Canvas
 				Node baseItem = node.getChildNodes().item(i2);
 				if (baseItem.getNodeName().equals("leftside"))
 				{
-					res.leftSide = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+					res.leftSide = SkinTexturePart.loadFromNode(baseItem, res.height, res.baseline);
 				}
 				else if (baseItem.getNodeName().equals("rangezone"))
 				{
-					res.rangeZone = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+					res.rangeZone = SkinTexturePart.loadFromNode(baseItem, res.height, res.baseline);
 				}
 				else if (baseItem.getNodeName().equals("rightside"))
 				{
-					res.rightSide = SkinElement.loadFromNode(baseItem, res.height, res.baseline);
+					res.rightSide = SkinTexturePart.loadFromNode(baseItem, res.height, res.baseline);
 				}
 			}
 			
@@ -129,7 +129,7 @@ public class Scale extends Canvas
 	
 	private Color foreColor, backColor;
 	
-	private ScaleSkinElement baseSkinElement, markerSkinElement;
+	private ResizingSkinElement baseSkinElement, markerSkinElement;
 	
 	private void makeSkin(Device device, int foreR, int foreG, int foreB, int backR, int backG, int backB)
 	{
@@ -308,11 +308,11 @@ public class Scale extends Canvas
 				}
 				else if (scaleItem.getNodeName().equals("base"))
 				{
-					baseSkinElement = ScaleSkinElement.loadFromNode(scaleItem);
+					baseSkinElement = ResizingSkinElement.loadFromNode(scaleItem);
 				}
 				else if (scaleItem.getNodeName().equals("marker"))
 				{
-					markerSkinElement = ScaleSkinElement.loadFromNode(scaleItem);
+					markerSkinElement = ResizingSkinElement.loadFromNode(scaleItem);
 				}
 			}
 		}

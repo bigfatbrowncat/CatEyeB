@@ -10,8 +10,9 @@
 	<classpathentry kind="src" path="/CatEyeB.RawImageLoader"/>
 	<classpathentry kind="src" path="/CatEyeB.PpmImageSaver"/>
 	<classpathentry kind="src" path="/CatEyeB.BasicStageOperations"/>
-	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.Core"/>
 	<classpathentry kind="lib" path="/ExternalLibs/lib/swt-debug.jar"/>
+	<classpathentry kind="lib" path="/target/bin" sourcepath="/CatEyeB.Core/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/CatEyeB.UI.SwtImageViewer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

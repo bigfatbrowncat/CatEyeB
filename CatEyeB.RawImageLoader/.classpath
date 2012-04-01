@@ -8,6 +8,5 @@
 	<classpathentry kind="lib" path="/ExternalLibs/lib/mockito-all-1.9.0.jar"/>
 	<classpathentry kind="src" path="/CatEyeB.Core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="/target/bin"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
